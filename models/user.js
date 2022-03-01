@@ -16,10 +16,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      masterBadge: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-      },
       statusMsg: {
         type: DataTypes.STRING(25),
         allowNull: false,
