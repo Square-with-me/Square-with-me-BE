@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (db) => {
     db.User.belongsToMany(db.Badge, { through: "UserBadge", onDelete: "CASCADE" });
     db.User.hasOne(db.WeekRecord, { onDelete: "CASCADE" });
+    db.User.hasOne(db.MonthRecord, { onDelete: "CASCADE" });
     db.User.belongsTo(db.Badge, { foreignKey: "masterBadgeId" });
     db.User.belongsToMany(db.Room, { through: "Participant", as: "Participating", onDelete: "CASCADE" });
   };
