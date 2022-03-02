@@ -23,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Badge.associate = (db) => {
-    db.Badge.belongsToMany(db.User, { through: "UserBadge", });
-    db.Badge.hasMany(db.User, { foreignKey: "masterBadgeId" })
+    db.Badge.belongsToMany(db.User, { through: "UserBadge", as: "Challengers" });
+    db.Badge.hasMany(db.User, { as: "MasterBadge", foreignKey: "masterBadgeId" })
   };
 
   return Badge;
