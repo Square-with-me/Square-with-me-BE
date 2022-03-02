@@ -1,19 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const passport = require("passport");
 
 // controllers
+const AuthController = require("../controllers/authController");
 const UserController = require("../controllers/userController");
 const RoomController = require("../controllers/roomController");
 
 // middlewares
 const middleware = require("../utils/middleware");
 
+// api/auth
+router.post("/auth/local", AuthController.local);   // 회원가입
+router.get("/auth/anonymous");   // 비회원 로그인
+router.get("/auth/kakao/callback", AuthController.kakao);   // 카카오 로그인 콜백
+
 // api/user
-router.post("/user/new", UserController.create.auth);   // 회원가입
 router.post("/user", UserController.get.auth);   // 로그인
-router.delete("/user");   // 로그아웃
-router.get("/user/anonymous");   // 비회원 로그인
 router.get("/user/me", middleware.auth, UserController.get.user);   // 로그인 유저 정보 가져오기
+router.delete("/user");   // 로그아웃
 
 // api/room
 router.post("/room/new");   // POST /api/room/new
