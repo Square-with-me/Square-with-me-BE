@@ -1,6 +1,4 @@
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-dotenv.config();
 
 // models
 const { User, Badge } = require("../models");
@@ -25,11 +23,11 @@ module.exports = {
     };
 
     try {
-      const { email } = jwt.verify(value, process.env.JWT_SECRET_KEY);
+      const { origin } = jwt.verify(value, process.env.JWT_SECRET_KEY);
 
       const user = await User.findOne({
-        where: { email },
-        attributes: ["id", "email", "nickname", "statusMsg"],
+        where: { origin },
+        attributes: ["id", "origin", "nickname", "profileImg", "statusMsg"],
         include: [{
           model: Badge,
           as: "MasterBadge",
