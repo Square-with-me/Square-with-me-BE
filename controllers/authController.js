@@ -70,10 +70,12 @@ module.exports = {
 
   kakao: (req, res, next) => {
     passport.authenticate("kakao",
-      { failureRedirect: "/" },
-      (error, user, info) => {
+      (error, user) => {
         if(error) {
-          return next(error);
+          return res.status(500).json({
+            isSuccess: false,
+            msg: "카카오 로그인 오류",
+          });
         };
 
         const { origin } = user;
@@ -87,6 +89,6 @@ module.exports = {
           }
         });
       }
-    )(req, res, next);
+    )(req, res, next);  // 미들웨어 확장
   },
 };

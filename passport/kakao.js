@@ -29,6 +29,8 @@ module.exports = () => {
           });
           if(exUser) {
             return done(null, exUser);
+            // done(서버 에러, 성공)
+            // done(null, success)는 AuthController.kakao의 (error, user)로 넘어가게 됨
           };
 
           const newUser = await User.create({
