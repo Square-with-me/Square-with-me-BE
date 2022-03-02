@@ -25,8 +25,9 @@
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
+    "passport": "^0.5.2",
+    "passport-kakao": "^1.0.1",
     "pm2": "^5.2.0",
-    "qs": "^6.10.3",
     "sequelize": "^6.17.0",
     "socket.io": "^4.4.1"
   }
