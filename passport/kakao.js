@@ -20,7 +20,7 @@ module.exports = () => {
               origin: profile.id,
               type: "kakao",
             },
-            attributes: ["id", "origin", "nickname", "profileImg", "statusMsg"],
+            attributes: ["id", "origin", "nickname", "profileImg", "statusMsg", "type"],
             include: [{
               model: Badge,
               as: "MasterBadge",
