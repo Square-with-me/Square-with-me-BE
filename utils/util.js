@@ -1,3 +1,5 @@
+const { v4 } = require("uuid");
+
 module.exports = {
   regex: {
     checkEmail: (email) => {
@@ -49,4 +51,7 @@ module.exports = {
     return msgs[randomIdx];
   },
 
+  createAnonOrigin: () => {
+    return v4();
+  }
 };
