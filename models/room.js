@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       pwd: {
         type: DataTypes.STRING(100),
         allowNull: true,
-      }
+      },
+      masterUserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       charset: 'utf8',
