@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       nickname: {
         type: DataTypes.STRING(12),
-        unique: true,
+        unique: false,
         allowNull: false,
       },
       pwd: {
