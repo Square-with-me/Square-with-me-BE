@@ -20,6 +20,13 @@ db.sequelize.sync()
 // static
 app.use("/", express.static(path.join(__dirname, "public")));
 
+const dotenv = require("dotenv");
+dotenv.config();
+
+const passportconfig = require('./passport/kakao');
+passportconfig();
+
+
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
