@@ -10,7 +10,7 @@ const {
 } = require("../utils/util");
 
 // models
-const { User } = require("../models");
+const { User, Badge } = require("../models");
 
 module.exports = {
   create: {
