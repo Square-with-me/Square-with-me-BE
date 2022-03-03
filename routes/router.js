@@ -17,6 +17,11 @@ router.get("/auth/kakao/callback", AuthController.kakao);   // 카카오 로그�
 // api/user
 router.post("/user", UserController.get.auth);   // 로그인
 router.get("/user/me", middleware.auth, UserController.get.user);   // 로그인 유저 정보 가져오기
+
+router.patch("/user/:userId/profile/img", middleware.auth, UserController.update.profileImg);   // 프로필 사진 수정
+router.patch("/user/:userId/profile/nickname", middleware.auth, UserController.update.nickname);   // 닉네임 수정
+router.patch("/user/:userId/profile/statusMsg", middleware.auth, UserController.update.statusMsg);   // 상태 메시지 수정
+
 router.delete("/user");   // 로그아웃
 
 // api/room
