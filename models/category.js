@@ -7,10 +7,6 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
       },
-      desc: {
-        type: DataTypes.STRING(40),
-        allowNull: false,
-      }
     },
     {
       charset: 'utf8',
