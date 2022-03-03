@@ -16,14 +16,7 @@ module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
       const { origin, nickname, pwd } = req.body;
-    
-      if(pwd.length < 8 || pwd.length > 16) {
-        return res.status(400).json({
-          isSuccess: false,
-          msg: "비밀번호가 올바르지 않습니다.",
-        });
-      };
-  
+
       if(!regex.checkEmail(origin)) {
         return res.status(400).json({
           isSuccess: false,
@@ -34,7 +27,7 @@ module.exports = {
       if(nickname.length < 2 || nickname.length > 8) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "상태 메시지는 1글자 ~ 20글자로 적어주세요."
+          msg: "닉네임은 2글자 ~ 8글자로 적어주세요."
         });
       };
   
@@ -42,6 +35,13 @@ module.exports = {
         return res.status(400).json({
           isSuccess: false,
           msg: "닉네임에 특수문자를 사용할 수 없습니다.",
+        });
+      };
+
+      if(pwd.length < 8 || pwd.length > 16) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "비밀번호가 올바르지 않습니다.",
         });
       };
   
