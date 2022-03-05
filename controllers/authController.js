@@ -10,7 +10,7 @@ const {
 } = require("../utils/util");
 
 // models
-const { User, Badge } = require("../models");
+const { User, Badge, WeekRecord, MonthRecord } = require("../models");
 
 module.exports = {
   create: {
@@ -66,13 +66,26 @@ module.exports = {
       };
   
       const hashedPwd = bcrypt.hashSync(pwd, 10);
-      await User.create({
+      const user = await User.create({
         origin,
         nickname,
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
       });
+
+      // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
+      await WeekRecord.create({
+        userId: user.id,
+      });
+
+      for(let i = 1; i <= 31; i++) {
+        await MonthRecord.create({
+          userId: user.id,
+          date: i,
+          time: 0,
+        });
+      };
   
       return res.status(201).json({
         isSuccess: true,
@@ -92,7 +105,20 @@ module.exports = {
 
           const { origin } = user;
           const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
-  
+
+          // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
+          await WeekRecord.create({
+            userId: user.id,
+          });
+
+          for(let i = 1; i <= 31; i++) {
+            await MonthRecord.create({
+              userId: user.id,
+              date: i,
+              time: 0,
+            });
+          };
+
           res.json({
             isSuccess: true,
             data: {
