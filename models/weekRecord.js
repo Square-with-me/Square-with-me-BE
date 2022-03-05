@@ -3,44 +3,56 @@ module.exports = (sequelize, DataTypes) => {
     "weekRecord",
     {
       mon: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       tue: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       wed: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       thur: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       fri: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       sat: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       sun: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
-      do: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+      beauty: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
-      share: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+      sports: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
-      talk: {
-        type: DataTypes.STRING(10),
-        default: "00-00-00",
+      study: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      counsel: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      culture: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      etc: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       }
     },
     {
