@@ -2,18 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const MonthRecord = sequelize.define(
     'monthRecord',
     {
-      title: {
-        type: DataTypes.STRING(30),
-        unique: true,
-        allowNull: false,
+      date: {
+        type: DataTypes.INTEGER,
       },
-      isSecret: {
-        type: DataTypes.BOOLEAN,
-        default: false,
-      },
-      pwd: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
+      time: {
+        type: DataTypes.INTEGER,
       }
     },
     {
