@@ -53,5 +53,25 @@ module.exports = {
 
   createAnonOrigin: () => {
     return v4();
-  }
+  },
+
+  // 해당 날짜의 요일 가져오기
+  getDay: (date) => {
+    const map = {
+      0: "sun",
+      1: "mon",
+      2: "tue",
+      3: "wed",
+      4: "thur",
+      5: "fri",
+      6: "sat",
+    };
+
+    let fullDate = new Date();
+    fullDate.setDate(date);  // date(ex: 23일이면 23) 넣으면 해당 날짜로 설정
+
+    let day = map[fullDate.getDay()];  // 해당 날짜의 요일 가져와서 문자로 치환
+
+    return day;
+  },
 };
