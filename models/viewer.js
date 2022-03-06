@@ -6,10 +6,6 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.INTEGER,
           allowNull: true,
         },
-        anonUserId: {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-        }
       },
       {
         charset: 'utf8',
