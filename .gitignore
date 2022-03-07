@@ -10,5 +10,8 @@ node_modules/
 # dotenv environment variable files
 .env
 
+#public
+public/
+
 # etc
 .DS_Store
