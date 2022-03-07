@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
+const fs = require("fs");
 
 const app = express();
 
@@ -16,6 +17,14 @@ db.sequelize.sync()
   .catch((error) => {
     console.error(error);
   });
+
+// public 폴더 생성
+try {
+  fs.accessSync('public');
+} catch(error) {
+  console.log('public 폴더가 없습니다. 새로 생성합니다.');
+  fs.mkdirSync('public');
+};
 
 // static
 app.use("/", express.static(path.join(__dirname, "public")));
