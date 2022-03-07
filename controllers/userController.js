@@ -1,11 +1,8 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
 // utils
 const { asyncWrapper, regex } = require("../utils/util");
 
 // models
-const { User, Badge } = require("../models");
+const { User, Badge, WeekRecord, MonthRecord } = require("../models");
 
 module.exports = {
   create: {
@@ -124,6 +121,41 @@ module.exports = {
         data: {
           user,
         }
+      });
+    }),
+    
+    // 보유한 뱃지 정보 가져오기는 아직 보류
+    badges: asyncWrapper(async (req, res) => {
+      const { userId } = res.params;
+
+      return res.status(200).json({
+        isSuccess: true,
+        // data:
+      });
+    }),
+
+    records: asyncWrapper(async (req, res) => {
+      const { userId } = res.params;
+
+      // 주간 기록 가져오기
+      const weekRecord = await WeekRecord.findOne({
+        where: { userId },
+        attributes: { exclude: ["id", "createdAt", "updatedAt"] },
+      });
+
+      // 월간 기록 가져오기
+      const monthRecord = await MonthRecord.findAll({
+        where: { userId },
+        attributes: ["date", "time"],
+        order: [ ["date"] ],
+      });
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: {
+          weekRecord,
+          monthRecord,
+        },
       });
     }),
   },
