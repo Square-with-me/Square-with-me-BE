@@ -1,4 +1,6 @@
 const { v4 } = require("uuid");
+const multer = require("multer");
+const path = require("path");
 
 module.exports = {
   regex: {
@@ -74,4 +76,18 @@ module.exports = {
 
     return day;
   },
+
+  localUpload: multer({
+    storage: multer.diskStorage({
+      destination(req, file, done) {
+        done(null, "public");
+      },
+      filename(req, file, done) {
+        const ext = path.extname(file.originalname);   // 확장자 추출(.png)
+        const basename = path.basename(file.originalname, ext);  // 파일 이름 추출
+        done(null, basename + "_" + new Date().getTime() + ext);  // 이름_130918231.png
+      },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 },
+  }),
 };

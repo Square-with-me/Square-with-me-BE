@@ -6,6 +6,9 @@ const AuthController = require("../controllers/authController");
 const UserController = require("../controllers/userController");
 const RoomController = require("../controllers/roomController");
 
+// utils
+const { localUpload } = require("../utils/util");
+
 // middlewares
 const middleware = require("../utils/middleware");
 
@@ -18,6 +21,9 @@ router.delete("/auth/:type", middleware.auth, AuthController.delete.auth);   // 
 
 // api/user
 router.get("/user/me", middleware.auth, UserController.get.user);   // 로그인 유저 정보 가져오기
+
+router.get("/user/:userId/badges", middleware.auth, UserController.get.badges);   // 보유한 뱃지 목록 가져오기
+router.get("/user/:userId/records", middleware.auth, UserController.get.records);   // 네모와 함께한 시간 가져오기
 
 router.patch("/user/:userId/profile/img", middleware.auth, UserController.update.profileImg);   // 프로필 사진 수정
 router.patch("/user/:userId/profile/nickname", middleware.auth, UserController.update.nickname);   // 닉네임 수정
@@ -34,5 +40,10 @@ router.delete("/room/:roomId/like", middleware.auth, RoomController.delete.like)
 // api/rooms
 router.get("/rooms", RoomController.get.rooms);   // 방 목록 불러오기
 router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms);   // 방 목록 불러오기
+
+// /api/upload
+router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
+  res.json(req.file.filename);
+});   // 이미지 업로드
 
 module.exports = router;

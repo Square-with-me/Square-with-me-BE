@@ -95,7 +95,7 @@ module.exports = {
   
     kakao: (req, res, next) => {
       passport.authenticate("kakao",
-        async (error, user) => {
+        asyncWrapper(async (error, user) => {
           if(error) {
             return res.status(500).json({
               isSuccess: false,
@@ -126,7 +126,7 @@ module.exports = {
               user,
             }
           });
-        }
+        })
       )(req, res, next);  // 미들웨어 확장
     },
 
