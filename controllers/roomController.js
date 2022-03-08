@@ -1,6 +1,7 @@
-// models
 const { Op } = require("sequelize");
-const { Room, Tag, Category, User, Viewer, WeekRecord, MonthRecord } = require("../models");
+
+// models
+const { Room, Tag, Category, User, Viewer, WeekRecord, MonthRecord, Like } = require("../models");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
@@ -12,10 +13,10 @@ module.exports = {
       const { title, isSecret, pwd, categoryId, tags } = req.body;
 
       // 이미 존재하는 방 제목인지 확인
-      const isExistTile = await Room.findOne({
+      const isExistTitle = await Room.findOne({
         where: { title },
       });
-      if(isExistTile) {
+      if(isExistTitle) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이미 존재하는 방 제목입니다.",
@@ -42,7 +43,7 @@ module.exports = {
 
       const fullRoom = await Room.findOne({
         where: { id: newRoom.id },
-        attributes: ["id", "title", "isSecret", "pwd", "masterUserId"],
+        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -125,6 +126,41 @@ module.exports = {
           break;
       };
     }),
+
+    like: asyncWrapper(async (req, res) => {
+      const { roomId } = req.params;
+      const { id: userId } = res.locals.user;
+
+      const [like, isFirst] = await Like.findOrCreate({  // 좋아요 목록에 없으면 생성
+        where: {
+          roomId: roomId,
+          likedId: userId,
+        },
+        defaults: {
+          likedId: userId,
+        }
+      });
+      if(!isFirst) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "이미 좋아요를 눌렀습니다.",
+        });
+      };
+
+      const room = await Room.findOne({
+        where: { id: roomId },
+      });
+
+      await room.increment("likeCnt");  // 좋아요 수 +1
+
+      return res.status(201).json({
+        isSuccess: true,
+        data: {
+          isLiking: true,
+          likeCnt: room.likeCnt + 1, 
+        }
+      })
+    }),
   },
 
   update: {
@@ -136,14 +172,9 @@ module.exports = {
       const { q: query } = req.query;
 
       switch(query) {
-        case "hot":
-          // 보류
-          break;
-
-        case "all":
-          // 전체 방 목록 가져오기
-          const wholRooms = await Room.findAll({
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt"],
+        case "hot":  // 인기 방 목록 가져오기
+          const hotRooms = await Room.findAll({
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -153,38 +184,61 @@ module.exports = {
               attributes: ["id", "name"],
               through: { attributes: [] },
             }],
+            order: [ ["likes", "desc"] ],
+          });
+
+          res.status(200).json({
+            isSuccess: true,
+            data: hotRooms,
+          })
+          break;
+
+        case "all":
+          // 전체 방 목록 가져오기
+          const wholeRooms = await Room.findAll({
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+            include: [{
+              model: Category,
+              attributes: ["id", "name"],
+            }, {
+              model: Tag,
+              as: "Tags",
+              attributes: ["id", "name"],
+              through: { attributes: [] },
+            }],
+            order: [ ["createdAt", "desc"] ],
           });
           
           res.status(200).json({
             isSuccess: true,
-            data: wholRooms,
+            data: wholeRooms,
           });
           break;
 
-          default:
-            // 검색어로 검색하는 경우
-            // 비슷한 방 제목 목록 가져오기
-            const rooms = await Room.findAll({
-              where: {
-                title: { [Op.like]: `%${query}%` }
-              },
-              attributes: ["id", "title", "isSecret", "pwd", "createdAt"],
-              include: [{
-                model: Category,
-                attributes: ["id", "name"],
-              }, {
-                model: Tag,
-                as: "Tags",
-                attributes: ["id", "name"],
-                through: { attributes: [] },
-              }],
-            });
-
-            res.status(200).json({
-              isSuccess: true,
-              data: rooms,
-            });
-            break;
+        default:
+          // 검색어로 검색하는 경우
+          // 비슷한 방 제목 목록 가져오기
+          const rooms = await Room.findAll({
+            where: {
+              title: { [Op.like]: `%${query}%` }
+            },
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+            include: [{
+              model: Category,
+              attributes: ["id", "name"],
+            }, {
+              model: Tag,
+              as: "Tags",
+              attributes: ["id", "name"],
+              through: { attributes: [] },
+            }],
+            order: [ ["createdAt", "desc"] ],
+          });
+          res.status(200).json({
+            isSuccess: true,
+            data: rooms,
+          });
+          break;
       };
     }),
     
@@ -194,7 +248,7 @@ module.exports = {
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
-        attributes: ["id", "title", "isSecret", "pwd", "createdAt"],
+        attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -204,6 +258,7 @@ module.exports = {
           attributes: ["id", "name"],
           through: { attributes: [] },
         }],
+        order: [ ["createdAt", "desc"] ],
       });
 
       return res.status(200).json({
@@ -300,6 +355,44 @@ module.exports = {
 
       res.status(200).json({
         isSuccess: true,
+      });
+    }),
+
+    like: asyncWrapper(async (req, res) => {
+      const { roomId } = req.params;
+      const { id: userId } = res.locals.user;
+
+      const isLiking = await Like.findOne({
+        where: {
+          roomId,
+          likedId: userId,
+        },
+      });
+      if(!isLiking) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "좋아요를 하지 않은 상태입니다.",
+        });
+      };
+
+      await Like.destroy({
+        where: {
+          roomId,
+          likedId: userId,
+        },
+      });
+
+      const room = await Room.findOne({
+        where: { id: roomId },
+      });
+      await room.decrement("likeCnt");
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: {
+          isLiking: false,
+          likeCnt: room.likeCnt - 1,
+        },
       });
     }),
   },

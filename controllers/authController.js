@@ -95,7 +95,7 @@ module.exports = {
   
     kakao: (req, res, next) => {
       passport.authenticate("kakao",
-        (error, user) => {
+        async (error, user) => {
           if(error) {
             return res.status(500).json({
               isSuccess: false,
