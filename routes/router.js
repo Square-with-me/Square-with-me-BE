@@ -34,6 +34,9 @@ router.post("/room/new", middleware.auth, RoomController.create.room);   // 방 
 router.post("/room/:roomId/user/:userId", middleware.auth, RoomController.create.participant);   // 방 참가하기
 router.delete("/room/:roomId/user/:userId", middleware.auth, RoomController.delete.participant);   // 방 나가기
 
+router.get("/room/:roomId/like", middleware.auth, RoomController.create.like);   // 좋아요
+router.delete("/room/:roomId/like", middleware.auth, RoomController.delete.like);   // 좋아요 취소
+
 // api/rooms
 router.get("/rooms", RoomController.get.rooms);   // 방 목록 불러오기
 router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms);   // 방 목록 불러오기
