@@ -135,7 +135,7 @@ module.exports = {
     }),
 
     records: asyncWrapper(async (req, res) => {
-      const { userId } = res.params;
+      const { userId } = req.params;
 
       // 주간 기록 가져오기
       const weekRecord = await WeekRecord.findOne({
