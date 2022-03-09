@@ -28,7 +28,7 @@ try {
 };
 
 // static
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use("/", express.static(path.join(__dirname, "public"))); // 운영체제에 맞춰 경로 지정하기
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -44,8 +44,8 @@ app.use(express.urlencoded({ extended: false }));
 if (process.env.NODE_ENV === "production") {
   // production 배포 상태에서 적용됨,
   app.use(morgan("combined"));
-  app.use(hpp());
-  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(hpp()); // request parameter pollution을 막기 위해 사용
+  app.use(helmet({ contentSecurityPolicy: false })); // 클라이언트 - 서버 간 중요한 정보에 대한 보안을 위해 서버에서 다양한 http header를 자동으로 설정
   app.use(
     cors({
       origin: ["*"],
