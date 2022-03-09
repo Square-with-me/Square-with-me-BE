@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const Room = sequelize.define(
-    'room',
+    "room",
     {
       title: {
         type: DataTypes.STRING(30),
@@ -14,11 +14,20 @@ module.exports = (sequelize, DataTypes) => {
       pwd: {
         type: DataTypes.STRING(100),
         allowNull: true,
-      }
+      },
+      masterUserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      likeCnt: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
-      charset: 'utf8',
-      collate: 'utf8_general_ci',
+      charset: "utf8",
+      collate: "utf8_general_ci",
     },
   );
 
@@ -27,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     db.Room.hasOne(db.Viewer, { onDelete: "CASCADE" });
     db.Room.belongsTo(db.Category);
     db.Room.belongsToMany(db.Tag, { through: "RoomTag", as: "Tags" });
+    db.Room.hasMany(db.Like, { onDelete: "CASCADE" });
   };
 
   return Room;
