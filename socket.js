@@ -1,154 +1,205 @@
 const app = require("./app");
-const sequelize = require("sequelize");
-const { Op } = sequelize; // query를 필터링하는 where 구문을 위한 operation을 줄여서 Op라 하는 것 같다.
-// where에 쓸 필터링 조건이 두개면 Op.and, or 조건으로 필터링한다면 Op.or 과 같은 식이다.
-
-// const options = {
-//   letsencrypt로 받은 인증서 경로를 입력
-// }; -> 보안을 위해 사용가능, 사용시 인증서 발급과정에 http(80번 포트)가 사용되므로 80 -> 원하는 포트 로 포트포워딩 필요!
-
 const server = require("http").createServer(app);
-
-// https 실제 배포 시 연결
-// const https = require("https").createServer(options, app);
-
-const { Room, PersonInRoom, StudyTime } = require("./models");
-
-// https 설정 시
-// const io = require("socket.io")(https, {
+const sequelize = require("sequelize");
+const { Op } = sequelize;
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
-    credentials: true,
+    // credentials: true,
   },
 });
 
-// 소켓 연결   -? 그래서 프론트랑 뭘 주고 받아야 하는데?
+// const { Room, PersonInRoom, StudyTime } = require("./models");
+
+// models
+// const room = require("./models/room");
+
+// controllers
+const RoomController = require("./controllers/roomController");
+const user = require("./models/user");
+
+//방에 몇명 있는지
+function roomSize(roomID) {
+  return io.sockets.adapter.rooms.get(roomID)?.size;
+}
+const users = {};
+const socketToRoom = {};
 io.on("connection", (socket) => {
-  let roomID;
-  let peerID;
-  let userID;
-  let nickname;
-  let streamID;
-  let statusMsg;
-
-  socket.on(
-    "join-room",
-    async (roomId, peerId, userId, nick, streamId, status) => {
-      roomID = roomId;
-      peerID = peerId;
-      userID = userId;
-      streamID = streamId;
-      statusMsg = status;
-      nickname = nick;
-      try {
-        socket.join(roomID);
-        socket
-          .to(roomID)
-          .emit("user-connected", peerID, nickname, streamID, statusMsg);
-        const users = await PersonInRoom.findAll({
-          where: {
-            roomId: roomID,
-            userId: { [Op.not]: userID },
-          },
-        });
-        socket.emit("welcome", users, users.length);
-
-        const room = await Room.findByPk(roomID);
-        const currentRound = room.currentRound;
-        const totalRound = room.round;
-        const openAt = room.openAt;
-        const now = Date.now();
-
-        socket.emit("restTime", currentRound, totalRound, openAt, now);
-      } catch (error) {
-        console.log(error);
+  // 방에 들어오면
+  socket.on("join room", async (data) => {
+    if (!data) {
+      return;
+    }
+    if (!users[data.roomID]) {
+      users[data.roomID] = {};
+      users[data.roomID].participants = [];
+      users[data.roomID].viewers = [];
+    }
+    //roomID, role
+    //asyncWrapper 쓰기
+    try {
+      //해당 방 안에 있는 사람들에게 영상공유를 할 수 있는 재료들을 건네줌
+      if (data.role === "participants") {
+        //참가자로 들어오면
+        if (users[data.roomID].participants) {
+          //이미 참가자가 있을때 배열에 push
+          if (users[data.roomID].participants.length >= 4) {
+            return alert("참가자 풀방");
+          }
+          users[data.roomID].participants.push(socket.id);
+        } else {
+          //참가자 배열이 존재하지 않으면 배열만들어주기
+          users[data.roomID].participants = [socket.id];
+        }
+      } else if (data.role === "viewers") {
+        //관전자로 들어오면
+        if (users[data.roomID].viewers) {
+          //이미 관전자가 있을때 배열에 push
+          if (users[data.roomID].viewers.length >= 5) {
+            return alert("관전자 풀방");
+          }
+          users[data.roomID].viewers.push(socket.id);
+        } else {
+          //관전자 배열이 존재하지 않으면 배열만들어주기
+          users[data.roomID].viewers = [socket.id];
+        }
+      } else {
+        return console.log("잘못된 접근");
       }
-    }
-  );
-
-  socket.on("peer", (nick) => {
-    socket.emit("peer", nick);
-  });
-
-  socket.on("endRest", async (currentRound) => {
-    const room = await Room.findByPk(roomID);
-    const openAt = Date.now() + room.studyTime * 60 * 1000;
-    await Room.update(
-      {
-        currentRound,
-        openAt,
-        isStarted: 1,
-      },
-      { where: { roomID } }
-    );
-    const now = Date.now();
-    socket.emit("studyTime", currentRound, room.round, openAt, now);
-  });
-
-  socket.on("endStudy", async () => {
-    const room = await Room.findByPk(roomID);
-    const openAt = Date.now() + room.recessTime * 60 * 1000;
-    const currentRound = room.currentRound;
-    const totalRound = room.round;
-
-    await Room.update(
-      {
-        openAt,
-        isStarted: 0,
-      },
-      { where: { roomID } }
-    );
-
-    await StudyTime.create({
-      userId: userID,
-      studyTime: room.studyTime,
-    });
-    const now = Date.now();
-    socket.emit("restTime", currentRound, totalRound, openAt, now);
-  });
-
-  socket.on("totalEnd", async () => {
-    const room = await Room.findByPk(roomID);
-    await StudyTime.create({
-      userId: userID,
-      studyTime: room.studyTime,
-    });
-    const now = Date.now();
-    const endTime = now + 60000;
-    socket.emit("totalEnd", endTime, now);
-  });
-
-  socket.on("disconnecting", async () => {
-    await PersonInRoom.destroy({
-      where: {
-        userId: userID,
-        roomId: roomID,
-      },
-    });
-
-    socket.to(roomID).emit("user-disconnected", peerID, nickname, streamID);
-
-    const PIR_list = await PersonInRoom.findAll({
-      where: {
-        roomId: roomID,
-      },
-    });
-
-    if (PIR_list.length === 0) {
-      await Room.destroy({ where: { roomId: roomID } });
+      socketToRoom[socket.id] = data.roomID; //부딪히며 이해하기
+      const participantsRoom = users[data.roomID].participants.filter(
+        (id) => id !== socket.id
+      );
+      const viewersInthisRoom = users[data.roomID].viewers.filter(
+        (id) => id !== socket.id
+      );
+      console.log(users);
+      //usersInThisRoom을 참가자와 관전자로 나눠서 관전자의 peer는 video와 audio를 false로 할 수 있게 만듬
+      //roomSize함수로 실시간 현재 총 인원을 방안에 표기함 (참가자,관전자 구분 안함)
+      socket
+        .to(data.roomID) //join을 안했는데 이게 될런지..
+        .emit(
+          "all users",
+          participantsRoom,
+          viewersInthisRoom,
+          roomSize(data.roomID)
+        );
+    } catch (error) {
+      console.log(error);
     }
   });
 
-  socket.on("message", (message) => {
-    socket.to(roomID).emit("message", nickname, message);
+  //빡빡이 따라함
+  socket.on("sending signal", (payload) => {
+    io.to(payload.userToSignal).emit("user joined", {
+      signal: payload.signal,
+      callerID: payload.callerID,
+    });
   });
 
-  socket.on("join-chatRoom", (roomId, userId, userNickname) => {
-    socket.join(roomId);
+  //빡빡이 따라함
+  socket.on("returning signal", (payload) => {
+    io.to(payload.callerID).emit("receiving returned signal", {
+      signal: payload.signal,
+      id: socket.id,
+    });
   });
+
+  //disconnecting event는 socket이 방을 떠나기 바로 직전 발생합니다!
+  // socket.on("disconnecting", () => {
+
+  //   socket.rooms.forEach((roomID) =>
+  //     socket.to(socket.id).emit("bye", socket.id, roomSize(roomID) - 1)
+  //   );
+  //   console.log("disconnecting거쳐감");
+  //   //bye에서는 작별인사하기
+  // });
+
+  socket.on("disconnect", () => {
+    const roomID = socketToRoom[socket.id];
+    users[roomID].participants = users[roomID].participants.filter(
+      (id) => id !== socket.id
+    );
+    users[roomID].viewers = users[roomID].viewers.filter(
+      (id) => id !== socket.id
+    );
+    console.log("left", users);
+    users[roomID].participants.forEach((participant) =>
+      socket.to(participant).emit("bye", socket.id, roomSize(roomID))
+    );
+  });
+
+  ///////아마 채팅기능///////
+  //   socket.on("message", (message) => {
+  //     socket.to(roomID).emit("message", nickname, message);
+  //   });
+
+  //   socket.on("join-chatRoom", (roomId, userId, userNickname) => {
+  //     socket.join(roomId);
+  //   });
 });
 
-// https 연결 시
-// module.exports = { server, https };
+//////////////////빡빡쓰///////////////
+// const users = {};
+
+// const socketToRoom = {};
+
+// io.on('connection', socket => {
+//   socket.on("join room", roomID => {
+//       if (users[roomID]) {
+//           const length = users[roomID].length;
+//           if (length === 4) {
+//               socket.emit("room full");
+//               return;
+//           }
+//           users[roomID].push(socket.id);
+//       } else {
+//           users[roomID] = [socket.id];
+//       }
+//       socketToRoom[socket.id] = roomID;
+//       console.log(socketToRoom);
+//       const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+
+//       socket.emit("all users", usersInThisRoom);
+//   });
+
+//   socket.on("sending signal", payload => {
+//       io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+//   });
+
+//   socket.on("returning signal", payload => {
+//       io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+//   });
+
+//   socket.on('disconnect', () => {
+//       const roomID = socketToRoom[socket.id];
+//       let room = users[roomID];
+//       if (room) {
+//           room = room.filter(id => id !== socket.id);
+//           users[roomID] = room;
+//       }
+//   });
+
+// });
+
 module.exports = { server };
+
+// 카메라 바꾸는거 (프론트)
+// async function getCameras() {
+//   try {
+//       const devies = await navigator.mediaDevices.enumerateDevices();
+//       const cameras = devies.filter((device) => device.kind === 'videoinput');
+//       const currentCamera = myStream.getVideoTracks()[0];
+//       cameras.forEach((camera) => {
+//           const option = document.createElement('option');
+//           option.value = camera.deviceId;
+//           option.innerText = camera.label;
+//           if (currentCamera.label === camera.label) {
+//               option.selected = true;
+//           }
+//           camerasSelect.appendChild(option);
+//       });
+//   } catch (e) {
+//       console.log(e);
+//   }
+// }
