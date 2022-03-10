@@ -9,14 +9,12 @@ const io = require("socket.io")(server, {
   },
 });
 
-// const { Room, PersonInRoom, StudyTime } = require("./models");
 
 // models
 // const room = require("./models/room");
-
-// controllers
-const RoomController = require("./controllers/roomController");
 const user = require("./models/user");
+
+
 
 //방에 몇명 있는지
 function roomSize(roomID) {
@@ -27,7 +25,7 @@ const socketToRoom = {};
 io.on("connection", (socket) => {
   // 방에 들어오면
   socket.on("join room", async (data) => {
-    if (!data) {
+    if (!data || !data.role || !data.roomID) {
       return;
     }
     if (!users[data.roomID]) {
@@ -38,6 +36,7 @@ io.on("connection", (socket) => {
     //roomID, role
     //asyncWrapper 쓰기
     try {
+
       //해당 방 안에 있는 사람들에게 영상공유를 할 수 있는 재료들을 건네줌
       if (data.role === "participants") {
         //참가자로 들어오면
@@ -66,6 +65,8 @@ io.on("connection", (socket) => {
       } else {
         return console.log("잘못된 접근");
       }
+      socket.join(data.roomID);
+      console.log(io.sockets.adapter.rooms)
       socketToRoom[socket.id] = data.roomID; //부딪히며 이해하기
       const participantsRoom = users[data.roomID].participants.filter(
         (id) => id !== socket.id
@@ -73,16 +74,17 @@ io.on("connection", (socket) => {
       const viewersInthisRoom = users[data.roomID].viewers.filter(
         (id) => id !== socket.id
       );
-      console.log(users);
+      console.log(participantsRoom)
+      // console.log(users);
       //usersInThisRoom을 참가자와 관전자로 나눠서 관전자의 peer는 video와 audio를 false로 할 수 있게 만듬
       //roomSize함수로 실시간 현재 총 인원을 방안에 표기함 (참가자,관전자 구분 안함)
-      socket
-        .to(data.roomID) //join을 안했는데 이게 될런지..
+      // socket.to(data.roomID)  //roomID안에 모든사람(나 자신 제외)
+      io.sockets.in(data.roomID)  //roomID안에 모든사람 (나 자신 포함)
+      // socket
         .emit(
-          "all users",
+          "room users",
           participantsRoom,
           viewersInthisRoom,
-          roomSize(data.roomID)
         );
     } catch (error) {
       console.log(error);
@@ -95,6 +97,7 @@ io.on("connection", (socket) => {
       signal: payload.signal,
       callerID: payload.callerID,
     });
+    console.log(payload)
   });
 
   //빡빡이 따라함
@@ -116,7 +119,13 @@ io.on("connection", (socket) => {
   // });
 
   socket.on("disconnect", () => {
+    
     const roomID = socketToRoom[socket.id];
+    if (!users[roomID]) {
+      users[roomID] = {};
+      users[roomID].participants = [];
+      users[roomID].viewers = [];
+    }
     users[roomID].participants = users[roomID].participants.filter(
       (id) => id !== socket.id
     );
