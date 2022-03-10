@@ -36,6 +36,7 @@ io.on("connection", (socket) => {
     //roomID, role
     //asyncWrapper 쓰기
     try {
+      let mySocketId = socket.id;
 
       //해당 방 안에 있는 사람들에게 영상공유를 할 수 있는 재료들을 건네줌
       if (data.role === "participants") {
@@ -79,13 +80,14 @@ io.on("connection", (socket) => {
       //usersInThisRoom을 참가자와 관전자로 나눠서 관전자의 peer는 video와 audio를 false로 할 수 있게 만듬
       //roomSize함수로 실시간 현재 총 인원을 방안에 표기함 (참가자,관전자 구분 안함)
       // socket.to(data.roomID)  //roomID안에 모든사람(나 자신 제외)
-      io.sockets.in(data.roomID)  //roomID안에 모든사람 (나 자신 포함)
-      // socket
+      // io.sockets.in(data.roomID)  //roomID안에 모든사람 (나 자신 포함)
+      socket
         .emit(
           "room users",
           participantsRoom,
           viewersInthisRoom,
         );
+      socket.to(data.roomID).emit("newbie", mySocketId);
     } catch (error) {
       console.log(error);
     }
@@ -97,15 +99,16 @@ io.on("connection", (socket) => {
       signal: payload.signal,
       callerID: payload.callerID,
     });
-    console.log(payload)
+    console.log("센딩시그널콘솔 요청하는사람 ",payload.callerID,"받는사람 ", payload.userToSignal)
   });
 
-  //빡빡이 따라함
+  //빡빡이 따라함 
   socket.on("returning signal", (payload) => {
     io.to(payload.callerID).emit("receiving returned signal", {
       signal: payload.signal,
       id: socket.id,
     });
+    console.log("리터닝시그널콘솔 아까 요청한사람 ", payload.callerID)
   });
 
   //disconnecting event는 socket이 방을 떠나기 바로 직전 발생합니다!
