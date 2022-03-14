@@ -5,6 +5,7 @@ const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const fs = require("fs");
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -39,6 +40,7 @@ passportconfig();
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser())
 
 if(process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));

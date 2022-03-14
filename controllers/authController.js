@@ -1,70 +1,78 @@
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const dotenv = require("dotenv");
+dotenv.config();
 // utils
 const {
   regex,
   asyncWrapper,
-  createStatusMsg, createAnonOrigin
+  createStatusMsg,
+  createAnonOrigin,
 } = require("../utils/util");
 
 // models
-const { User, Badge, WeekRecord, MonthRecord } = require("../models");
+const {
+  User,
+  Badge,
+  WeekRecord,
+  MonthRecord,
+  RefreshToken,
+} = require("../models");
 
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
       const { origin, nickname, pwd } = req.body;
 
-      if(!regex.checkEmail(origin)) {
+      if (!regex.checkEmail(origin)) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이메일 형식이 올바르지 않습니다.",
         });
-      };
-  
-      if(nickname.length < 2 || nickname.length > 8) {
+      }
+
+      if (nickname.length < 2 || nickname.length > 8) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "닉네임은 2글자 ~ 8글자로 적어주세요."
+          msg: "닉네임은 2글자 ~ 8글자로 적어주세요.",
         });
-      };
-  
-      if(!regex.checkNickname(nickname)) {
+      }
+
+      if (!regex.checkNickname(nickname)) {
         return res.status(400).json({
           isSuccess: false,
           msg: "닉네임에 특수문자를 사용할 수 없습니다.",
         });
-      };
+      }
 
-      if(pwd.length < 8 || pwd.length > 16) {
+      if (pwd.length < 8 || pwd.length > 16) {
         return res.status(400).json({
           isSuccess: false,
           msg: "비밀번호가 올바르지 않습니다.",
         });
-      };
-  
+      }
+
       const isExistOrigin = await User.findOne({
         where: { origin },
       });
-      if(isExistOrigin) {
+      if (isExistOrigin) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이미 존재하는 이메일입니다.",
         });
-      };
-  
+      }
+
       const isExistNickname = await User.findOne({
         where: { nickname: nickname },
       });
-      if(isExistNickname) {
+      if (isExistNickname) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이미 존재하는 닉네임입니다.",
         });
-      };
-  
+      }
+
       const hashedPwd = bcrypt.hashSync(pwd, 10);
       const user = await User.create({
         origin,
@@ -79,29 +87,30 @@ module.exports = {
         userId: user.id,
       });
 
-      for(let i = 1; i <= 31; i++) {
+      for (let i = 1; i <= 31; i++) {
         await MonthRecord.create({
           userId: user.id,
           date: i,
           time: 0,
         });
-      };
-  
+      }
+
       return res.status(201).json({
         isSuccess: true,
         msg: "회원가입에 성공하였습니다.",
       });
     }),
-  
+
     kakao: (req, res, next) => {
-      passport.authenticate("kakao",
+      passport.authenticate(
+        "kakao",
         asyncWrapper(async (error, user) => {
-          if(error) {
+          if (error) {
             return res.status(500).json({
               isSuccess: false,
               msg: "카카오 로그인 오류",
             });
-          };
+          }
 
           const { origin } = user;
           const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
@@ -111,23 +120,23 @@ module.exports = {
             userId: user.id,
           });
 
-          for(let i = 1; i <= 31; i++) {
+          for (let i = 1; i <= 31; i++) {
             await MonthRecord.create({
               userId: user.id,
               date: i,
               time: 0,
             });
-          };
+          }
 
           res.json({
             isSuccess: true,
             data: {
               token,
               user,
-            }
+            },
           });
         })
-      )(req, res, next);  // 미들웨어 확장
+      )(req, res, next); // 미들웨어 확장
     },
 
     anon: asyncWrapper(async (req, res) => {
@@ -139,9 +148,12 @@ module.exports = {
         pwd: "0",
         statusMsg: "익명의 유저입니다.",
         type: "anon",
-      })
+      });
 
-      const token = jwt.sign({ origin: anonOrigin }, process.env.JWT_SECRET_KEY);
+      const token = jwt.sign(
+        { origin: anonOrigin },
+        process.env.JWT_SECRET_KEY
+      );
 
       return res.status(201).json({
         isSuccess: true,
@@ -152,54 +164,109 @@ module.exports = {
       });
     }),
   },
-  
+
   get: {
     auth: asyncWrapper(async (req, res) => {
       const { origin, pwd } = req.body;
 
-      if(!origin || !pwd) {
+      if (!origin || !pwd) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이메일 혹은 비밀번호를 입력하세요.",
         });
-      };
+      }
 
       const user = await User.findOne({
         where: { origin },
       });
-      if(!user) {
+      if (!user) {
         return res.status(400).json({
           isSuccess: false,
           msg: "존재하지 않는 이메일입니다.",
         });
-      };
+      }
 
       const pwdCheck = bcrypt.compareSync(pwd, user.pwd);
-      if(!pwdCheck) {
+      if (!pwdCheck) {
         return res.status(400).json({
           isSuccess: false,
           msg: "비밀번호가 틀렸습니다.",
         });
-      };
+      }
 
       const fullUser = await User.findOne({
         where: {
           origin,
           type: "local",
         },
-        attributes: ["id", "origin", "nickname", "profileImg", "statusMsg", "type"],
-        include: [{
-          model: Badge,
-          as: "MasterBadge",
-          attributes: ["id", "name"],
-        }],
+        attributes: [
+          "id",
+          "origin",
+          "nickname",
+          "profileImg",
+          "statusMsg",
+          "type",
+        ],
+        include: [
+          {
+            model: Badge,
+            as: "MasterBadge",
+            attributes: ["id", "name"],
+          },
+        ],
       });
-      const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
+
+      //리프레시토큰
+      const existToken = await RefreshToken.findOne({
+        userId: user.id
+      });
+      if(existToken){
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "이미 로그인 중입니다.",
+        });
+      }
+
+      const refreshToken = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: '1d',
+          issuer: "sw",
+        }
+      );
+
+      let expiredAt = new Date();
+      expiredAt.setDate(
+        expiredAt.getDate() + 1
+      );
+
+      await RefreshToken.create({
+        token: refreshToken,
+        userId: user.id,
+        expiryDate: expiredAt.getTime(),
+      });
+
+      //엑세스토큰
+      const accessToken = jwt.sign(
+        { origin: user.origin },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: '1h',
+          issuer: "sw",
+        }
+      );
+      res.cookie("accessToken", accessToken,);  //1.same site 설정 찾기
+      res.cookie("refreshToken", refreshToken, {httpOnly: true});
+      // 토큰복호화 테스트
+      const decodingToken = jwt.verify(accessToken, process.env.JWT_SECRET_KEY)
+      console.log(decodingToken)
+      console.log(accessToken)
+      console.log(refreshToken)
 
       return res.status(200).json({
         isSuccess: true,
         data: {
-          token,
           user: fullUser,
         },
       });
@@ -211,21 +278,25 @@ module.exports = {
       const { type } = req.params;
       const { id } = res.locals.user;
 
-      switch(type) {
+      switch (type) {
         case "local":
+          await RefreshToken.destroy({
+            where:{ userId:id}
+          })  
+          res.clearCookie //2.쿠키삭제되게끔 만들기
           break;
         case "kakao":
           break;
         case "anon":
           await User.destroy({
             where: { id },
-          })
+          });
           break;
-      };
+      }
 
       return res.status(200).json({
         isSuccess: true,
-      })
+      });
     }),
-  }
+  },
 };

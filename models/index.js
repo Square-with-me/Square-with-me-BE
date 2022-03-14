@@ -20,6 +20,7 @@ db.Badge = require("./badge")(sequelize, Sequelize);
 db.WeekRecord = require("./weekRecord")(sequelize, Sequelize);
 db.MonthRecord = require("./monthRecord")(sequelize, Sequelize);
 db.Like = require("./like")(sequelize, Sequelize);
+db.RefreshToken = require("./refreshToken")(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
