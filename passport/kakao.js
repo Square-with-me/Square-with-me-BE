@@ -41,6 +41,20 @@ module.exports = () => {
             pwd: "0",
             statusMsg: createStatusMsg(),
           });
+
+          // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가 
+          await WeekRecord.create({
+            userId: newUser.id,
+          });
+
+          for (let i = 1; i <= 31; i++) {
+            await MonthRecord.create({
+              userId: newUser.id,
+              date: i,
+              time: 0,
+            });
+          }
+
           return done(null, newUser);
         } catch(error) {
           console.error(error);
