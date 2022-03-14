@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     db.User.hasOne(db.CounselingRecord, { onDelete: "CASCADE" });
     db.User.hasOne(db.CultureRecord, { onDelete: "CASCADE" });
     db.User.hasOne(db.ETCRecord, { onDelete: "CASCADE" });
-    db.User.hasOne(db.MonthRecord, { onDelete: "CASCADE" });
+    db.User.hasMany(db.MonthRecord, { onDelete: "CASCADE" });
   };
 
   return User;
