@@ -47,7 +47,7 @@ module.exports = {
             issuer: "sw",
           }
         );
-        res.cookie("accessToken", newAccessToken, {httpOnly: true});
+        res.cookie("accessToken", newAccessToken, { httpOnly: true, sameSite:"lax" });
         req.cookies.accessToken = newAccessToken;
         next();
       }
@@ -77,7 +77,7 @@ module.exports = {
           userId: user.id,
           expiryDate: expiredAt.getTime(),
         });
-        res.cookie("refreshToken", newRefreshToken, {httpOnly: true});
+        res.cookie("refreshToken", newRefreshToken, { httpOnly: true, sameSite:"lax" });
         req.cookies.refreshToken = newRefreshToken;
         next();
       } else {

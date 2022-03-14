@@ -112,27 +112,60 @@ module.exports = {
             });
           }
 
-          const { origin } = user;
-          const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
+          // const { origin } = user;
+          // const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
 
-          // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-          await WeekRecord.create({
+          //리프레시토큰
+          const existToken = await RefreshToken.findOne({
             userId: user.id,
           });
-
-          for (let i = 1; i <= 31; i++) {
-            await MonthRecord.create({
-              userId: user.id,
-              date: i,
-              time: 0,
+          if (existToken) {
+            return res.status(400).json({
+              isSuccess: false,
+              msg: "이미 로그인 중입니다.",
             });
           }
 
-          res.json({
+          const refreshToken = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET_KEY,
+            {
+              expiresIn: "1d",
+              issuer: "sw",
+            }
+          );
+
+          let expiredAt = new Date();
+          expiredAt.setDate(expiredAt.getDate() + 1);
+
+          await RefreshToken.create({
+            token: refreshToken,
+            userId: user.id,
+            expiryDate: expiredAt.getTime(),
+          });
+
+          //엑세스토큰
+          const accessToken = jwt.sign(
+            { origin: user.origin },
+            process.env.JWT_SECRET_KEY,
+            {
+              expiresIn: "1h",
+              issuer: "sw",
+            }
+          );
+          res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: "lax",
+          }); //options 참고 : https://www.npmjs.com/package/cookie
+          res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+          });
+
+          return res.status(200).json({
             isSuccess: true,
             data: {
-              token,
-              user,
+              user: fullUser,
             },
           });
         })
@@ -218,9 +251,9 @@ module.exports = {
 
       //리프레시토큰
       const existToken = await RefreshToken.findOne({
-        userId: user.id
+        userId: user.id,
       });
-      if(existToken){
+      if (existToken) {
         return res.status(400).json({
           isSuccess: false,
           msg: "이미 로그인 중입니다.",
@@ -231,15 +264,13 @@ module.exports = {
         { id: user.id },
         process.env.JWT_SECRET_KEY,
         {
-          expiresIn: '1d',
+          expiresIn: "1d",
           issuer: "sw",
         }
       );
 
       let expiredAt = new Date();
-      expiredAt.setDate(
-        expiredAt.getDate() + 1
-      );
+      expiredAt.setDate(expiredAt.getDate() + 1);
 
       await RefreshToken.create({
         token: refreshToken,
@@ -252,17 +283,23 @@ module.exports = {
         { origin: user.origin },
         process.env.JWT_SECRET_KEY,
         {
-          expiresIn: '1h',
+          expiresIn: "1h",
           issuer: "sw",
         }
       );
-      res.cookie("accessToken", accessToken,);  //1.same site 설정 찾기
-      res.cookie("refreshToken", refreshToken, {httpOnly: true});
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+      }); //options 참고 : https://www.npmjs.com/package/cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "lax",
+      });
       // 토큰복호화 테스트
-      const decodingToken = jwt.verify(accessToken, process.env.JWT_SECRET_KEY)
-      console.log(decodingToken)
-      console.log(accessToken)
-      console.log(refreshToken)
+      const decodingToken = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+      console.log(decodingToken);
+      console.log(accessToken);
+      console.log(refreshToken);
 
       return res.status(200).json({
         isSuccess: true,
@@ -281,11 +318,17 @@ module.exports = {
       switch (type) {
         case "local":
           await RefreshToken.destroy({
-            where:{ userId:id}
-          })  
-          res.clearCookie //2.쿠키삭제되게끔 만들기
+            where: { userId: id },
+          });
+          res.clearCookie("accessToken");
+          res.clearCookie("refreshToken");
           break;
         case "kakao":
+          await RefreshToken.destroy({
+            where: { userId: id },
+          });
+          res.clearCookie("accessToken");
+          res.clearCookie("refreshToken");
           break;
         case "anon":
           await User.destroy({
