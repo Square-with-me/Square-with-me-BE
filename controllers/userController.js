@@ -7,6 +7,20 @@ const { User, Badge, WeekRecord, MonthRecord } = require("../models");
 module.exports = {
   create: {
 
+    // 뱃지 획득 시 생성
+    newBadges: asyncWrapper(async (req, res) => {
+      const { userId } = req.params;
+      
+      const user = await User.findOne({
+        where: { id: userId },
+      });
+      if (user.) {
+
+      }
+
+
+    })
+    
   },
 
   update: {
@@ -126,7 +140,9 @@ module.exports = {
     
     // 보유한 뱃지 정보 가져오기는 아직 보류
     badges: asyncWrapper(async (req, res) => {
-      const { userId } = res.params;
+      const { userId } = req.params; // ch: res.params로 되어있길래 req.params로 변경
+
+      // 여기다가 구현해야 함
 
       return res.status(200).json({
         isSuccess: true,
