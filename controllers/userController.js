@@ -2,7 +2,7 @@
 const { asyncWrapper, regex } = require("../utils/util");
 
 // models
-const { User, Badge, WeekRecord, MonthRecord } = require("../models");
+const { User, Badge, MonthRecord, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
 
 module.exports = {
   create: {
@@ -126,7 +126,7 @@ module.exports = {
     
     // 보유한 뱃지 정보 가져오기는 아직 보류
     badges: asyncWrapper(async (req, res) => {
-      const { userId } = res.params;
+      const { userId } = res.locals.user;
 
       return res.status(200).json({
         isSuccess: true,
@@ -135,27 +135,45 @@ module.exports = {
     }),
 
     records: asyncWrapper(async (req, res) => {
-      const { userId } = req.params;
+      const { id } = res.locals.user;
 
       // 주간 기록 가져오기
-      const weekRecord = await WeekRecord.findOne({
-        where: { userId },
-        attributes: { exclude: ["id", "createdAt", "updatedAt"] },
+      const record = await User.findOne({
+        where: { id },
+        attributes: ["id"],
+        include: [{
+          model: BeautyRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: SportsRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: StudyRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: CounselingRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: CultureRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: ETCRecord,
+          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        }, {
+          model: MonthRecord,
+          attributes: ["time", "date"],
+        }],
       });
-
-      // 월간 기록 가져오기
-      const monthRecord = await MonthRecord.findAll({
-        where: { userId },
-        attributes: ["date", "time"],
-        order: [ ["date"] ],
-      });
+      if(!record) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "일치하는 유저 정보가 없습니다.",
+        });
+      };
 
       return res.status(200).json({
         isSuccess: true,
-        data: {
-          weekRecord,
-          monthRecord,
-        },
+        data: record,
       });
     }),
   },
