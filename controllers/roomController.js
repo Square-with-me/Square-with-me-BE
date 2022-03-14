@@ -185,6 +185,7 @@ module.exports = {
               through: { attributes: [] },
             }],
             order: [ ["likeCnt", "desc"] ],
+            limit: 3,
           });
 
           res.status(200).json({
