@@ -184,7 +184,7 @@ module.exports = {
               attributes: ["id", "name"],
               through: { attributes: [] },
             }],
-            order: [ ["likes", "desc"] ],
+            order: [ ["likeCnt", "desc"] ],
           });
 
           res.status(200).json({
