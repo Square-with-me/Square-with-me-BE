@@ -68,6 +68,7 @@ io.on("connection", (socket) => {
       signal: payload.signal,
       id: socket.id,
     });
+    console.log("리터닝시그널");
   });
 
   socket.on("end", async (payload, done) => {
