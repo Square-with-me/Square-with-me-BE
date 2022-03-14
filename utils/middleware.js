@@ -6,8 +6,14 @@ const { User, Badge } = require("../models");
 module.exports = {
   auth: async (req, res, next) => {
     const { authorization } = req.headers;
+    if(!authorization) {
+      return res.status(400).json({
+        isSuccess: false,
+        msg: "토큰 정보가 없습니다.",
+      });
+    };
+    
     const [type, value] = authorization.split(" ");
-
     if(type !== "Bearer") {
       return res.status(400).json({
         isSuccess: false,
