@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const CouselingRecord = sequelize.define("couselingRecord", {
+  const CounselingRecord = sequelize.define("counselingRecord", {
     time: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     collate: "utf8_general_ci",
   });
 
-  CouselingRecord.associate = (db) => {
-    db.CouselingRecord.belongsTo(db.User);
+  CounselingRecord.associate = (db) => {
+    db.CounselingRecord.belongsTo(db.User);
   };
 
-  return CouselingRecord;
+  return CounselingRecord;
 };
