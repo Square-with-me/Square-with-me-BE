@@ -44,7 +44,6 @@ module.exports = {
           process.env.JWT_SECRET_KEY,
           {
             expiresIn: '1h',
-            issuer: "sw",
           }
         );
         res.cookie("accessToken", newAccessToken, { httpOnly: true, sameSite:"lax" });
@@ -65,7 +64,6 @@ module.exports = {
           process.env.JWT_SECRET_KEY,
           {
             expiresIn: '1d',
-            issuer: "sw",
           }
         );
         let expiredAt = new Date();

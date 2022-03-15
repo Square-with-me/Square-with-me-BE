@@ -16,14 +16,14 @@ const {
   User,
   Badge,
   RefreshToken,
-  MonthRecord,  
+  MonthRecord,
   BeautyRecord,
   SportsRecord,
   StudyRecord,
   CounselingRecord,
   CultureRecord,
-  ETCRecord
-} = require("../models")
+  ETCRecord,
+} = require("../models");
 
 module.exports = {
   create: {
@@ -89,8 +89,8 @@ module.exports = {
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
       await BeautyRecord.create({
-        userId: user.id
-      })
+        userId: user.id,
+      });
 
       await SportsRecord.create({
         userId: user.id,
@@ -145,7 +145,7 @@ module.exports = {
         { userId: user.id, date: 30 },
         { userId: user.id, date: 31 },
       ]);
-  
+
       return res.status(201).json({
         isSuccess: true,
         msg: "회원가입에 성공하였습니다.",
@@ -182,7 +182,6 @@ module.exports = {
             process.env.JWT_SECRET_KEY,
             {
               expiresIn: "1d",
-              issuer: "sw",
             }
           );
 
@@ -201,7 +200,6 @@ module.exports = {
             process.env.JWT_SECRET_KEY,
             {
               expiresIn: "1h",
-              issuer: "sw",
             }
           );
           res.cookie("accessToken", accessToken, {
@@ -216,7 +214,7 @@ module.exports = {
           return res.status(200).json({
             isSuccess: true,
             data: {
-              user: fullUser,
+              user,
             },
           });
         })
@@ -316,7 +314,6 @@ module.exports = {
         process.env.JWT_SECRET_KEY,
         {
           expiresIn: "1d",
-          issuer: "sw",
         }
       );
 
@@ -335,7 +332,6 @@ module.exports = {
         process.env.JWT_SECRET_KEY,
         {
           expiresIn: "1h",
-          issuer: "sw",
         }
       );
       res.cookie("accessToken", accessToken, {
@@ -346,11 +342,6 @@ module.exports = {
         httpOnly: true,
         sameSite: "lax",
       });
-      // 토큰복호화 테스트
-      const decodingToken = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
-      console.log(decodingToken);
-      console.log(accessToken);
-      console.log(refreshToken);
 
       return res.status(200).json({
         isSuccess: true,
