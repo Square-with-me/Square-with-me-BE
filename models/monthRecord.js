@@ -4,9 +4,12 @@ module.exports = (sequelize, DataTypes) => {
     {
       date: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
       time: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       }
     },
     {

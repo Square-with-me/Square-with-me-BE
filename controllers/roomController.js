@@ -1,7 +1,9 @@
 const { Op } = require("sequelize");
 
 // models
-const { Room, Tag, Category, User, Viewer, WeekRecord, MonthRecord, Like } = require("../models");
+const { 
+  Room, Tag, Category, User, Viewer, MonthRecord, Like, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord
+} = require("../models");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
@@ -30,6 +32,7 @@ module.exports = {
         pwd,
         categoryId,
         masterUserId: userId,
+        participantCnt: 1,
       });
 
       // tags 배열 돌면서 없는 태그는 생성
@@ -43,7 +46,7 @@ module.exports = {
 
       const fullRoom = await Room.findOne({
         where: { id: newRoom.id },
-        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt"],
+        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -73,22 +76,24 @@ module.exports = {
       // roomId로 방 찾기
       const room = await Room.findOne({
         where: { id: roomId },
+        attributes: ["id", "participantCnt"]
       });
 
       // role에 따라서
       switch(role) {
         case "participant":
           // 현재 참가자 수 확인
-          const participants = await room.getParticipants();
-          if(participants.length >= 4) {
+          if(room.participantCnt >= 4) {
             return res.status(400).json({
               isSuccess: false,
               msg: "인원이 모두 찼습니다.",
             });
           };
-        
+
           // 참가자 추가
           await room.addParticipants(userId);
+          // 참가자 수 + 1
+          await room.increment("participantCnt"); 
         
           res.status(201).json({
             isSuccess: true,
@@ -170,11 +175,11 @@ module.exports = {
   get: {
     rooms: asyncWrapper(async (req, res) => {
       const { q: query } = req.query;
-
+      let rooms = [];
       switch(query) {
         case "hot":  // 인기 방 목록 가져오기
-          const hotRooms = await Room.findAll({
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+          rooms = await Room.findAll({
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -184,19 +189,15 @@ module.exports = {
               attributes: ["id", "name"],
               through: { attributes: [] },
             }],
-            order: [ ["likes", "desc"] ],
+            order: [ ["likeCnt", "desc"] ],
+            limit: 3,
           });
-
-          res.status(200).json({
-            isSuccess: true,
-            data: hotRooms,
-          })
           break;
 
         case "all":
           // 전체 방 목록 가져오기
-          const wholeRooms = await Room.findAll({
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+          rooms = await Room.findAll({
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -207,22 +208,34 @@ module.exports = {
               through: { attributes: [] },
             }],
             order: [ ["createdAt", "desc"] ],
-          });
-          
-          res.status(200).json({
-            isSuccess: true,
-            data: wholeRooms,
           });
           break;
 
-        default:
-          // 검색어로 검색하는 경우
-          // 비슷한 방 제목 목록 가져오기
-          const rooms = await Room.findAll({
+        case "possible":  // 입장 가능한 방 목록 가져오기
+          rooms = await Room.findAll({
+            where: {
+              participantCnt: { [Op.lte]: 3 },
+            },
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            include: [{
+              model: Category,
+              attributes: ["id", "name"],
+            }, {
+              model: Tag,
+              as: "Tags",
+              attributes: ["id", "name"],
+              through: { attributes: [] },
+            }],
+            order: [ ["createdAt", "desc"] ],
+          })
+          break;
+
+        default:  // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
+          rooms = await Room.findAll({
             where: {
               title: { [Op.like]: `%${query}%` }
             },
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -234,12 +247,13 @@ module.exports = {
             }],
             order: [ ["createdAt", "desc"] ],
           });
-          res.status(200).json({
-            isSuccess: true,
-            data: rooms,
-          });
           break;
       };
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: rooms,
+      })
     }),
     
     categoryRooms: asyncWrapper(async (req, res) => {
@@ -248,7 +262,7 @@ module.exports = {
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
-        attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt"],
+        attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -269,83 +283,132 @@ module.exports = {
   },
 
   delete: {
-    participant: asyncWrapper(async (req, res) => {
-      const { roomId, userId } = req.params;
-      const { t: time, c: category, d: date, r: role } = req.query;
+    participant: async (data) => {
+      const { roomId, userId, time, categoryId, date} = data;
 
-      // 관전자였을 경우
-      if(role === "viewer") {
-        await Viewer.destroy({
-          where: {
-            roomId,
-            userId,
-          },
-        });
-      };
-
-      // roomId로 방 찾기
       const room = await Room.findOne({
         where: { id: roomId },
       });
       if(!room) {
-        return res.status(400).json({
+        return {
           isSuccess: false,
-          msg: "존재하지 않는 방입니다.",
-        });
+          msg: "존재하지 않는 방 정보입니다.",
+        };
       };
+      // 날짜로 요일 가져오기
+      const day = getDay(date);
 
       // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
-      const day = getDay(date);
-      const preWeekRecords = await WeekRecord.findOne({
-        where: { userId },
-      });
-      const newWeekRecord = {};
-      newWeekRecord[day] = preWeekRecords[day] + Number(time);
-      newWeekRecord[category] = preWeekRecords[category] + Number(time);
-
-      await preWeekRecords.update(newWeekRecord);
-
+      let preRecord = null;
+      switch(categoryId) {  // 카테고리에 따라 시간 업데이트
+        case 1:
+          preRecord = await BeautyRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        case 2:
+          preRecord = await SportsRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        case 3:
+          preRecord = await StudyRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        case 4:
+          preRecord = await CounselingRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        case 5:
+          preRecord = await CultureRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        case 6:
+          preRecord = await ETCRecord.findOne({
+            where: {
+              userId,
+              day,
+            }
+          });
+          await preRecord.update({
+            time: preRecord.time + time,
+          });
+          break;
+        default:
+          break;
+      }
+      
       // 한달 기록 테이블에 시간 기록
-      const preMonthRecords = await MonthRecord.findOne({
+      const preMonthRecord = await MonthRecord.findOne({
         where: {
           userId,
           date,
         },
       });
-      await preMonthRecords.update({
-        time: preMonthRecords.time + Number(time),
+      await preMonthRecord.update({
+        time: preMonthRecord.time + time,
       });
 
-      // 방장인지 확인하고 맞으면 다음사람한테 방장 넘기기
-      const isMasterUser = Number(userId) === room.masterUserId;
+      // 방장인지 확인
+      const isMasterUser = userId === room.masterUserId;
       switch(isMasterUser) {
         case true:
           const participants = await room.getParticipants({
             order: [ ["createdAt"] ],
           });
-          // 남은 인원 확인하고 2명 이상이면 방장 넘김
-          if(participants.length > 1) {
+          if(participants.length > 1) {  // 남은 인원 2명 이상이면 다음으로 들어온 사람한테 방장 넘기기
             await room.update({
               masterUserId: participants[1].id,
             });
           };
 
-          room.removeParticipants(userId);
+          await room.removeParticipants(userId);  // 나 자신은 참가자에서 없애기
+          await room.decrement("participantCnt");
           break;
 
         case false:
-          room.removeParticipants(userId);
+          await room.removeParticipants(userId); // 참가자에서 없애기
+          await room.decrement("participantCnt");
           break;
 
         default:
-          res.status(400).json({
-            isSuccess: false,
-            msg: "들어오는건 자유지만 나가는건 아니란다."
-          });
           break;
       };
 
-      // 남은 참가자 확인
+      // 남은 참가자 확인하고 0명이면 방 삭제
       const left = await room.getParticipants();
       if(left.length === 0) {
         await Room.destroy({
@@ -353,10 +416,10 @@ module.exports = {
         });
       };
 
-      res.status(200).json({
+      return {
         isSuccess: true,
-      });
-    }),
+      };
+    },
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;
