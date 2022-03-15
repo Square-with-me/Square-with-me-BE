@@ -37,7 +37,7 @@ module.exports = {
       if(nickname.length < 2 || nickname.length > 8) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "상태 메시지는 1글자 ~ 20글자로 적어주세요."
+          msg: "닉네임은 2글자 ~ 8글자로 적어주세요."
         });
       };
 
