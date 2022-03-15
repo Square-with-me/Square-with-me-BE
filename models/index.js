@@ -18,6 +18,7 @@ db.Tag = require("./tag")(sequelize, Sequelize);
 db.Viewer = require("./viewer")(sequelize, Sequelize);
 db.Badge = require("./badge")(sequelize, Sequelize);
 db.Like = require("./like")(sequelize, Sequelize);
+db.RefreshToken = require("./refreshToken")(sequelize, Sequelize);
 db.BeautyRecord = require("./beautyRecord")(sequelize, Sequelize);
 db.SportsRecord = require("./sportsRecord")(sequelize, Sequelize);
 db.StudyRecord = require("./studyRecord")(sequelize, Sequelize);

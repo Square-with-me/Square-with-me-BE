@@ -11,6 +11,7 @@
   "author": "square-with-me-BE-team",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.11.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
@@ -18,6 +19,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",

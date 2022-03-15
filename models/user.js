@@ -39,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     db.User.belongsToMany(db.Badge, { through: "UserBadge", as: "MyBadges", onDelete: "CASCADE" });
     db.User.belongsTo(db.Badge, { as: "MasterBadge", foreignKey: "masterBadgeId" });
     db.User.belongsToMany(db.Room, { through: "Participant", as: "Participating", onDelete: "CASCADE" });
+    db.User.hasOne(db.RefreshToken);
     db.User.hasOne(db.BeautyRecord, { onDelete: "CASCADE" });
     db.User.hasOne(db.SportsRecord, { onDelete: "CASCADE" });
     db.User.hasOne(db.StudyRecord, { onDelete: "CASCADE" });
