@@ -175,10 +175,10 @@ module.exports = {
   get: {
     rooms: asyncWrapper(async (req, res) => {
       const { q: query } = req.query;
-
+      let rooms = [];
       switch(query) {
         case "hot":  // 인기 방 목록 가져오기
-          const hotRooms = await Room.findAll({
+          rooms = await Room.findAll({
             attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
@@ -192,16 +192,11 @@ module.exports = {
             order: [ ["likeCnt", "desc"] ],
             limit: 3,
           });
-
-          res.status(200).json({
-            isSuccess: true,
-            data: hotRooms,
-          })
           break;
 
         case "all":
           // 전체 방 목록 가져오기
-          const wholeRooms = await Room.findAll({
+          rooms = await Room.findAll({
             attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
@@ -214,17 +209,29 @@ module.exports = {
             }],
             order: [ ["createdAt", "desc"] ],
           });
-          
-          res.status(200).json({
-            isSuccess: true,
-            data: wholeRooms,
-          });
           break;
 
-        default:
-          // 검색어로 검색하는 경우
-          // 비슷한 방 제목 목록 가져오기
-          const rooms = await Room.findAll({
+        case "possible":  // 입장 가능한 방 목록 가져오기
+          rooms = await Room.findAll({
+            where: {
+              participantCnt: { [Op.lte]: 3 },
+            },
+            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            include: [{
+              model: Category,
+              attributes: ["id", "name"],
+            }, {
+              model: Tag,
+              as: "Tags",
+              attributes: ["id", "name"],
+              through: { attributes: [] },
+            }],
+            order: [ ["createdAt", "desc"] ],
+          })
+          break;
+
+        default:  // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
+          rooms = await Room.findAll({
             where: {
               title: { [Op.like]: `%${query}%` }
             },
@@ -240,12 +247,13 @@ module.exports = {
             }],
             order: [ ["createdAt", "desc"] ],
           });
-          res.status(200).json({
-            isSuccess: true,
-            data: rooms,
-          });
           break;
       };
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: rooms,
+      })
     }),
     
     categoryRooms: asyncWrapper(async (req, res) => {
