@@ -10,7 +10,7 @@ const {
 } = require("../utils/util");
 
 // models
-const { User, Badge, WeekRecord, MonthRecord } = require("../models");
+const { User, Badge, WeekRecord, MonthRecord, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
 
 module.exports = {
   create: {
@@ -75,17 +75,63 @@ module.exports = {
       });
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-      await WeekRecord.create({
+      await BeautyRecord.create({
+        userId: user.id
+      })
+
+      await SportsRecord.create({
         userId: user.id,
       });
 
-      for(let i = 1; i <= 31; i++) {
-        await MonthRecord.create({
-          userId: user.id,
-          date: i,
-          time: 0,
-        });
-      };
+      await StudyRecord.create({
+        userId: user.id,
+      });
+
+      await CounselingRecord.create({
+        userId: user.id,
+      });
+
+      await CultureRecord.create({
+        userId: user.id,
+      });
+
+      await ETCRecord.create({
+        userId: user.id,
+      });
+
+      await MonthRecord.bulkCreate([
+        { userId: user.id, date: 1 },
+        { userId: user.id, date: 2 },
+        { userId: user.id, date: 3 },
+        { userId: user.id, date: 4 },
+        { userId: user.id, date: 5 },
+        { userId: user.id, date: 6 },
+        { userId: user.id, date: 7 },
+        { userId: user.id, date: 8 },
+        { userId: user.id, date: 9 },
+        { userId: user.id, date: 10 },
+        { userId: user.id, date: 11 },
+        { userId: user.id, date: 12 },
+        { userId: user.id, date: 13 },
+        { userId: user.id, date: 14 },
+        { userId: user.id, date: 15 },
+        { userId: user.id, date: 16 },
+        { userId: user.id, date: 17 },
+        { userId: user.id, date: 18 },
+        { userId: user.id, date: 19 },
+        { userId: user.id, date: 20 },
+        { userId: user.id, date: 21 },
+        { userId: user.id, date: 22 },
+        { userId: user.id, date: 23 },
+        { userId: user.id, date: 24 },
+        { userId: user.id, date: 25 },
+        { userId: user.id, date: 26 },
+        { userId: user.id, date: 27 },
+        { userId: user.id, date: 28 },
+        { userId: user.id, date: 29 },
+        { userId: user.id, date: 30 },
+        { userId: user.id, date: 31 },
+      ]);
   
       return res.status(201).json({
         isSuccess: true,
