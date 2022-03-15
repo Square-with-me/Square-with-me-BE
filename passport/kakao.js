@@ -2,7 +2,17 @@ const passport = require("passport");
 const { Strategy: KakaoStrategy } = require("passport-kakao");
 
 // models
-const { User, Badge } = require("../models");
+const {
+  User,
+  Badge, 
+  MonthRecord,  
+  BeautyRecord,
+  SportsRecord,
+  StudyRecord,
+  CounselingRecord,
+  CultureRecord,
+  ETCRecord
+} = require("../models");
 
 // utils
 const { createStatusMsg } = require("../utils/util");
@@ -43,17 +53,63 @@ module.exports = () => {
           });
 
           // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가 
-          await WeekRecord.create({
+          await BeautyRecord.create({
+            userId: newUser.id
+          })
+    
+          await SportsRecord.create({
             userId: newUser.id,
           });
-
-          for (let i = 1; i <= 31; i++) {
-            await MonthRecord.create({
-              userId: newUser.id,
-              date: i,
-              time: 0,
-            });
-          }
+    
+          await StudyRecord.create({
+            userId: newUser.id,
+          });
+    
+          await CounselingRecord.create({
+            userId: newUser.id,
+          });
+    
+          await CultureRecord.create({
+            userId: newUser.id,
+          });
+    
+          await ETCRecord.create({
+            userId: newUser.id,
+          });
+    
+          await MonthRecord.bulkCreate([
+            { userId: newUser.id, date: 1 },
+            { userId: newUser.id, date: 2 },
+            { userId: newUser.id, date: 3 },
+            { userId: newUser.id, date: 4 },
+            { userId: newUser.id, date: 5 },
+            { userId: newUser.id, date: 6 },
+            { userId: newUser.id, date: 7 },
+            { userId: newUser.id, date: 8 },
+            { userId: newUser.id, date: 9 },
+            { userId: newUser.id, date: 10 },
+            { userId: newUser.id, date: 11 },
+            { userId: newUser.id, date: 12 },
+            { userId: newUser.id, date: 13 },
+            { userId: newUser.id, date: 14 },
+            { userId: newUser.id, date: 15 },
+            { userId: newUser.id, date: 16 },
+            { userId: newUser.id, date: 17 },
+            { userId: newUser.id, date: 18 },
+            { userId: newUser.id, date: 19 },
+            { userId: newUser.id, date: 20 },
+            { userId: newUser.id, date: 21 },
+            { userId: newUser.id, date: 22 },
+            { userId: newUser.id, date: 23 },
+            { userId: newUser.id, date: 24 },
+            { userId: newUser.id, date: 25 },
+            { userId: newUser.id, date: 26 },
+            { userId: newUser.id, date: 27 },
+            { userId: newUser.id, date: 28 },
+            { userId: newUser.id, date: 29 },
+            { userId: newUser.id, date: 30 },
+            { userId: newUser.id, date: 31 },
+          ]);
 
           return done(null, newUser);
         } catch(error) {

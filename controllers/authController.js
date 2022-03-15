@@ -15,7 +15,7 @@ const {
 const {
   User,
   Badge,
-  WeekRecord,
+  RefreshToken,
   MonthRecord,  
   BeautyRecord,
   SportsRecord,
