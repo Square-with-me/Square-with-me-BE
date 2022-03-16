@@ -334,13 +334,14 @@ module.exports = {
           expiresIn: "1h",
         }
       );
+      
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "lax"
       }); //options 참고 : https://www.npmjs.com/package/cookie
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "lax"
       });
 
       return res.status(200).json({

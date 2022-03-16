@@ -10,10 +10,13 @@ module.exports = {
   auth: asyncWrapper(async (req, res, next) => {
     const accessToken = verifyToken(req.cookies.accessToken);
     const refreshToken = verifyToken(req.cookies.refreshToken);
+    console.log(accessToken);
+    console.log(refreshToken);
+    console.log(req.cookies)
     const currentRefreshToken =  await RefreshToken.findOne({ //현재 가지고있는 리프레시토큰이
       where: {userId: refreshToken.id}
     });
-    if(currentRefreshToken.expiryDate.getTime() > new Date().getTime() || !refreshToken){  //만료되면 DB에서 지움, 쿠키에 토큰이 없어도 지움
+    if(currentRefreshToken.expiryDate.getTime() < new Date().getTime() || !refreshToken){  //만료되면 DB에서 지움, 쿠키에 토큰이 없어도 지움
       RefreshToken.destroy({
         where: {userId: refreshToken.id}
       })
@@ -48,7 +51,6 @@ module.exports = {
         );
         res.cookie("accessToken", newAccessToken, { httpOnly: true, sameSite:"lax" });
         req.cookies.accessToken = newAccessToken;
-        next();
       }
     } else {
       if (refreshToken === undefined) {
@@ -77,26 +79,25 @@ module.exports = {
         });
         res.cookie("refreshToken", newRefreshToken, { httpOnly: true, sameSite:"lax" });
         req.cookies.refreshToken = newRefreshToken;
-        next();
       } else {
         // access, refresh 둘 다 유효
-        next();
+        const user = await User.findOne({
+          where: { origin:accessToken.origin},
+          attributes: ["id", "origin", "nickname", "profileImg", "statusMsg", "type"],
+          include: [{
+            model: Badge,
+            as: "MasterBadge",
+            attributes: ["id", "name"],
+          }],
+        })
+        if (!user) {
+          return res.status(400).json({ isSuccess: false, msg: "서버내부에러" });
+        }
+        res.locals.user = user;
       }
     }
-    const user = await User.findOne({
-      where: { origin:accessToken.origin},
-      attributes: ["id", "origin", "nickname", "profileImg", "statusMsg"],
-      include: [{
-        model: Badge,
-        as: "MasterBadge",
-        attributes: ["id", "name"],
-      }],
-    })
-    if (!user) {
-      return res.status(400).json({ isSuccess: false, msg: "서버내부에러" });
-    }
-    res.locals.user = user;
     next();
+    console.log(res.locals.user);
   },
   )
 };
