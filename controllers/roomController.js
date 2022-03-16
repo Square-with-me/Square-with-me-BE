@@ -71,65 +71,44 @@ module.exports = {
 
     participant: asyncWrapper(async (req, res) => {
       const { roomId, userId } = req.params;
-      const { role } = req.body;
 
       // roomId로 방 찾기
       const room = await Room.findOne({
         where: { id: roomId },
-        attributes: ["id", "participantCnt"]
+        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt", "participantCnt"],
+        include: [{
+          model: Category,
+          attributes: ["id", "name"],
+        }, {
+          model: Tag,
+          as: "Tags",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        }, {
+          model: User,
+          as: "Participants",
+          attributes: ["id", "nickname", "masterBadgeId"],
+          through: { attributes: [] },
+        }],
       });
 
-      // role에 따라서
-      switch(role) {
-        case "participant":
-          // 현재 참가자 수 확인
-          if(room.participantCnt >= 4) {
-            return res.status(400).json({
-              isSuccess: false,
-              msg: "인원이 모두 찼습니다.",
-            });
-          };
-
-          // 참가자 추가
-          await room.addParticipants(userId);
-          // 참가자 수 + 1
-          await room.increment("participantCnt"); 
-        
-          res.status(201).json({
-            isSuccess: true,
-          });
-          break;
-          
-        case "viewer":
-          const viewers = await Viewer.findAll({
-            where: { roomId, },
-          });
-          //  5명 초과인지 확인
-          if(viewers.length > 5) {
-            return res.status(400).json({
-              isSuccess: false,
-              msg: "인원이 모두 찼습니다.",
-            });
-          };
-
-          // 뷰어로 추가
-          await Viewer.create({
-            userId,
-            roomId,
-          });
-
-          res.status(200).json({
-            isSuccess: true,
-          })
-          break;
-
-        default:
-          res.status(400).json({
-            isSuccess: false,
-            msg: "role이 전달되지 않았습니다.",
-          });
-          break;
+      // 현재 참가자 수 확인
+      if(room.participantCnt >= 4) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "인원이 모두 찼습니다.",
+        });
       };
+
+      // 참가자 추가
+      await room.addParticipants(userId);
+      // 참가자 수 + 1
+      await room.increment("participantCnt"); 
+        
+      res.status(201).json({
+        isSuccess: true,
+        data: room,
+      });
     }),
 
     like: asyncWrapper(async (req, res) => {
@@ -287,6 +266,7 @@ module.exports = {
 
   delete: {
     participant: async (data) => {
+      console.log("controllerㄹ 왔음", data);
       const { roomId, userId, time, categoryId, date} = data;
 
       const room = await Room.findOne({
@@ -303,72 +283,61 @@ module.exports = {
 
       // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
       let preRecord = null;
+
+      const whereOption = {}
+      const updateOption = {};
+      whereOption.userId = userId;
+      whereOption[day] = day;
       switch(categoryId) {  // 카테고리에 따라 시간 업데이트
         case 1:
           preRecord = await BeautyRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+
+          updateOption[day] = preRecord[day] + time;
+
+          await preRecord.update(updateOption);
           break;
         case 2:
           preRecord = await SportsRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+          
+          console.log("preRecord", preRecord);
+          updateOption[day] = preRecord[day] + time;
+          await preRecord.update(updateOption);
           break;
         case 3:
           preRecord = await StudyRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+          
+          updateOption[day] = preRecord[day] + time;
+          await preRecord.update(updateOption);
           break;
         case 4:
           preRecord = await CounselingRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+          
+          updateOption[day] = preRecord[day] + time;
+          await preRecord.update(updateOption);
           break;
         case 5:
           preRecord = await CultureRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+          
+          updateOption[day] = preRecord[day] + time;
+          await preRecord.update(updateOption);
           break;
         case 6:
           preRecord = await ETCRecord.findOne({
-            where: {
-              userId,
-              day,
-            }
+            where: whereOption,
           });
-          await preRecord.update({
-            time: preRecord.time + time,
-          });
+          
+          updateOption[day] = preRecord[day] + time;
+          await preRecord.update(updateOption);
           break;
         default:
           break;
