@@ -49,7 +49,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
-      origin: "http://localhost:8088",
+      origin: ["*"],
       credentials: true,
     })
   );
@@ -57,7 +57,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
   app.use(
     cors({
-      origin: "http://localhost:8088",
+      origin: ["*"],
       credentials: true,
     })
   );
