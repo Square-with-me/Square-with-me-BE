@@ -42,13 +42,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
   app.use(hpp());
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
-      origin: ["*"],
+      origin: "http://localhost:8088",
       credentials: true,
     })
   );
@@ -56,7 +57,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
   app.use(
     cors({
-      origin: "*",
+      origin: "http://localhost:8088",
       credentials: true,
     })
   );
