@@ -214,7 +214,10 @@ module.exports = {
         case "possible":  // 입장 가능한 방 목록 가져오기
           rooms = await Room.findAll({
             where: {
-              participantCnt: { [Op.lte]: 3 },
+              [Op.and]: [
+                { participantCnt: { [Op.lte]: 3 } },
+                { isSecret: false, },
+              ],
             },
             attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
             include: [{
