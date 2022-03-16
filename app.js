@@ -5,7 +5,7 @@ const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const fs = require("fs");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -22,43 +22,43 @@ db.sequelize
 
 // public 폴더 생성
 try {
-  fs.accessSync('public');
-} catch(error) {
-  console.log('public 폴더가 없습니다. 새로 생성합니다.');
-  fs.mkdirSync('public');
-};
+  fs.accessSync("public");
+} catch (error) {
+  console.log("public 폴더가 없습니다. 새로 생성합니다.");
+  fs.mkdirSync("public");
+}
 
 // static
-app.use("/", express.static(path.join(__dirname, "public"))); // 운영체제에 맞춰 경로 지정하기
+app.use("/", express.static(path.join(__dirname, "public")));
 
 const dotenv = require("dotenv");
 dotenv.config();
 
-const passportconfig = require('./passport/kakao');
+const passportconfig = require("./passport/kakao");
 passportconfig();
-
 
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser())
+app.use(cookieParser());
+
 
 if (process.env.NODE_ENV === "production") {
-  // production 배포 상태에서 적용됨,
   app.use(morgan("combined"));
-  app.use(hpp()); // request parameter pollution을 막기 위해 사용
-  app.use(helmet({ contentSecurityPolicy: false })); // 클라이언트 - 서버 간 중요한 정보에 대한 보안을 위해 서버에서 다양한 http header를 자동으로 설정
+  app.use(hpp());
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
       origin: ["*"],
+      credentials: true,
     })
   );
 } else {
-  //
   app.use(morgan("dev"));
   app.use(
     cors({
-      origin: "*",
+      origin: ["*"],
+      credentials: true,
     })
   );
 }
