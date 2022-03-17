@@ -35,6 +35,7 @@ router.patch("/user/:userId/profile/statusMsg", middleware.auth, UserController.
 // api/room
 router.post("/room/new", middleware.auth, RoomController.create.room);   // 방 생성하기
 router.post("/room/:roomId/user/:userId", middleware.auth, RoomController.create.participant);   // 방 참가하기
+router.get("/room/:roomId/pwd/:pwd", middleware.auth, RoomController.get.pwd);  // 비밀번호 확인하기
 router.delete("/room/:roomId/user/:userId", middleware.auth, RoomController.delete.participant);   // 방 나가기
 
 router.get("/room/:roomId/like", middleware.auth, RoomController.create.like);   // 좋아요

@@ -46,7 +46,7 @@ module.exports = {
 
       const fullRoom = await Room.findOne({
         where: { id: newRoom.id },
-        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt", "participantCnt"],
+        attributes: ["id", "title", "isSecret", "masterUserId", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -75,7 +75,7 @@ module.exports = {
       // roomId로 방 찾기
       const room = await Room.findOne({
         where: { id: roomId },
-        attributes: ["id", "title", "isSecret", "pwd", "masterUserId", "likeCnt", "participantCnt"],
+        attributes: ["id", "title", "isSecret", "masterUserId", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -158,7 +158,7 @@ module.exports = {
       switch(query) {
         case "hot":  // 인기 방 목록 가져오기
           rooms = await Room.findAll({
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -176,7 +176,7 @@ module.exports = {
         case "all":
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -198,7 +198,7 @@ module.exports = {
                 { isSecret: false, },
               ],
             },
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -217,7 +217,7 @@ module.exports = {
             where: {
               title: { [Op.like]: `%${query}%` }
             },
-            attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
               attributes: ["id", "name"],
@@ -244,7 +244,7 @@ module.exports = {
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
-        attributes: ["id", "title", "isSecret", "pwd", "createdAt", "likeCnt", "participantCnt"],
+        attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
           attributes: ["id", "name"],
@@ -260,6 +260,24 @@ module.exports = {
       return res.status(200).json({
         isSuccess: true,
         data: rooms,
+      });
+    }),
+
+    pwd: asyncWrapper(async (req, res) => {
+      const { roomId, pwd } = req.params;
+
+      const room = await Room.findOne({
+        where: { id: roomId },
+      });
+      const pwdCheck = room.pwd === pwd;
+      if(!pwdCheck) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "비밀번호가 일치하지 않습니다.",
+        });
+      }
+      return res.status(200).json({
+        isSuccess: true
       });
     }),
   },
@@ -280,18 +298,15 @@ module.exports = {
       };
       // 날짜로 요일 가져오기
       const day = getDay(date);
-
+      console.log("유저 아이디", userId, "요일", day)
       // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
       let preRecord = null;
 
-      const whereOption = {}
       const updateOption = {};
-      whereOption.userId = userId;
-      whereOption[day] = day;
       switch(categoryId) {  // 카테고리에 따라 시간 업데이트
         case 1:
           preRecord = await BeautyRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -300,16 +315,15 @@ module.exports = {
           break;
         case 2:
           preRecord = await SportsRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
           
-          console.log("preRecord", preRecord);
           updateOption[day] = preRecord[day] + time;
           await preRecord.update(updateOption);
           break;
         case 3:
           preRecord = await StudyRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
           
           updateOption[day] = preRecord[day] + time;
@@ -317,15 +331,15 @@ module.exports = {
           break;
         case 4:
           preRecord = await CounselingRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
-          
+
           updateOption[day] = preRecord[day] + time;
           await preRecord.update(updateOption);
           break;
         case 5:
           preRecord = await CultureRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
           
           updateOption[day] = preRecord[day] + time;
@@ -333,7 +347,7 @@ module.exports = {
           break;
         case 6:
           preRecord = await ETCRecord.findOne({
-            where: whereOption,
+            where: { userId },
           });
           
           updateOption[day] = preRecord[day] + time;
