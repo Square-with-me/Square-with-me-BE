@@ -13,20 +13,29 @@ const RoomController = require("./controllers/roomController");
 const users = {};
 const socketToRoom = {};
 const socketToNickname = {};
+const socketToUser = {};
 
 io.on("connection", (socket) => {
-  socket.on("join room", async (payload, done) => {
-    const roomId = payload.roomId;
-    const nickname = payload.nickname;
+  let roomId;
+  let userId;
 
-    if (!roomId || !nickname) {
+  let time = 0;
+  let categoryId;
+  let date;
+
+  socket.on("join room", async (payload, done) => {
+    roomId = payload.roomId;
+    userId = payload.userId; // payload에 userId 추가 필요
+    categoryId = payload.categoryId;  // payload 추가 필요
+    date = payload.date;  // payload 추가 필요
+
+    if (!roomId) {
       socket.emit("no data");
     }
 
-    if (users[roomId]) {
-      // 기존 참가자 있음
-      if (users[roomId].length >= 4) {
-        // 참가자 풀방
+    if (users[roomId]) { // 기존 참가자 있음
+      
+      if (users[roomId].length >= 4) { // 참가자 풀방
         return done();
       }
 
@@ -38,28 +47,41 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
 
-    socketToRoom[socket.id] = roomId; //각각의 소켓아이디가 어떤 룸에 들어가는지
-    socketToNickname[socket.id] = nickname;
+    socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
+    socketToNickname[socket.id] = payload.nickname;
+    socketToUser[socket.id] = {
+      roomId: payload.roomId,
+      id: payload.userId,
+      nickname: payload.nickname,
+      profileImg: payload.profileImg,
+      masterBadgeSrc: payload.masterBadgeSrc,
+      statusMsg: payload.statusMsg,
+    }
 
-    let otherUsers = users[roomId].filter((socketId) => socketId !== socket.id);
+    let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
-    otherUsers = otherUsers.map((socketId) => {
+    const otherSockets = others.map((socketId) => {
       return {
-        socketId: socketId,
+        socketId,
         nickname: socketToNickname[socket.id],
       };
     });
+    const otherUsers = others.map((socketId) => {
+      return socketToUser[socketId]
+    });
 
-    socket.emit("send users", otherUsers);
+    socket.emit("send users", { otherSockets, otherUsers });
   });
 
   socket.on("send signal", (payload) => {
     const callerNickname = socketToNickname[payload.callerId];
+    const userInfo = socketToUser[socket.id];
 
     io.to(payload.userToSignal).emit("user joined", {
       signal: payload.signal,
       callerId: payload.callerId,
       callerNickname,
+      userInfo,
     });
   });
 
@@ -70,55 +92,44 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("send_message", (data) => {
-    socket.broadcast.to(data.roomId).emit('receive_message', data);
+  socket.on("send_message", (payload) => {
+    socket.broadcast.to(payload.roomId).emit('receive_message', payload);
   });
 
-  socket.on("end", async (payload, done) => {
+  socket.on("save_time", (payload) => {
+    time = payload;
+    console.log("업데이트 된 시간", time);
+  });
+
+  socket.on("disconnecting", async () => {
+    console.log("방 나가기", roomId, userId, categoryId, date, time)
     const data = {
-      roomId: payload.roomId,
-      userId: payload.userId,
-      time: payload.time,
-      categoryId: payload.categoryId,
-      date: payload.date,
+      roomId,
+      userId,
+      time: time,
+      categoryId: categoryId,
+      date: date,
     };
 
     await RoomController.delete.participant(data);
 
-    const roomId = socketToRoom[socket.id];
-
-    if (users[roomId]) {
+    if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
     }
-
-    socket.broadcast.emit("user left", {
-      socketId: socket.id,
-      nickname: socketToNickname[socket.id],
-    });
-
-    delete socketToNickname[socket.id];
-
-    done();
-  });
-
-  socket.on("disconnecting", () => {
-    const roomId = socketToRoom[socket.id];
-
-    if (users[roomId]) {
-      users[roomId] = users[roomId].filter((id) => id !== socket.id);
-    }
+    const userInfo = socketToUser[socket.id];
 
     socket.broadcast.to(roomId).emit("user left", {
       socketId: socket.id,
-      nickname: socketToNickname[socket.id],
+      userInfo,
     });
 
     delete socketToNickname[socket.id];
+    delete socketToUser[socket.id];
   });
 
   // 타이머
-  socket.on("start_timer", (data) => {
-    socket.broadcast.to(data.roomId).emit("start_receive", data);
+  socket.on("start_timer", (payload) => {
+    socket.broadcast.to(payload.roomId).emit("start_receive", payload);
   });
 
   socket.on("stop_time", (roomId) => {
