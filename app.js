@@ -42,7 +42,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
   app.use(hpp());
@@ -50,7 +49,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(
     cors({
       origin: ["*"],
-      credentials: true,
+      // credentials: true,
     })
   );
 } else {
