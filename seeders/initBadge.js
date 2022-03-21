@@ -32,37 +32,37 @@ module.exports = {
         createdAt: new Date,
         updatedAt: new Date,
         desc: "스포츠 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/sports.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/sports.svg",
       }, {
         name: "study",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "스터디 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/study.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/study.svg",
       }, {
         name: "counsel",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "상담 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/counseling.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/counseling.svg",
       }, {
         name: "culture",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "문화 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/culture.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/culture.svg",
       }, {
         name: "etc",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "기타 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/etc.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/etc.svg",
       }, {
         name: "firstCome",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "선착순 100명에게만 지급되는 뱃지입니다.",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/firstCome.svg",
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/firstCome.svg",
         leftBadges: 100,
       }, {
         name: "reviewer",
@@ -75,7 +75,7 @@ module.exports = {
         createdAt: new Date,
         updatedAt: new Date,
         desc: "잠긴 뱃지",
-        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/lock.svg"
+        imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/lock.svg"
       },
     ]);
   },
