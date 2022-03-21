@@ -92,7 +92,7 @@ module.exports = {
     }),
 
     masterBadge: asyncWrapper(async (req, res) => {
-      const { userId } = req.params;
+      const { id: userId } = res.locals.user;
       const { badgeId } = req.body;
 
       const user = await User.findOne({
