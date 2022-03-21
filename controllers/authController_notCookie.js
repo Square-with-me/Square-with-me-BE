@@ -210,6 +210,7 @@ module.exports = {
             res.status(200).json({
               isSuccess: true,
               data: {
+                token,
                 user,
                 badge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음, S3로 전달하는 선착순 뱃지 이미지 링크도 들어있음
               },
@@ -218,6 +219,7 @@ module.exports = {
             res.status(200).json({
               isSuccess: true,
               data: {
+                token,
                 user,
               },
             });
@@ -332,6 +334,7 @@ module.exports = {
         return res.status(200).json({
           isSuccess: true,
           data: {
+            token,
             user: fullUser,
             badge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음
           },
@@ -340,6 +343,7 @@ module.exports = {
         return res.status(200).json({
           isSuccess: true,
           data: {
+            token,
             user: fullUser,
           },
         });
