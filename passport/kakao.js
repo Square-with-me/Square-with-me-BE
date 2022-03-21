@@ -34,7 +34,7 @@ module.exports = () => {
             include: [{
               model: Badge,
               as: "MasterBadge",
-              attributes: ["id", "name"],
+              attributes: ["id", "name", "imageUrl"],
             }],
           });
           if(exUser) {
