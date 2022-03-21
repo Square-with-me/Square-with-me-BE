@@ -169,11 +169,15 @@ module.exports = {
     
     // 보유한 뱃지 정보 가져오기는 아직 보류
     badges: asyncWrapper(async (req, res) => {
-      const { userId } = res.locals.user;
+      const { user } = res.locals;
+
+      const badges = await user.getMyBadges({
+        attributes: ["id", "name", "imageUrl"],
+      });
 
       return res.status(200).json({
         isSuccess: true,
-        // data:
+        data: badges,
       });
     }),
 
