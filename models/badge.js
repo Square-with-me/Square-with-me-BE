@@ -1,3 +1,5 @@
+const db = require(".");
+
 module.exports = (sequelize, DataTypes) => {
   const Badge = sequelize.define(
     'badge',
@@ -7,14 +9,23 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
       },
-      condition: {
-        type: DataTypes.STRING(40),
-        allowNull: false,
-      },
+      // condition: {
+      //   type: DataTypes.STRING(40),
+      //   allowNull: false,
+      // }, ch: 필요 없을 것으로 보임
       desc: {
         type: DataTypes.STRING(40),
         allowNull: false,
-      }
+      },
+      imageUrl: {
+        type: DataTypes.STRING(300), // 길이 필요에 따라 조정 가능
+        allowNull: false,
+      },
+      leftBadges: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
     },
     {
       charset: 'utf8',
