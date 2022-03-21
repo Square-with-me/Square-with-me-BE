@@ -10,7 +10,7 @@ const UserController = require("../controllers/userController");
 const RoomController = require("../controllers/roomController");
 
 // utils
-const { localUpload } = require("../utils/util");
+const { localUpload, s3Upload } = require("../utils/util");
 
 // middlewares
 const middleware = require("../utils/middleware");
@@ -50,13 +50,13 @@ router.get("/rooms", RoomController.get.rooms);   // 방 목록 불러오기
 router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms);   // 방 목록 불러오기
 
 // /api/upload
-router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
-  res.json(req.file.filename);
-});   // 이미지 업로드
+// router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
+//   res.json(req.file.filename);
+// });   // 이미지 업로드
 
 // /api/upload
-// router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
-//   res.json(req.file.location);
-// });   // 이미지 업로드 for S3
+router.post("/upload/image", middleware.auth, s3Upload.single("image"), (req, res, next) => {
+  res.json(req.file.location);
+});   // 이미지 업로드 for S3
 
 module.exports = router;
