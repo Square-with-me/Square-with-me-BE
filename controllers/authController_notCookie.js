@@ -191,7 +191,7 @@ module.exports = {
           });
           const isGivenBadge = await user.getMyBadges({
             where: {
-              badgeId: firstComeBadge.id,
+              where: { id: firstComeBadge.id, },
             },
           }); // 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
 
@@ -200,7 +200,7 @@ module.exports = {
 
           // ch: 100번이라는 숫자와 비교하는 것으로 식을 짜면 mysql의 특성상 1 ~ 100번 사이의 유저가 탈퇴했다고해도 그 다음 번호의 사람에게 뱃지를 주지는 않는다.
 
-          if (!isGivenBadge && 0 < leftBadge) {
+          if (isGivenBadge.length === 0 && 0 < leftBadge) {
             await firstComeBadge.decrement("leftBadges");
 
             await user.addMyBadges(
@@ -212,7 +212,7 @@ module.exports = {
               data: {
                 token,
                 user,
-                badge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음, S3로 전달하는 선착순 뱃지 이미지 링크도 들어있음
+                newBadge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음, S3로 전달하는 선착순 뱃지 이미지 링크도 들어있음
               },
             });
           } else {
@@ -300,7 +300,7 @@ module.exports = {
           {
             model: Badge,
             as: "MasterBadge",
-            attributes: ["id", "name"],
+            attributes: ["id", "name", "imageUrl"],
           },
         ],
       });
@@ -316,27 +316,22 @@ module.exports = {
         },
       });
       const isGivenBadge = await user.getMyBadges({
-        where: {
-          badgeId: firstComeBadge.id,
-        },
-      }); // 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
+        where: { id: firstComeBadge.id, },
+      })
 
       // 100번째 까지 모두 지급되었는지 확인
       const leftBadge = firstComeBadge.leftBadges;
 
-      if (!isGivenBadge && user.type === "local" && 0 < leftBadge) {
+      if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
         // ch: 로컬로 로그인한 사람에게만 지급, 카카오는 위에 따로 구현되어 있음
-
-        await user.addMyBadges(
-          firstComeBadge.id // 특정 유저에게 선착순 뱃지가 없으므로 해당 유저의 아이디에 선착순 유저 뱃지 지급
-        );
+        await user.addMyBadges(firstComeBadge.id);  // 특정 유저에게 선착순 뱃지가 없으므로 해당 유저의 아이디에 선착순 유저 뱃지 지급
 
         return res.status(200).json({
           isSuccess: true,
           data: {
             token,
             user: fullUser,
-            badge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음
+            newBadge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음
           },
         });
       } else {
