@@ -95,14 +95,17 @@ io.on("connection", (socket) => {
   socket.on("send_message", (payload) => {
     socket.broadcast.to(payload.roomId).emit('receive_message', payload);
   });
+  socket.on("send_emoji", (payload) => {
+    socket.broadcast.to(payload.roomId).emit('receive_emoji', payload);
+  });
 
   socket.on("save_time", (payload) => {
     time = payload;
-    console.log("업데이트 된 시간", time);
   });
 
   socket.on("disconnecting", async () => {
     console.log("방 나가기", roomId, userId, categoryId, date, time)
+
     const data = {
       roomId,
       userId,
