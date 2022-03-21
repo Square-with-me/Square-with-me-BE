@@ -2,7 +2,7 @@ const { Op } = require("sequelize");
 
 // models
 const { 
-  Room, Tag, Category, User, Viewer, MonthRecord, Like, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord
+  Room, Tag, Category, User, MonthRecord, Like, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord
 } = require("../models");
 
 // utils
@@ -287,7 +287,6 @@ module.exports = {
 
   delete: {
     participant: async (data) => {
-      console.log("controllerㄹ 왔음", data);
       const { roomId, userId, time, categoryId, date} = data;
 
       const room = await Room.findOne({
@@ -371,132 +370,6 @@ module.exports = {
         time: preMonthRecord.time + time,
       });
 
- // *****ch: 시간과 관련된 뱃지들 지급*****
-
-      // 유저의 기록 찾기
-      const theRecords = await WeekRecord.findOne({
-        where: {
-          userId,
-        },
-      });
-      // 유저가 누군지 지정해주기
-      const thatUser = await User.findOne({
-        where: {
-          userId,
-        },
-      });
-
-      // 특정 카테고리 이름 가져오기
-      const theCategory = await Category.findOne({
-        where: {
-          id: categoryId,
-        },
-      })
-      const category = theCategory.name
-      
-      /*
-      ch: 예시로 각각 카테고리별 시간 100시간 이상일 떄 해당 뱃지 지급한다고 가정,
-      기준 추후에 달라지면 각각 설정하기 위해 if (100 <= theRecords[category] 이 구문 각각의 if 절에 넣어줌
-      */
-
-      // 뱃지 카테고리 종류별로 가져오기 beauty, study, sports, counsel, culture, etc
-      const theBadge = [];
-
-      if (category === "beauty") {
-        // Badge 테이블에 등록된 해당 뱃지 가져와야 함
-        theBadge = await Badge.findOne({
-          where: {
-            name: "beauty", // 해당 뱃지 이름이나 id로 찾아야 함
-          },
-        });
-
-        // 그 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      } else if (category === "study") {
-        theBadge = await Badge.findOne({
-          where: {
-            name: "study",
-          },
-        });
-
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      } else if (category === "sports") {
-        theBadge = await Badge.findOne({
-          where: {
-            name: "sports",
-          },
-        });
-
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      } else if (category === "counsel") {
-        theBadge = await Badge.findOne({
-          where: {
-            name: "counsel",
-          },
-        });
-
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      } else if (category === "culture") {
-        theBadge = await Badge.findOne({
-          where: {
-            name: "culture",
-          },
-        });
-
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      } else {
-        theBadge = await Badge.findOne({
-          where: {
-            name: "etc",
-          },
-        });
-
-        const myBadges = await thatUser.getMyBadges({
-          where: {
-            badgeId: theBadge.id,
-          },
-        });
-        if (100 <= theRecords[category] && !myBadges) {
-          await thatUser.addMyBadges(theBadge.id);
-        }
-      }
-
       // 방장인지 확인
       const isMasterUser = userId === room.masterUserId;
       switch(isMasterUser) {
@@ -534,8 +407,6 @@ module.exports = {
 
       return {
         isSuccess: true,
-        category: category, // ch: 어떤 뱃지를 주어야하는지 알려주기 위해 같이 전달
-        imageUrl: theBadge.imageUrl, // ch: 뱃지가 있을 경우 여기다가 반환해줄 S3 이미지 링크 넣어서 같이 반환해주기
       };
     },
 
