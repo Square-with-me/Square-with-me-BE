@@ -89,7 +89,7 @@ const { asyncWrapper } = require("./util");
 //           include: [{
 //             model: Badge,
 //             as: "MasterBadge",
-//             attributes: ["id", "name"],
+//             attributes: ["id", "name", "imageUrl"],
 //           }],
 //         })
 //         if (!user) {
@@ -139,7 +139,7 @@ module.exports = {
         include: [{
           model: Badge,
           as: "MasterBadge",
-          attributes: ["id", "name"],
+          attributes: ["id", "name", "imageUrl"],
         }],
       })
       if(!user) {
