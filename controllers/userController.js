@@ -105,9 +105,7 @@ module.exports = {
 
       return res.status(200).json({
         isSuccess: true,
-        data: {
-          MasterBadgeId: badgeId,
-        },
+        data: badgeId,
       });
     }),
   },
