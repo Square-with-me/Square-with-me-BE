@@ -54,4 +54,9 @@ router.post("/upload/image", middleware.auth, localUpload.single("image"), (req,
   res.json(req.file.filename);
 });   // 이미지 업로드
 
+// /api/upload
+// router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
+//   res.json(req.file.location);
+// });   // 이미지 업로드 for S3
+
 module.exports = router;
