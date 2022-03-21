@@ -178,12 +178,6 @@ module.exports = {
             });
           }
 
-          // 카카오 로그인 유저 뱃지 기준 확인
-
-          // *****ch: 로그인과 관련된 뱃지들 지급*****
-
-          // 선착순 뱃지 지급 + 인원 100 명 까지만 추가해야함! -> badges테이블에 leftBadges 남은 갯수가 0이 되기 전까지 지급
-          //선착순 뱃지 이름을 firstCome 이라고 가정, 실제로 DB에 badge 테이블에 name 넣어주어야 함
           const firstComeBadge = await Badge.findOne({
             where: {
               name: "firstCome",
@@ -193,18 +187,15 @@ module.exports = {
             where: {
               where: { id: firstComeBadge.id, },
             },
-          }); // 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
+          });
 
-          // 100번째 까지 모두 지급되었는지 확인
           const leftBadge = firstComeBadge.leftBadges;
-
-          // ch: 100번이라는 숫자와 비교하는 것으로 식을 짜면 mysql의 특성상 1 ~ 100번 사이의 유저가 탈퇴했다고해도 그 다음 번호의 사람에게 뱃지를 주지는 않는다.
 
           if (isGivenBadge.length === 0 && 0 < leftBadge) {
             await firstComeBadge.decrement("leftBadges");
 
             await user.addMyBadges(
-              firstComeBadge.id // 특정 유저에게 선착순 뱃지가 없으므로 해당 유저의 아이디에 선착순 유저 뱃지 지급
+              firstComeBadge.id
             );
 
             res.status(200).json({
@@ -212,7 +203,7 @@ module.exports = {
               data: {
                 token,
                 user,
-                newBadge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음, S3로 전달하는 선착순 뱃지 이미지 링크도 들어있음
+                newBadge: firstComeBadge,
               },
             });
           } else {
@@ -306,10 +297,6 @@ module.exports = {
       });
       const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
 
-      // *****ch: 로컬로그인과 관련된 뱃지들 지급*****
-
-      // 선착순 뱃지 지급
-      //선착순 뱃지 이름을 firstCome 이라고 가정, 실제로 DB에 badge 테이블에 name 넣어주어야 함
       const firstComeBadge = await Badge.findOne({
         where: {
           name: "firstCome",
@@ -323,15 +310,14 @@ module.exports = {
       const leftBadge = firstComeBadge.leftBadges;
 
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
-        // ch: 로컬로 로그인한 사람에게만 지급, 카카오는 위에 따로 구현되어 있음
-        await user.addMyBadges(firstComeBadge.id);  // 특정 유저에게 선착순 뱃지가 없으므로 해당 유저의 아이디에 선착순 유저 뱃지 지급
+        await user.addMyBadges(firstComeBadge.id);
 
         return res.status(200).json({
           isSuccess: true,
           data: {
             token,
             user: fullUser,
-            newBadge: firstComeBadge, // ch: 획득한 뱃지를 리턴해주어야 특정 유저의 뱃지 페이지를 업데이트 해줄 수 있음
+            newBadge: firstComeBadge,
           },
         });
       } else {
