@@ -165,19 +165,6 @@ module.exports = {
           const { origin } = user;
           const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
 
-          // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-          await WeekRecord.create({
-            userId: user.id,
-          });
-
-          for (let i = 1; i <= 31; i++) {
-            await MonthRecord.create({
-              userId: user.id,
-              date: i,
-              time: 0,
-            });
-          }
-
           const firstComeBadge = await Badge.findOne({
             where: {
               name: "firstCome",
@@ -202,7 +189,6 @@ module.exports = {
               isSuccess: true,
               data: {
                 token,
-                user,
                 newBadge: firstComeBadge,
               },
             });
@@ -218,31 +204,6 @@ module.exports = {
         })
       )(req, res, next); // 미들웨어 확장
     },
-
-    anon: asyncWrapper(async (req, res) => {
-      const anonOrigin = createAnonOrigin();
-
-      const anonUser = await User.create({
-        origin: anonOrigin,
-        nickname: "익명의 유저",
-        pwd: "0",
-        statusMsg: "익명의 유저입니다.",
-        type: "anon",
-      });
-
-      const token = jwt.sign(
-        { origin: anonOrigin },
-        process.env.JWT_SECRET_KEY
-      );
-
-      return res.status(201).json({
-        isSuccess: true,
-        data: {
-          user: anonUser,
-          token,
-        },
-      });
-    }),
   },
 
   get: {
@@ -316,7 +277,6 @@ module.exports = {
           isSuccess: true,
           data: {
             token,
-            user: fullUser,
             newBadge: firstComeBadge,
           },
         });
@@ -325,7 +285,6 @@ module.exports = {
           isSuccess: true,
           data: {
             token,
-            user: fullUser,
           },
         });
       }
