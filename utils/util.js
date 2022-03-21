@@ -2,6 +2,16 @@ const { v4 } = require("uuid");
 const multer = require("multer");
 const path = require("path");
 
+const multerS3 = require("multer-s3");
+const AWS = require("aws-sdk");
+
+// AWS Config
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  region: "ap-northeast-2"
+});
+
 module.exports = {
   regex: {
     checkEmail: (email) => {
@@ -89,5 +99,15 @@ module.exports = {
       },
     }),
     limits: { fileSize: 20 * 1024 * 1024 },
+  }),
+
+  s3Upload: multer({
+    storage: multerS3({
+      s3: new AWS.S3(),
+      bucket: "square-with-me-bucket",
+      key(req, file, cb) {
+        cb(null, `images/${Date.now()}_${path.basename(file.originalname)}`)
+      }
+    })
   }),
 };
