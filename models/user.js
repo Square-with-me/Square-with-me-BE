@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       profileImg: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(200),
         allowNull: true,
       },
       statusMsg: {
