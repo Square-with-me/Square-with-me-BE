@@ -17,7 +17,6 @@ const middleware = require("../utils/middleware");
 
 // api/auth
 router.post("/auth/local", AuthController.create.local);   // 회원가입
-router.get("/auth/anon", AuthController.create.anon);   // 비회원 로그인
 router.get("/auth/kakao/callback", AuthController.create.kakao);   // 카카오 로그인 콜백
 router.post("/auth", AuthController.get.auth);   // 로그인, 출석과 관련된 뱃지도 지급
 router.delete("/auth/:type", middleware.auth, AuthController.delete.auth);   // 로그아웃
