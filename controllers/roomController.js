@@ -156,7 +156,13 @@ module.exports = {
 
   get: {
     rooms: asyncWrapper(async (req, res) => {
-      const { q: query } = req.query;
+      const { q: query, p: page } = req.query;
+
+      let offset = 0;
+      if(page > 1) {
+        offset = 8 * (page - 1);
+      };
+
       let rooms = [];
       switch(query) {
         case "hot":  // 인기 방 목록 가져오기
@@ -179,6 +185,8 @@ module.exports = {
         case "all":
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
+            offset: offset,
+            limit: 8,
             attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
@@ -201,6 +209,8 @@ module.exports = {
                 { isSecret: false, },
               ],
             },
+            offset: offset,
+            limit: 8,
             attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
@@ -220,6 +230,8 @@ module.exports = {
             where: {
               title: { [Op.like]: `%${query}%` },
             },
+            offset: offset,
+            limit: 8,
             attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
             include: [{
               model: Category,
@@ -243,10 +255,18 @@ module.exports = {
 
     categoryRooms: asyncWrapper(async (req, res) => {
       const { categoryId } = req.params;
+      const { p: page } = req.query;
 
+      let offset = 0;
+      if(page > 1) {
+        offset = 8 * (page - 1);
+      };
+      
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
+        offset: offset,
+        limit: 8,
         attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
         include: [{
           model: Category,
