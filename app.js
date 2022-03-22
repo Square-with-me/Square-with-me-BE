@@ -6,8 +6,13 @@ const hpp = require("hpp");
 const helmet = require("helmet");
 const fs = require("fs");
 const cookieParser = require("cookie-parser");
+const connect = require('./mongoSchemas/index');
 
 const app = express();
+
+// 몽고 db 커넥트
+connect();
+console.log('몽고DB도 연결됨, app.js에서')
 
 // MySQL
 const db = require("./models");

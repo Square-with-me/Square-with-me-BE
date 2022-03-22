@@ -2,9 +2,12 @@
 const { asyncWrapper, regex } = require("../utils/util");
 
 // models
-const { User, Badge, MonthRecord, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
+const { User, Badge } = require("../models");
+// const { User, Badge, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
 
-
+// Mongo DB 시간기록
+const WeekRecord = require("../mongoSchemas/weekRecord");
+const MonthRecord = require("../mongoSchemas/monthRecord");
 
 module.exports = {
   create: {
@@ -142,13 +145,22 @@ module.exports = {
       const { id } = res.locals.user;
 
       // 주간 기록 가져오기
-      const record = await User.findOne({
+      // 창훈 Mongo DB 테스트 코드
+      
+const theRecord = await WeekRecord.findOne({userId: id})
+console.log("이야 성공이닷",theRecord)
+
+      const record = await User.findOne(
+        {
         where: { id },
         attributes: ["id"],
-        include: [{
-          model: BeautyRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
+        include: [
+          // 원래 코드
+        //   {
+        //   model: BeautyRecord,
+        //   attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
+        // },
+        {
           model: SportsRecord,
           attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
         }, {

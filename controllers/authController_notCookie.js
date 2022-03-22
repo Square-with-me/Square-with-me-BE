@@ -11,18 +11,27 @@ const {
 } = require("../utils/util");
 
 // models
-const {
-  User,
-  Badge,
-  WeekRecord,
-  MonthRecord,
-  BeautyRecord,
-  SportsRecord,
-  StudyRecord,
-  CounselingRecord,
-  CultureRecord,
-  ETCRecord,
-} = require("../models");
+
+//원래 코드
+// const {
+//   User,
+//   Badge,
+//   WeekRecord,
+//   MonthRecord,
+//   BeautyRecord,
+//   SportsRecord,
+//   StudyRecord,
+//   CounselingRecord,
+//   CultureRecord,
+//   ETCRecord,
+// } = require("../models");
+
+
+const { User, Badge } = require("../models");
+
+// Mongo DB 시간기록
+const WeekRecord = require("../mongoSchemas/weekRecord");
+const MonthRecord = require("../mongoSchemas/monthRecord");
 
 module.exports = {
   create: {
@@ -86,64 +95,76 @@ module.exports = {
         type: "local",
       });
 
+
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-      await BeautyRecord.create({
-        userId: user.id,
-      });
 
-      await SportsRecord.create({
-        userId: user.id,
-      });
-
-      await StudyRecord.create({
-        userId: user.id,
-      });
-
-      await CounselingRecord.create({
-        userId: user.id,
-      });
-
-      await CultureRecord.create({
-        userId: user.id,
-      });
-
-      await ETCRecord.create({
-        userId: user.id,
-      });
-
-      await MonthRecord.bulkCreate([
-        { userId: user.id, date: 1 },
-        { userId: user.id, date: 2 },
-        { userId: user.id, date: 3 },
-        { userId: user.id, date: 4 },
-        { userId: user.id, date: 5 },
-        { userId: user.id, date: 6 },
-        { userId: user.id, date: 7 },
-        { userId: user.id, date: 8 },
-        { userId: user.id, date: 9 },
-        { userId: user.id, date: 10 },
-        { userId: user.id, date: 11 },
-        { userId: user.id, date: 12 },
-        { userId: user.id, date: 13 },
-        { userId: user.id, date: 14 },
-        { userId: user.id, date: 15 },
-        { userId: user.id, date: 16 },
-        { userId: user.id, date: 17 },
-        { userId: user.id, date: 18 },
-        { userId: user.id, date: 19 },
-        { userId: user.id, date: 20 },
-        { userId: user.id, date: 21 },
-        { userId: user.id, date: 22 },
-        { userId: user.id, date: 23 },
-        { userId: user.id, date: 24 },
-        { userId: user.id, date: 25 },
-        { userId: user.id, date: 26 },
-        { userId: user.id, date: 27 },
-        { userId: user.id, date: 28 },
-        { userId: user.id, date: 29 },
-        { userId: user.id, date: 30 },
-        { userId: user.id, date: 31 },
+      await WeekRecord.insertMany([
+        { userId: user.id, category: "beauty",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
+        { userId: user.id, category: "sports",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
+        { userId: user.id, category: "study",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
+        { userId: user.id, category: "counseling",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
+        { userId: user.id, category: "culture",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
+        { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
       ]);
+      // // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
+      // await BeautyRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await SportsRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await StudyRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await CounselingRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await CultureRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await ETCRecord.create({
+      //   userId: user.id,
+      // });
+
+      await MonthRecord.insertMany([
+        { userId: user.id, date: 1, time: 0 },
+        { userId: user.id, date: 2, time: 0 },
+        { userId: user.id, date: 3, time: 0 },
+        { userId: user.id, date: 4, time: 0 },
+        { userId: user.id, date: 5, time: 0 },
+        { userId: user.id, date: 6, time: 0 },
+        { userId: user.id, date: 7, time: 0 },
+        { userId: user.id, date: 8, time: 0 },
+        { userId: user.id, date: 9, time: 0 },
+        { userId: user.id, date: 10, time: 0 },
+        { userId: user.id, date: 11, time: 0 },
+        { userId: user.id, date: 12, time: 0 },
+        { userId: user.id, date: 13, time: 0 },
+        { userId: user.id, date: 14, time: 0 },
+        { userId: user.id, date: 15, time: 0 },
+        { userId: user.id, date: 16, time: 0 },
+        { userId: user.id, date: 17, time: 0 },
+        { userId: user.id, date: 18, time: 0 },
+        { userId: user.id, date: 19, time: 0 },
+        { userId: user.id, date: 20, time: 0 },
+        { userId: user.id, date: 21, time: 0 },
+        { userId: user.id, date: 22, time: 0 },
+        { userId: user.id, date: 23, time: 0 },
+        { userId: user.id, date: 24, time: 0 },
+        { userId: user.id, date: 25, time: 0 },
+        { userId: user.id, date: 26, time: 0 },
+        { userId: user.id, date: 27, time: 0 },
+        { userId: user.id, date: 28, time: 0 },
+        { userId: user.id, date: 29, time: 0 },
+        { userId: user.id, date: 30, time: 0 },
+        { userId: user.id, date: 31, time: 0 },
+      ]);
+
 
       return res.status(201).json({
         isSuccess: true,
@@ -258,6 +279,7 @@ module.exports = {
       });
       const token = jwt.sign({ origin }, process.env.JWT_SECRET_KEY);
 
+      // 로컬 로그인 뱃지 지급
       const firstComeBadge = await Badge.findOne({
         where: {
           name: "firstCome",
