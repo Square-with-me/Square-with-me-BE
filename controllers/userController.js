@@ -4,6 +4,8 @@ const { asyncWrapper, regex } = require("../utils/util");
 // models
 const { User, Badge, MonthRecord, BeautyRecord, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
 
+
+
 module.exports = {
   create: {
     
