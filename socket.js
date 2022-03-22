@@ -104,8 +104,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnecting", async () => {
-    console.log("방 나가기", roomId, userId, categoryId, date, time)
-
     const data = {
       roomId,
       userId,
