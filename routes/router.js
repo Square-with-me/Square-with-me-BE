@@ -36,7 +36,7 @@ router.patch("/user/:userId/profile/masterBadge", middleware.auth, UserControlle
 router.post("/room/new", middleware.auth, RoomController.create.room);   // 방 생성하기
 router.post("/room/:roomId/user/:userId", middleware.auth, RoomController.create.participant);   // 방 참가하기
 router.get("/room/:roomId/pwd/:pwd", middleware.auth, RoomController.get.pwd);  // 비밀번호 확인하기
-router.delete("/room/:roomId/user/:userId", middleware.auth, RoomController.delete.participant);   // 방 나가기, 시간과 관련된 뱃지 지급
+// router.delete("/room/:roomId/user/:userId", middleware.auth, RoomController.delete.participant);   // 방 나가기, 시간과 관련된 뱃지 지급
 
 router.get("/room/:roomId/like", middleware.auth, RoomController.create.like);   // 좋아요
 router.delete("/room/:roomId/like", middleware.auth, RoomController.delete.like);   // 좋아요 취소

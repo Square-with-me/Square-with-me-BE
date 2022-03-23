@@ -382,14 +382,12 @@ module.exports = {
   },
 
   delete: {
-    participant: asyncWrapper(async (req, res) => {
-      const { roomId, userId, time, categoryId, date } = req.body.data; // 기존 코드는 받는 인자 data, 테스트 할 때는 req.body.data로 테스트, 썬더 클라이언트에서 body에 필요한 데이터 넣음
-      // 라우터에서 이미 이 부분을 한번 호출하고 그것과 별개로 socket의 에서 data에 필요한 정보를 채우고 이 부분을 실행하는 데
-      // data가 실리기 전 한번 실행되고 나서 또 실행되는 것은 아닌지
-      // 기존 코드에 asyncWrapper 씌워서 예외처리해줌,
+    participant: async (data) => {
+      try { // asyncWrapper는 http 요청에 맞춰진 것이므로 여기선 try catch 구문으로 에러 캐치
 
-      console.log("req란 이것이다", req);
-      console.log("req.body란 이것이다", req.body);
+        const { roomId, userId, time, categoryId, date } = data; // 기존 코드는 받는 인자 data, 테스트 할 때는 req.body.data로 테스트, 썬더 클라이언트에서 body에 필요한 데이터 넣음
+    
+      console.log("data는 이것이다",data)
 
       // 특정 카테고리 이름 가져오기
 
@@ -675,18 +673,24 @@ module.exports = {
           id: theBadge.id,
         },
       });
-      if (userHasBadge !== []) {
-        return res.json({
-          isSuccess: true,
-          category: category, // ch: 어떤 뱃지를 주어야하는지 알려주기 위해 같이 전달, 카테고리 한글명 전달
-          imageUrl: theBadge.imageUrl, // ch: 뱃지가 있을 경우 여기다가 반환해줄 S3 이미지 링크 넣어서 같이 반환해주기// 이미 url 링크 지급한 적 있으면 보내지 않게 하기는 추후 고민
-        });
-      } else {
-        return res.json({
-          isSuccess: true,
-        });
+      // if (userHasBadge !== []) {
+      //   return {
+      //     isSuccess: true,
+      //     category: category, // ch: 어떤 뱃지를 주어야하는지 알려주기 위해 같이 전달, 카테고리 한글명 전달
+      //     imageUrl: theBadge.imageUrl, // ch: 뱃지가 있을 경우 여기다가 반환해줄 S3 이미지 링크 넣어서 같이 반환해주기// 이미 url 링크 지급한 적 있으면 보내지 않게 하기는 추후 고민
+      //     userGotBadge: true
+      //   };
+      // } else {
+      //   return {
+      //     isSuccess: true,
+      //     userGotBadge: false
+      //   };
+      // }
+
+      } catch(error) {
+        console.error(error);
       }
-    }),
+    },
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;
