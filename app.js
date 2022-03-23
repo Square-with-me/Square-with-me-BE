@@ -53,8 +53,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
-      origin: "*",
-      // credentials: true,
+      origin: "http://nemowithme.com",
+      credentials: true,
     })
   );
 } else {
