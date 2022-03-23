@@ -366,16 +366,9 @@ module.exports = {
         }
       );
 
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        path: "/",
-        sameSite: "lax",
-      }); //options 참고 : https://www.npmjs.com/package/cookie
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        path: "/",
-        sameSite: "lax",
-      });
+      //options 참고 : https://www.npmjs.com/package/cookie
+      res.cookie("accessToken", accessToken, { path: "/", httpOnly: true, sameSite: "lax", });
+      res.cookie("refreshToken", refreshToken, { path: "/", httpOnly: true, sameSite: "lax", });
 
       const firstComeBadge = await Badge.findOne({
         where: {
