@@ -104,7 +104,7 @@ module.exports = {
       });
 
       await user.update({
-        MasterBadgeId: badgeId,
+        masterBadgeId: badgeId,
       });
       const myMasterBadge = await Badge.findOne({
         where: { id: badgeId }
