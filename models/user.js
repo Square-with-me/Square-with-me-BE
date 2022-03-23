@@ -27,7 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       type: {
         type: DataTypes.STRING(10),
         allowNull: false,
-      }
+      },
+      masterBadgeId: {
+        type: DataTypes.STRING(10),
+        allowNull: true,
+      },
     },
     {
       charset: "utf8",
