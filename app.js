@@ -44,8 +44,8 @@ app.use(cookieParser());
 
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
-  // app.use(hpp());
-  // app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(hpp());
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
       origin: "http://nemowithme.com",
