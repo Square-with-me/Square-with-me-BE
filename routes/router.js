@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 // controllers
-// const AuthController = require("../controllers/authController");  // 쿠키 버전
-const AuthController = require("../controllers/authController_notCookie");  // 쿠키 x 버전
+const AuthController = require("../controllers/authController");  // 쿠키 버전
+// const AuthController = require("../controllers/authController_notCookie");  // 쿠키 x 버전
 
 
 const UserController = require("../controllers/userController");
