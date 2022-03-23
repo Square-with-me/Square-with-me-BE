@@ -2,25 +2,7 @@ const { Op } = require("sequelize");
 
 // models
 
-// 원래코드
-
-// const {
-//   Room,
-//   Tag,
-//   Category,
-//   User,
-//   Viewer,
-//   // MonthRecord,
-//   Like,
-//   SportsRecord,
-//   StudyRecord,
-//   CounselingRecord,
-//   CultureRecord,
-//   ETCRecord,
-// } = require("../models");
-
-
-const { Room, Tag, Category, User, Viewer, Like } = require("../models");
+const { Room, Tag, Category, User, Viewer, Like, Badge } = require("../models");
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");
@@ -202,9 +184,9 @@ module.exports = {
       const { q: query, p: page } = req.query;
 
       let offset = 0;
-      if(page > 1) {
+      if (page > 1) {
         offset = 8 * (page - 1);
-      };
+      }
 
       let rooms = [];
       switch (query) {
@@ -240,17 +222,27 @@ module.exports = {
           rooms = await Room.findAll({
             offset: offset,
             limit: 8,
-            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
-            include: [{
-              model: Category,
-              attributes: ["id", "name"],
-            }, {
-              model: Tag,
-              as: "Tags",
-              attributes: ["id", "name"],
-              through: { attributes: [] },
-            }],
-            order: [ ["createdAt", "desc"] ],
+            attributes: [
+              "id",
+              "title",
+              "isSecret",
+              "createdAt",
+              "likeCnt",
+              "participantCnt",
+            ],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "name"],
+              },
+              {
+                model: Tag,
+                as: "Tags",
+                attributes: ["id", "name"],
+                through: { attributes: [] },
+              },
+            ],
+            order: [["createdAt", "desc"]],
           });
           break;
 
@@ -264,18 +256,28 @@ module.exports = {
             },
             offset: offset,
             limit: 8,
-            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
-            include: [{
-              model: Category,
-              attributes: ["id", "name"],
-            }, {
-              model: Tag,
-              as: "Tags",
-              attributes: ["id", "name"],
-              through: { attributes: [] },
-            }],
-            order: [ ["createdAt", "desc"] ],
-          })
+            attributes: [
+              "id",
+              "title",
+              "isSecret",
+              "createdAt",
+              "likeCnt",
+              "participantCnt",
+            ],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "name"],
+              },
+              {
+                model: Tag,
+                as: "Tags",
+                attributes: ["id", "name"],
+                through: { attributes: [] },
+              },
+            ],
+            order: [["createdAt", "desc"]],
+          });
           break;
 
         default:
@@ -286,17 +288,27 @@ module.exports = {
             },
             offset: offset,
             limit: 8,
-            attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
-            include: [{
-              model: Category,
-              attributes: ["id", "name"],
-            }, {
-              model: Tag,
-              as: "Tags",
-              attributes: ["id", "name"],
-              through: { attributes: [] },
-            }],
-            order: [ ["createdAt", "desc"] ],
+            attributes: [
+              "id",
+              "title",
+              "isSecret",
+              "createdAt",
+              "likeCnt",
+              "participantCnt",
+            ],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "name"],
+              },
+              {
+                model: Tag,
+                as: "Tags",
+                attributes: ["id", "name"],
+                through: { attributes: [] },
+              },
+            ],
+            order: [["createdAt", "desc"]],
           });
           break;
       }
@@ -312,26 +324,36 @@ module.exports = {
       const { p: page } = req.query;
 
       let offset = 0;
-      if(page > 1) {
+      if (page > 1) {
         offset = 8 * (page - 1);
-      };
-      
+      }
+
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
         offset: offset,
         limit: 8,
-        attributes: ["id", "title", "isSecret", "createdAt", "likeCnt", "participantCnt"],
-        include: [{
-          model: Category,
-          attributes: ["id", "name"],
-        }, {
-          model: Tag,
-          as: "Tags",
-          attributes: ["id", "name"],
-          through: { attributes: [] },
-        }],
-        order: [ ["createdAt", "desc"] ],
+        attributes: [
+          "id",
+          "title",
+          "isSecret",
+          "createdAt",
+          "likeCnt",
+          "participantCnt",
+        ],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "name"],
+          },
+          {
+            model: Tag,
+            as: "Tags",
+            attributes: ["id", "name"],
+            through: { attributes: [] },
+          },
+        ],
+        order: [["createdAt", "desc"]],
       });
 
       return res.status(200).json({
@@ -360,17 +382,23 @@ module.exports = {
   },
 
   delete: {
-    participant: async (data) => {
-      console.log("controller 왔음", data);
-      const { roomId, userId, time, categoryId, date } = data;
+    participant: asyncWrapper(async (req, res) => {
+      const { roomId, userId, time, categoryId, date } = req.body.data; // 기존 코드는 받는 인자 data, 테스트 할 때는 req.body.data로 테스트, 썬더 클라이언트에서 body에 필요한 데이터 넣음
+      // 라우터에서 이미 이 부분을 한번 호출하고 그것과 별개로 socket의 에서 data에 필요한 정보를 채우고 이 부분을 실행하는 데
+      // data가 실리기 전 한번 실행되고 나서 또 실행되는 것은 아닌지
+      // 기존 코드에 asyncWrapper 씌워서 예외처리해줌,
+
+      console.log("req란 이것이다", req);
+      console.log("req.body란 이것이다", req.body);
 
       // 특정 카테고리 이름 가져오기
+
       const theCategory = await Category.findOne({
         where: {
           id: categoryId,
         },
       });
-      const category = theCategory.name;
+      const category = theCategory.name; // 카테고리명은 한글
 
       const room = await Room.findOne({
         where: { id: roomId },
@@ -395,7 +423,7 @@ module.exports = {
           preRecord = await WeekRecord.findOne({
             // where: { userId },
             userId,
-            category: "beauty"
+            category: "beauty",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -405,7 +433,7 @@ module.exports = {
         case 2:
           preRecord = await WeekRecord.findOne({
             userId,
-            category: "sports"
+            category: "sports",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -414,7 +442,7 @@ module.exports = {
         case 3:
           preRecord = await WeekRecord.findOne({
             userId,
-            category: "study"
+            category: "study",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -423,7 +451,7 @@ module.exports = {
         case 4:
           preRecord = await WeekRecord.findOne({
             userId,
-            category: "counseling"
+            category: "counseling",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -432,7 +460,7 @@ module.exports = {
         case 5:
           preRecord = await WeekRecord.findOne({
             userId,
-            category: "culture"
+            category: "culture",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -441,7 +469,7 @@ module.exports = {
         case 6:
           preRecord = await WeekRecord.findOne({
             userId,
-            category: "etc"
+            category: "etc",
           });
 
           updateOption[day] = preRecord[day] + time;
@@ -453,28 +481,52 @@ module.exports = {
 
       // 한달 기록 테이블에 시간 기록
       const preMonthRecord = await MonthRecord.findOne({
-          userId,
-          date,
+        userId,
+        date,
       });
       await preMonthRecord.updateOne({
         time: preMonthRecord.time + time,
       });
 
-      // *****ch: 시간과 관련된 뱃지들 지급*****
+      // *****시간과 관련된 뱃지들 지급*****
+
+      // 카테고리명은 한글, 뱃지 카테고리명은 영어, 둘 사이를 매치시켜주기 위함
+
+      let badgeCategory = "";
+      if (category === "뷰티") {
+        badgeCategory = "beauty";
+      } else if (category === "운동") {
+        badgeCategory = "sports";
+      } else if (category === "스터디") {
+        badgeCategory = "study";
+      } else if (category === "상담") {
+        badgeCategory = "counseling";
+      } else if (category === "문화") {
+        badgeCategory = "culture";
+      } else if (category === "기타") {
+        badgeCategory = "etc";
+      }
 
       // 특정 유저의 특정 카테고리 기록 찾기
       const userRecords = await WeekRecord.findOne({
-          userId,
-          category: category
+        userId,
+        category: badgeCategory,
       });
 
       // 특정 유저의 특정 분야의 시간 총합
-      const categoryTotalTime = userRecords.mon + userRecords.tue + userRecords.wed + userRecords.thur + userRecords.fri + userRecords.sat + userRecords.sun
+      const categoryTotalTime =
+        userRecords.mon +
+        userRecords.tue +
+        userRecords.wed +
+        userRecords.thur +
+        userRecords.fri +
+        userRecords.sat +
+        userRecords.sun;
 
       // 유저가 누군지 지정해주기
       const thatUser = await User.findOne({
         where: {
-          userId,
+          id: userId,
         },
       });
 
@@ -484,27 +536,28 @@ module.exports = {
       */
 
       // 뱃지 카테고리 종류별로 가져오기 beauty, study, sports, counsel, culture, etc
-      const theBadge = [];
+      let theBadge = [];
 
-      if (category === "beauty") {
+      if (badgeCategory === "beauty") {
         // Badge 테이블에 등록된 해당 뱃지 가져와야 함
         theBadge = await Badge.findOne({
           where: {
-            name: "beauty", // 해당 뱃지 이름이나 id로 찾아야 함
+            name: "beauty",
           },
         });
 
         // 그 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-          await thatUser.addMyBadges(theBadge.id);
+          thatUser.addMyBadges(theBadge.id);
         }
-      } else if (category === "study") {
+      } else if (badgeCategory === "study") {
         theBadge = await Badge.findOne({
           where: {
             name: "study",
@@ -513,13 +566,13 @@ module.exports = {
 
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           await thatUser.addMyBadges(theBadge.id);
         }
-      } else if (category === "sports") {
+      } else if (badgeCategory === "sports") {
         theBadge = await Badge.findOne({
           where: {
             name: "sports",
@@ -528,28 +581,28 @@ module.exports = {
 
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           await thatUser.addMyBadges(theBadge.id);
         }
-      } else if (category === "counsel") {
+      } else if (badgeCategory === "counseling") {
         theBadge = await Badge.findOne({
           where: {
-            name: "counsel",
+            name: "counseling",
           },
         });
 
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           await thatUser.addMyBadges(theBadge.id);
         }
-      } else if (category === "culture") {
+      } else if (badgeCategory === "culture") {
         theBadge = await Badge.findOne({
           where: {
             name: "culture",
@@ -558,10 +611,10 @@ module.exports = {
 
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           await thatUser.addMyBadges(theBadge.id);
         }
       } else {
@@ -573,10 +626,10 @@ module.exports = {
 
         const isGivenBadge = await thatUser.getMyBadges({
           where: {
-            badgeId: theBadge.id,
+            id: theBadge.id,
           },
         });
-        if (100 <= categoryTotalTime && !isGivenBadge) {
+        if (100 <= categoryTotalTime && isGivenBadge !== []) {
           await thatUser.addMyBadges(theBadge.id);
         }
       }
@@ -619,21 +672,21 @@ module.exports = {
       // 리턴 전 특정 유저가 뱃지를 획득했는지 확인, 있을 경우 이미지 Url 지급
       const userHasBadge = await thatUser.getMyBadges({
         where: {
-          badgeId: theBadge.id,
+          id: theBadge.id,
         },
       });
-      if (userHasBadge) {
-        return {
+      if (userHasBadge !== []) {
+        return res.json({
           isSuccess: true,
-          category: category, // ch: 어떤 뱃지를 주어야하는지 알려주기 위해 같이 전달
+          category: category, // ch: 어떤 뱃지를 주어야하는지 알려주기 위해 같이 전달, 카테고리 한글명 전달
           imageUrl: theBadge.imageUrl, // ch: 뱃지가 있을 경우 여기다가 반환해줄 S3 이미지 링크 넣어서 같이 반환해주기// 이미 url 링크 지급한 적 있으면 보내지 않게 하기는 추후 고민
-        };
+        });
       } else {
-        return {
+        return res.json({
           isSuccess: true,
-        };
+        });
       }
-    },
+    }),
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;

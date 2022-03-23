@@ -12,21 +12,6 @@ const {
 
 // models
 
-//원래 코드
-// const {
-//   User,
-//   Badge,
-//   WeekRecord,
-//   MonthRecord,
-//   BeautyRecord,
-//   SportsRecord,
-//   StudyRecord,
-//   CounselingRecord,
-//   CultureRecord,
-//   ETCRecord,
-// } = require("../models");
-
-
 const { User, Badge } = require("../models");
 
 // Mongo DB 시간기록
@@ -87,6 +72,8 @@ module.exports = {
       }
 
       const hashedPwd = bcrypt.hashSync(pwd, 10);
+
+
       const user = await User.create({
         origin,
         nickname,
@@ -97,6 +84,7 @@ module.exports = {
 
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
+      
 
       await WeekRecord.insertMany([
         { userId: user.id, category: "beauty",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
@@ -106,30 +94,6 @@ module.exports = {
         { userId: user.id, category: "culture",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
         { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
       ]);
-      // // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-      // await BeautyRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await SportsRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await StudyRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await CounselingRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await CultureRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await ETCRecord.create({
-      //   userId: user.id,
-      // });
 
       await MonthRecord.insertMany([
         { userId: user.id, date: 1, time: 0 },

@@ -9,10 +9,6 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
       },
-      // condition: {
-      //   type: DataTypes.STRING(40),
-      //   allowNull: false,
-      // }, ch: 필요 없을 것으로 보임
       desc: {
         type: DataTypes.STRING(40),
         allowNull: false,
