@@ -368,10 +368,14 @@ module.exports = {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        domain: "nemowithme.com",
+        path: "/",
         sameSite: "lax",
       }); //options 참고 : https://www.npmjs.com/package/cookie
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
+        domain: "nemowithme.com",
+        path: "/",
         sameSite: "lax",
       });
 
