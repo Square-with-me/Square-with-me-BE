@@ -369,12 +369,12 @@ module.exports = {
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "lax",
       }); //options 참고 : https://www.npmjs.com/package/cookie
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "lax",
       });
 
       const firstComeBadge = await Badge.findOne({
