@@ -9,6 +9,9 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 // MySQL
 const db = require("./models");
 db.sequelize
@@ -30,9 +33,6 @@ try {
 
 // static
 app.use("/", express.static(path.join(__dirname, "public")));
-
-const dotenv = require("dotenv");
-dotenv.config();
 
 const passportconfig = require("./passport/kakao");
 passportconfig();
