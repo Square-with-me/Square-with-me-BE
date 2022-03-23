@@ -3,7 +3,6 @@ const { asyncWrapper, regex } = require("../utils/util");
 
 // models
 const { User, Badge } = require("../models");
-// const { User, Badge, SportsRecord, StudyRecord, CounselingRecord, CultureRecord, ETCRecord } = require("../models");
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");
@@ -107,10 +106,14 @@ module.exports = {
       await user.update({
         MasterBadgeId: badgeId,
       });
+      const myMasterBadge = await Badge.findOne({
+        where: { id: badgeId }
+      });
+      const imageUrl = await myMasterBadge.imageUrl
 
       return res.status(200).json({
         isSuccess: true,
-        data: badgeId,
+        data: imageUrl,
       });
     }),
   },

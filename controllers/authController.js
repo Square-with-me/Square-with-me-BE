@@ -13,20 +13,6 @@ const {
 
 // models
 
-// 원래 코드
-// const {
-//   User,
-//   Badge,
-//   RefreshToken,
-//   MonthRecord,
-//   BeautyRecord,
-//   SportsRecord,
-//   StudyRecord,
-//   CounselingRecord,
-//   CultureRecord,
-//   ETCRecord,
-//   BeautyRecord,
-// } = require("../models");
 
 const { User, Badge, RefreshToken } = require("../models");
 

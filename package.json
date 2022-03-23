@@ -20,6 +20,7 @@
   "dependencies": {
     "aws-sdk": "^2.1096.0",
     "bcrypt": "^5.0.1",
+    "bson": "^4.6.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
