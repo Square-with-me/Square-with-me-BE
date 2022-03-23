@@ -88,11 +88,11 @@ module.exports = {
 
       await WeekRecord.insertMany([
         { userId: user.id, category: "beauty",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
-        { userId: user.id, category: "sports",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
-        { userId: user.id, category: "study",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
-        { userId: user.id, category: "counseling",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
-        { userId: user.id, category: "culture",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
-        { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0  },
+        { userId: user.id, category: "sports",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
+        { userId: user.id, category: "study",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
+        { userId: user.id, category: "counseling",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
+        { userId: user.id, category: "culture",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
+        { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
       ]);
 
       await MonthRecord.insertMany([
