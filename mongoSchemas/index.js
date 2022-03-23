@@ -1,13 +1,13 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
-const { mongodbUrl } = process.env;
+const { MONGO_DB_URL } = process.env;
 
 
 // Mongo DB 연결 부분
 const connect = () => {
   mongoose
-      .connect(mongodbUrl, {
+      .connect(MONGO_DB_URL, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
           ignoreUndefined: true,
