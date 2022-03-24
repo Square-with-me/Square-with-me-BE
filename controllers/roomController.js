@@ -411,15 +411,70 @@ module.exports = {
       const day = getDay(date);
       console.log("유저 아이디", userId, "요일", day);
       // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
-      let preRecord = null;
+    // when a new week starts, what should I do for resetting the week data?
+    // how to check the date?
+    // date is the joining date
+    
+
+    
+
+    let preRecord = null;
+
+    let preRecords = await WeekRecord.findOne({
+      userId
+    });
+
+    let today = preRecords.lastUpdated // from DB
+    // console.log(today.getDate(),"today + getDate()")
+    // let preDateMs = today.setDate(today.getDate()+7)
+    // console.log(preDateMs, "today + 7,milliseconds")
+    // let preDate = new Date(preDateMs)
+    
+    // let DateToCompare = preDate.getDate()
+    
+    // let roomExitDate = new Date().getDate()
+
+    // ex: last last fri  next 
+    // 
+    
+    let roomExitDate = new Date()
+
+    if(roomExitDate)  
+
+
+      
+      // for(let i = 0 ; i < preRecords.length ; i ++) {
+
+      //   if (preRecords[i].lastUpdated <= roomExitDate) {
+      //       if (7 <= exitDate - preRecords[i].lastUpdated) {
+      //           await WeekRecord.updateMany({userId}, {$set: { mon: 0, tue:0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0 }})
+      //           break;
+      //       } else {
+      //         if (preRecords[i].lastUpdated - exitDate <)
+
+      //       }
+
+      //   }
+
+      // }
 
       const updateOption = {};
       switch (
         categoryId // 카테고리에 따라 시간 업데이트
       ) {
         case 1:
-          preRecord = await WeekRecord.findOne({
-            // where: { userId },
+
+        // if (true) {
+        //   preRecord = await WeekRecord.updateOne({
+        //     userId,
+        //     category: "beauty",
+        //   } ,{ $set: { mon: 0, tue:0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0 } })
+
+        // } else {
+          
+        // }
+        
+        preRecord = await WeekRecord.findOne({
             userId,
             category: "beauty",
           });

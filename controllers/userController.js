@@ -8,6 +8,7 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+
 module.exports = {
   create: {
     
@@ -147,52 +148,28 @@ module.exports = {
     records: asyncWrapper(async (req, res) => {
       const { id } = res.locals.user;
 
-      // 주간 기록 가져오기
-      // 창훈 Mongo DB 테스트 코드
+      // 네모와 함께한 시간 주간, 월간 기록 가져오기
       
-const theRecord = await WeekRecord.findOne({userId: id})
-console.log("이야 성공이닷",theRecord)
-
-      const record = await User.findOne(
-        {
-        where: { id },
-        attributes: ["id"],
-        include: [
-          // 원래 코드
-        //   {
-        //   model: BeautyRecord,
-        //   attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        // },
-        {
-          model: SportsRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
-          model: StudyRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
-          model: CounselingRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
-          model: CultureRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
-          model: ETCRecord,
-          attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
-        }, {
-          model: MonthRecord,
-          attributes: ["time", "date"],
-        }],
-      });
-      if(!record) {
+  const weekdaysRecord = await WeekRecord.find({userId: id}, {_id: 0, __v: 0})
+      console.log("주간 기록을 가져온다",weekdaysRecord)
+      // console.log(weekdaysRecord === [])
+      // console.log(weekdaysRecord) // result: []
+        // date is for the date when the person came into the room.
+      if(weekdaysRecord.length === 0) {
         return res.status(400).json({
           isSuccess: false,
           msg: "일치하는 유저 정보가 없습니다.",
         });
       };
 
+      const monthRecord = await MonthRecord.find({userId: id}, {_id: 0, __v: 0})
+
       return res.status(200).json({
         isSuccess: true,
-        data: record,
+        data: {
+          weekdaysRecord,
+          monthRecord
+        }
       });
     }),
   },

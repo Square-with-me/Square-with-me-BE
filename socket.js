@@ -100,7 +100,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("save_time", (payload) => {
-    time = payload;
+    time = payload; // data received for every 1500 seconds
   });
 
   socket.on("disconnecting", async () => {
