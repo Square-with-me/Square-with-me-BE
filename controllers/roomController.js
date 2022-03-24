@@ -416,8 +416,6 @@ module.exports = {
     // date is the joining date
     
 
-    
-
     let preRecord = null;
 
     let preRecords = await WeekRecord.findOne({
@@ -465,10 +463,10 @@ module.exports = {
         case 1:
 
         // if (true) {
-        //   preRecord = await WeekRecord.updateOne({
-        //     userId,
-        //     category: "beauty",
-        //   } ,{ $set: { mon: 0, tue:0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0 } })
+          // preRecord = await WeekRecord.updateOne({
+          //   userId,
+          //   category: "beauty",
+          // } ,{ $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0 } })
 
         // } else {
           
