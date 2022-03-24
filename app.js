@@ -48,7 +48,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
-      origin: "http://nemowithme.com",
+      origin: "https://nemowithme.com",
       credentials: true,
     })
   );
