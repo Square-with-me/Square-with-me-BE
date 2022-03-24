@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
-const fs = require("fs");
+// const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const connect = require('./mongoSchemas/index');
 
@@ -22,19 +22,19 @@ const db = require("./models");
 db.sequelize
   .sync()
   .then(() => {
-    console.log("DB 연결 성공");
+    console.log("MySQL DB 연결 성공");
   })
   .catch((error) => {
     console.error(error);
   });
 
 // public 폴더 생성
-try {
-  fs.accessSync("public");
-} catch (error) {
-  console.log("public 폴더가 없습니다. 새로 생성합니다.");
-  fs.mkdirSync("public");
-}
+// try {
+//   fs.accessSync("public");
+// } catch (error) {
+//   console.log("public 폴더가 없습니다. 새로 생성합니다.");
+//   fs.mkdirSync("public");
+// }
 
 // static
 app.use("/", express.static(path.join(__dirname, "public")));
@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(
     cors({
       origin: "https://nemowithme.com",
-      credentials: true,
+      // credentials: true,
     })
   );
 } else {
@@ -65,7 +65,11 @@ if (process.env.NODE_ENV === "production") {
       // credentials: true,
     })
   );
-}
+};
+
+router.get("/", (req, res) => {
+  return res.status(200).send("Hello");
+});
 
 // routes
 const router = require("./routes/router");
