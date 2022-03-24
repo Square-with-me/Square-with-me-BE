@@ -17,7 +17,7 @@ module.exports = {
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
+    "username": process.env.MYSQL_PRODUCTION_DB_USERNAME,
     "password": process.env.MYSQL_PRODUCTION_DB_PASSWORD,
     "database": "nemo_with_me_database",
     "host": process.env.MYSQL_PRODUCTION_DB_HOST,
