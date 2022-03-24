@@ -9,6 +9,10 @@ const weekRecordSchema = new mongoose.Schema({
     type: String,
     allowNull: false,
   },
+  lastUpdated: {
+        type: String,
+        default: new Date()
+    },
   mon: {
     type: Number,
     allowNull: false,
