@@ -22,7 +22,7 @@ module.exports = () => {
     new KakaoStrategy(
       {
         clientID: process.env.KAKAO_REST_API_KEY,
-        callbackURL: "http://localhost:3000/api/auth/kakao/callback",
+        callbackURL: "https://nemowithme.com/api/auth/kakao/callback",
       }, async (accessToken, refreshToken, profile, done) => {
         try {
           const exUser = await User.findOne({
