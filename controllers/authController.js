@@ -82,6 +82,7 @@ module.exports = {
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
+
       });
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
@@ -94,36 +95,6 @@ module.exports = {
         { userId: user.id, category: "culture", mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
         { userId: user.id, category: "etc", mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
       ]);
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "beauty"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "sports"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "study"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "counseling"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "culture"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "etc"
-      // });
 
       await MonthRecord.insertMany([
         { userId: user.id, date: 1, time: 0 },
