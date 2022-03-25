@@ -14,6 +14,11 @@ const monthRecordSchema = new mongoose.Schema({
     allowNull: false,
     defaultValue: 0,
   },
+  lastUpdatedDate: {
+    type: Date,
+    allowNull: false,
+    default: new Date()
+  },
 });
 
 module.exports = mongoose.model("monthRecords", monthRecordSchema);

@@ -40,7 +40,7 @@ module.exports = {
         desc: "스터디 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
         imageUrl: "https://square-with-me-bucket.s3.ap-northeast-2.amazonaws.com/badges/study.svg",
       }, {
-        name: "counsel",
+        name: "counseling",
         createdAt: new Date,
         updatedAt: new Date,
         desc: "상담 카테고리 1시간 달성 시 지급되는 뱃지입니다.",
