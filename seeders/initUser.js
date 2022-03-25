@@ -13,7 +13,7 @@ module.exports = {
     */
   //  일회성 컬럼 추가용
      queryInterface.addColumn('users', 'lastUpdated', {
-      type: DataTypes.DATE,
+      type: Sequelize.DATE,
         allowNull: false,
       defaultValue: new Date()
     })
