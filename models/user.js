@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(10),
         allowNull: true,
       },
+      lastUpdated: {
+        type: DataTypes.DATE(),
+        allowNull: false,
+        default: new Date()
+      },
     },
     {
       charset: "utf8",

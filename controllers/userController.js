@@ -147,6 +147,8 @@ module.exports = {
 
       // 네모와 함께한 시간 주간, 월간 기록 가져오기
 
+      //////////////////// <주간 기록>
+
       let weekdaysRecord = await WeekRecord.find(
         { userId: id },
         { _id: 0, __v: 0 }
@@ -154,7 +156,7 @@ module.exports = {
       console.log("주간 기록을 가져온다", weekdaysRecord);
       // console.log(weekdaysRecord === [])
       // console.log(weekdaysRecord) // result: []
-      // date is for the date when the person came into the room.
+      // date 는 사용자가 방에 들어온 시점을 가리킴
       if (weekdaysRecord.length === 0) {
         return res.status(400).json({
           isSuccess: false,
@@ -162,15 +164,19 @@ module.exports = {
         });
       }
 
-
-      ////////////////////// last updated column
-      //define a date object variable that will take the current system date
-      let lastUpdatedDate = weekdaysRecord[0].lastUpdated
+      const thatUser = await User.findOne({
+        where: {
+          id,
+        },
+      });
+      ////////////////////// last updated column, 마지막으로 업데이트된 날짜가 몇 주차에 속해 있는지 구하기
+      //define a date object variable that will take the current system date  
+      const lastUpdatedDate = thatUser.lastUpdated // 여기에 마지막 업데이트 된 날짜 넣어야함
 
       //find the year of the current date
       let oneJan = new Date(lastUpdatedDate.getFullYear(), 0, 1);
 
-      // calculating number of days in given year before a given date
+      // calculating number of days in given year before a given date, 일수 계산
       let numberOfDays = Math.floor(
         (lastUpdatedDate - oneJan) / (24 * 60 * 60 * 1000)
       );
@@ -185,8 +191,8 @@ module.exports = {
         "Week Numbers of current date (" + lastUpdatedDate + ") is:" + result
       );
 
-      ////////////////this time
-      let checkingDate = new Date();
+      ////////////////체크하는 시점이 몇 주차에 속해 있는지 구하기
+      const checkingDate = new Date();
 
       //find the year of the current date
       let oneJan2 = new Date(checkingDate.getFullYear(), 0, 1);
@@ -204,35 +210,66 @@ module.exports = {
         "Week Numbers of current date (" + checkingDate + ") is:" + result2
       );
 
+      // 각각의 날짜가 속한 주차가 같은지 혹은 같은 주차에 속해있지만 연도가 다른지
       if (
         result !== result2 ||
         lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()
       ) {
 
-        const dateForLastUpdated = await new Date(
-          checkingDate.getFullYear(),
-          checkingDate.getMonth() + 1,
-          checkingDate.getDate()
-        );        
+        const dateForLastUpdated = checkingDate
 
-        await WeekRecord.updateMany({
-          userId: id,
-        } ,{ $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0, lastUpdated: dateForLastUpdated } })
-        // update to 0
-        // how could I get the data from this Monday?
-        // we should get all categories' time record which starts from Monday.
-        // I have to check time and update at 1) leaving room 2) checking the time graph
-        weekdaysRecord = await WeekRecord.find(
-          { userId: id },
-          { _id: 0, __v: 0 }
-        );
+        // // how could I get the data from this Monday?
+        // // we should get all categories' time record which starts from Monday.
+        // // I have to check time and update at 1) leaving room 2) checking the time graph 방을 나갈 때, 기록을 조회할 때 둘 다 시점을 체크해야 한다.
+        //// 그렇지 않으면 오랜만에 로그인한 유저가 시간을 조회하기 전에 방에 참여했다가 나오면서 지난 주, 지지난주 누적된 시간으로 뱃지를 받을 수 있기 때문!
+
+        await User.update({
+          where: {
+            id,
+          },
+          lastUpdated: dateForLastUpdated
+        })
+
+        // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
+        await WeekRecord.updateMany({userId: id}, {$set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun :0}})
+        weekdaysRecord = await WeekRecord.find({userId: id}, { _id: 0, __v: 0 })
       }
       
-      // need to check the month is different
+      ////////////// <월간 기록>
       const monthRecord = await MonthRecord.find(
         { userId: id },
         { _id: 0, __v: 0 }
       );
+      console.log("월간 기록을 가져온다", monthRecord);
+      // date 는 사용자가 방에 들어온 시점을 가리킴
+      if (monthRecord.length === 0) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "일치하는 유저 정보가 없습니다.",
+        });
+      }
+
+      /////////// 마지막으로 기록된 시점과 현재 기록 조회하는 시점이 동일한 월에 속해 있는지 비교하고 속해있지 않다면 몇월인지 알려주며 월간 기록 리셋해주기
+
+
+      // 마지막으로 업데이트된 날짜가 몇번째 달에 속해 있는지 구하기
+      // 주는 같아도 월화수목금토일이 8월말 9월초 처럼 월이 달라지는 경우가 생기기 떄문에 주간 기록의 lastUpdated와 별도의 열 lastUpdatedDate을 MonthRecord 모델에 생성
+
+      const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1 // 배열 형태로 나올 것이기에 그 중 아무것이나 지정
+
+      // 체크하는 시점이 몇번째 달에 속해 있는지 구하기
+      // const checkingDate = new Date();
+
+      const checkingMonth = checkingDate.getMonth() + 1 // since January gives 0
+
+      // 각각의 날짜가 속한 달이 같은지 혹은 같은 달에 속해있지만 연도가 다른지
+      if (
+        lastUpdatedMonth !== checkingMonth ||
+        monthRecord[0].lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()
+      ) {
+          await MonthRecord.updateMany({userId: id}, {$set: {time: 0, lastUpdatedDate: checkingDate}})
+          monthRecord = await MonthRecord.find({userId: id}, { _id: 0, __v: 0 })
+      }
 
       return res.status(200).json({
         isSuccess: true,
