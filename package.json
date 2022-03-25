@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server",
-    "start": "cross-env NODE_ENV=production pm2 start server.js",
+    "start": "pm2 start server.js",
     "prettify": "prettier --wrtie *.js **/*.js"
   },
   "author": "square-with-me-BE-team",
