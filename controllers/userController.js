@@ -206,6 +206,8 @@ module.exports = {
       const lastUpdatedDate = thatUser.lastUpdated; // 여기에 마지막 업데이트 된 날짜 넣어야함
       const checkingDate = kr_curr
 
+      console.log(lastUpdatedDate,"lastUpdatedDate는 이것이다")
+      console.log(checkingDate, "checkingDate")
       const oneDay = 86400000; //  Milliseconds for a day
 
 
@@ -216,6 +218,7 @@ module.exports = {
         lastUpdatedDate.getDate(),
         0
       );
+      console.log(lastUpdatedZeroHour, "lastUpdatedZeroHour다!")
 
       const checkingZeroHour = new Date(
         checkingDate.getFullYear(),
@@ -224,7 +227,8 @@ module.exports = {
         0
       );
 
-      
+      console.log(checkingZeroHour, "checkingZeroHour")
+
       // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
       if (checkingZeroHour.getDay() === 0) {
         if (
@@ -241,6 +245,7 @@ module.exports = {
             lastUpdated: checkingDate,
           });
 
+          console.log("1111업데이트는 됐나?")
           // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
           await WeekRecord.updateMany(
             { userId: id },
@@ -253,6 +258,7 @@ module.exports = {
             { _id: 0, __v: 0 }
           );
         }
+        console.log("WeekRecord업데이트는 됐나?")
       } else {
         if (
           lastUpdatedZeroHour <=
@@ -269,6 +275,7 @@ module.exports = {
             lastUpdated: checkingDate,
           });
 
+          console.log("2222222업데이트는 됐나?")
           // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
           await WeekRecord.updateMany(
             { userId: id },
@@ -276,6 +283,7 @@ module.exports = {
               $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
             }
           );
+          console.log("222222222WeekRecord업데이트는 됐나?")
           weekdaysRecord = await WeekRecord.find(
             { userId: id },
             { _id: 0, __v: 0 }
