@@ -224,11 +224,15 @@ module.exports = {
 
       console.log(checkingZeroHour, "checkingZeroHour");
 
+      
       // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
       if (checkingZeroHour.getDay() === 0) {
+        console.log(lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay? true : false, "111")
+        console.log(checkingZeroHour + 1 * oneDay <= lastUpdatedZeroHour? true : false, "222")
         if (
           lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay || checkingZeroHour + 1 * oneDay <= lastUpdatedZeroHour
         ) {
+          // lastUpdatedZeroHour <= checkingZeroHour - 7*oneDay || checkingZeroHour + 1*oneDay <= lastUpdatedZeroHour
           // 요일 초기화 실행
           console.log("초기화 가즈아");
 
