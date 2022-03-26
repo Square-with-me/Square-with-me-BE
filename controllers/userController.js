@@ -204,7 +204,7 @@ module.exports = {
       });
       
       const lastUpdatedDate = thatUser.lastUpdated; // 여기에 마지막 업데이트 된 날짜 넣어야함
-      const checkingDate = kr_curr,
+      const checkingDate = kr_curr
 
       const oneDay = 86400000; //  Milliseconds for a day
 
