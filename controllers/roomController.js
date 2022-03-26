@@ -10,6 +10,22 @@ const MonthRecord = require("../mongoSchemas/monthRecord");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
+let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
+
+// for local time
+// 1. 현재 PC 표준 시간
+const curr = new Date();
+
+// 2. UTC 시간 계산
+const utc = 
+      curr.getTime() + 
+      (curr.getTimezoneOffset() * 60 * 1000);
+
+// 3. UTC to KST (UTC + 9시간)
+const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+const kr_curr = 
+      new Date(utc + (KR_TIME_DIFF));
+
 
 module.exports = {
   create: {
@@ -414,10 +430,9 @@ module.exports = {
         // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
         // date는 방 입장 시점을 나타냄
 
-        const roomExitDate = new Date();
+        const roomExitDate = kr_curr;
 
         // <월간 기록>
-
 
         /////////// 마지막으로 기록된 시점과 현재 기록 조회하는 시점이 동일한 월에 속해 있는지 비교하고 속해있지 않다면 몇월인지 알려주며 월간 기록 리셋해주기
         // 주는 같아도 월화수목금토일이 8월말 9월초 처럼 월이 달라지는 경우가 생기기 떄문에 주간 기록의 lastUpdated와 별도의 열 lastUpdatedDate을 MonthRecord 모델에 생성
@@ -435,9 +450,8 @@ module.exports = {
           });
         }
 
-  
         // 마지막으로 업데이트된 날짜가 몇번째 달에 속해 있는지 구하기
-        
+
         const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 배열 형태로 나올 것이기에 그 중 아무것이나 지정
 
         // 체크하는 시점이 몇 주차에 속해 있는지 구하기
@@ -456,8 +470,7 @@ module.exports = {
           );
         }
 
-        
-        // <주간기록 가져오기와 카테고리별 뱃지 지급>
+        // <주간기록> - 가져오기와 카테고리별 뱃지 지급
 
         /*
     월 ~ 토 까지 이용, 다음 수요일에 이용 시 방나갈 때 어느시점에 시간을 초기화 하여야 하나?
@@ -615,6 +628,7 @@ module.exports = {
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
               thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "study") {
             theBadge = await Badge.findOne({
@@ -630,6 +644,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "sports") {
             theBadge = await Badge.findOne({
@@ -645,6 +660,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "counseling") {
             theBadge = await Badge.findOne({
@@ -660,6 +676,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "culture") {
             theBadge = await Badge.findOne({
@@ -675,6 +692,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else {
             theBadge = await Badge.findOne({
@@ -690,138 +708,295 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           }
 
           // <시간 초기화>
 
           ////////////////// 시간 초기화가 마지막으로 이루어진 주차가 해당 연도에 몇 주차에 속해 있는지 구하기
-          const lastUpdatedDate = await thatUser.lastUpdated;
+          // const lastUpdatedDate = await thatUser.lastUpdated;
           // 여기에 마지막 업데이트 된 날짜 넣어야함
 
-          let oneJan = new Date(lastUpdatedDate.getFullYear(), 0, 1);
-          let numberOfDays = Math.floor(
-            (lastUpdatedDate - oneJan) / (24 * 60 * 60 * 1000)
-          );
-          let result = Math.ceil(
-            (lastUpdatedDate.getDay() + 1 + numberOfDays) / 7
-          );
-          console.log(
-            "Week Numbers of current date (" +
-              lastUpdatedDate +
-              ") is:" +
-              result
+          // let oneJan = new Date(lastUpdatedDate.getFullYear(), 0, 1);
+          // let numberOfDays = Math.floor(
+          //   (lastUpdatedDate - oneJan) / (24 * 60 * 60 * 1000)
+          // );
+          // let result = Math.ceil(
+          //   (lastUpdatedDate.getDay() + 1 + numberOfDays) / 7
+          // );
+          // console.log(
+          //   "Week Numbers of current date (" +
+          //     lastUpdatedDate +
+          //     ") is:" +
+          //     result
+          // );
+
+          // ////////////////방을 나가는 시점이 해당 연도 몇 주차에 속해 있는지 구하기
+
+          // let oneJan2 = new Date(roomExitDate.getFullYear(), 0, 1);
+          // let numberOfDays2 = Math.floor(
+          //   (roomExitDate - oneJan2) / (24 * 60 * 60 * 1000)
+          // );
+          // let result2 = Math.ceil(
+          //   (roomExitDate.getDay() + 1 + numberOfDays2) / 7
+          // );
+          // console.log(
+          //   "Week Numbers of current date (" + roomExitDate + ") is:" + result2
+          // );
+
+          // // 각각의 날짜가 속한 주차가 같은지 혹은 같은 주차에 속해있지만 연도가 다른지
+          // if (
+          //   result !== result2 ||
+          //   lastUpdatedDate.getFullYear() !== roomExitDate.getFullYear()
+          // ) {
+
+          // }
+
+          const lastUpdatedDate = await thatUser.lastUpdated;
+          
+          const oneDay = 86400000; //  Milliseconds for a day
+
+          // 시간 상관없이 요일끼리만 비교하기 위해 모든 시간은 0으로 설정
+          const lastUpdatedZeroHour = new Date(
+            lastUpdatedDate.getFullYear(),
+            lastUpdatedDate.getMonth(),
+            lastUpdatedDate.getDate(),
+            0
           );
 
-          ////////////////방을 나가는 시점이 해당 연도 몇 주차에 속해 있는지 구하기
-
-          let oneJan2 = new Date(roomExitDate.getFullYear(), 0, 1);
-          let numberOfDays2 = Math.floor(
-            (roomExitDate - oneJan2) / (24 * 60 * 60 * 1000)
-          );
-          let result2 = Math.ceil(
-            (roomExitDate.getDay() + 1 + numberOfDays2) / 7
-          );
-          console.log(
-            "Week Numbers of current date (" + roomExitDate + ") is:" + result2
+          const roomExitZeroHour = new Date(
+            roomExitDate.getFullYear(),
+            roomExitDate.getMonth(),
+            roomExitDate.getDate(),
+            0
           );
 
-          // 각각의 날짜가 속한 주차가 같은지 혹은 같은 주차에 속해있지만 연도가 다른지
-          if (
-            result !== result2 ||
-            lastUpdatedDate.getFullYear() !== roomExitDate.getFullYear()
-          ) {
-            const dateForLastUpdated = roomExitDate;
+          // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
+          if (roomExitZeroHour.getDay() === 0) {
+            if (
+              lastUpdatedZeroHour <= roomExitZeroHour - 7 * oneDay ||
+              roomExitZeroHour + 1 * oneDay <= lastUpdatedZeroHour
+            ) {
+              // 요일 초기화 실행
+              console.log("초기화 가즈아");
 
-            await User.update({
-              where: {
-                id,
-              },
-              lastUpdated: dateForLastUpdated,
-            });
+              const dateForLastUpdated = roomExitDate;
 
-            // 원하는 행을 찾아서 해당 행의 데이터 변경
-            await WeekRecord.updateMany(
-              { userId: id },
-              {
-                $set: {
-                  mon: 0,
-                  tue: 0,
-                  wed: 0,
-                  thur: 0,
-                  fri: 0,
-                  sat: 0,
-                  sun: 0,
+              await User.update({
+                where: {
+                  id,
                 },
-              }
-            );
+                lastUpdated: dateForLastUpdated,
+              });
+
+              // 원하는 행을 찾아서 해당 행의 데이터 변경
+              await WeekRecord.updateMany(
+                { userId: id },
+                {
+                  $set: {
+                    mon: 0,
+                    tue: 0,
+                    wed: 0,
+                    thur: 0,
+                    fri: 0,
+                    sat: 0,
+                    sun: 0,
+                  },
+                }
+              );
+            }
+          } else {
+            if (
+              lastUpdatedZeroHour <=
+              roomExitZeroHour - roomExitZeroHour.getDay() * oneDay ||
+              roomExitZeroHour + (8 - roomExitZeroHour.getDay()) * oneDay <=
+                lastUpdatedZeroHour
+            ) {
+              console.log("초기화 가즈아2");
+
+              const dateForLastUpdated = roomExitDate;
+
+              await User.update({
+                where: {
+                  id,
+                },
+                lastUpdated: dateForLastUpdated,
+              });
+
+              // 원하는 행을 찾아서 해당 행의 데이터 변경
+              await WeekRecord.updateMany(
+                { userId: id },
+                {
+                  $set: {
+                    mon: 0,
+                    tue: 0,
+                    wed: 0,
+                    thur: 0,
+                    fri: 0,
+                    sat: 0,
+                    sun: 0,
+                  },
+                }
+              );
+            }
           }
         } else {
           // 일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 = 뱃지 지급 여부 판단'
 
           // <시간 초기화>
 
-          ////////////////// 시간 초기화가 마지막으로 이루어진 주차가 해당 연도에 몇 주차에 속해 있는지 구하기
+          // ////////////////// 시간 초기화가 마지막으로 이루어진 주차가 해당 연도에 몇 주차에 속해 있는지 구하기
+          // const lastUpdatedDate = await thatUser.lastUpdated;
+          // // 여기에 마지막 업데이트 된 날짜 넣어야함
+
+          // let oneJan = new Date(lastUpdatedDate.getFullYear(), 0, 1);
+          // let numberOfDays = Math.floor(
+          //   (lastUpdatedDate - oneJan) / (24 * 60 * 60 * 1000)
+          // );
+          // let result = Math.ceil(
+          //   (lastUpdatedDate.getDay() + 1 + numberOfDays) / 7
+          // );
+          // console.log(
+          //   "Week Numbers of current date (" +
+          //     lastUpdatedDate +
+          //     ") is:" +
+          //     result
+          // );
+
+          // ////////////////방을 나가는 시점이 해당 연도 몇 주차에 속해 있는지 구하기
+          // const roomExitDate = new Date();
+
+          // let oneJan2 = new Date(roomExitDate.getFullYear(), 0, 1);
+          // let numberOfDays2 = Math.floor(
+          //   (roomExitDate - oneJan2) / (24 * 60 * 60 * 1000)
+          // );
+          // let result2 = Math.ceil(
+          //   (roomExitDate.getDay() + 1 + numberOfDays2) / 7
+          // );
+          // console.log(
+          //   "Week Numbers of current date (" + roomExitDate + ") is:" + result2
+          // );
+
+          // // 각각의 날짜가 속한 주차가 같은지 혹은 같은 주차에 속해있지만 연도가 다른지
+          // if (
+          //   result !== result2 ||
+          //   lastUpdatedDate.getFullYear() !== roomExitDate.getFullYear()
+          // ) {
+          //   const dateForLastUpdated = roomExitDate;
+
+          //   await User.update({
+          //     where: {
+          //       id,
+          //     },
+          //     lastUpdated: dateForLastUpdated,
+          //   });
+
+          //   // 원하는 행을 찾아서 해당 행의 데이터 변경
+          //   await WeekRecord.updateMany(
+          //     { userId: id },
+          //     {
+          //       $set: {
+          //         mon: 0,
+          //         tue: 0,
+          //         wed: 0,
+          //         thur: 0,
+          //         fri: 0,
+          //         sat: 0,
+          //         sun: 0,
+          //       },
+          //     }
+          //   );
+          // }
+
           const lastUpdatedDate = await thatUser.lastUpdated;
-          // 여기에 마지막 업데이트 된 날짜 넣어야함
+          
 
-          let oneJan = new Date(lastUpdatedDate.getFullYear(), 0, 1);
-          let numberOfDays = Math.floor(
-            (lastUpdatedDate - oneJan) / (24 * 60 * 60 * 1000)
-          );
-          let result = Math.ceil(
-            (lastUpdatedDate.getDay() + 1 + numberOfDays) / 7
-          );
-          console.log(
-            "Week Numbers of current date (" +
-              lastUpdatedDate +
-              ") is:" +
-              result
+          const oneDay = 86400000; //  Milliseconds for a day
+
+          // 시간 상관없이 요일끼리만 비교하기 위해 모든 시간은 0으로 설정
+          const lastUpdatedZeroHour = new Date(
+            lastUpdatedDate.getFullYear(),
+            lastUpdatedDate.getMonth(),
+            lastUpdatedDate.getDate(),
+            0
           );
 
-          ////////////////방을 나가는 시점이 해당 연도 몇 주차에 속해 있는지 구하기
-          const roomExitDate = new Date();
-
-          let oneJan2 = new Date(roomExitDate.getFullYear(), 0, 1);
-          let numberOfDays2 = Math.floor(
-            (roomExitDate - oneJan2) / (24 * 60 * 60 * 1000)
-          );
-          let result2 = Math.ceil(
-            (roomExitDate.getDay() + 1 + numberOfDays2) / 7
-          );
-          console.log(
-            "Week Numbers of current date (" + roomExitDate + ") is:" + result2
+          const roomExitZeroHour = new Date(
+            roomExitDate.getFullYear(),
+            roomExitDate.getMonth(),
+            roomExitDate.getDate(),
+            0
           );
 
-          // 각각의 날짜가 속한 주차가 같은지 혹은 같은 주차에 속해있지만 연도가 다른지
-          if (
-            result !== result2 ||
-            lastUpdatedDate.getFullYear() !== roomExitDate.getFullYear()
-          ) {
-            const dateForLastUpdated = roomExitDate;
+          // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
+          if (roomExitZeroHour.getDay() === 0) {
+            if (
+              lastUpdatedZeroHour <= roomExitZeroHour - 7 * oneDay ||
+              roomExitZeroHour + 1 * oneDay <= lastUpdatedZeroHour
+            ) {
+              // 요일 초기화 실행
+              console.log("초기화 가즈아");
 
-            await User.update({
-              where: {
-                id,
-              },
-              lastUpdated: dateForLastUpdated,
-            });
+              const dateForLastUpdated = roomExitDate;
 
-            // 원하는 행을 찾아서 해당 행의 데이터 변경
-            await WeekRecord.updateMany(
-              { userId: id },
-              {
-                $set: {
-                  mon: 0,
-                  tue: 0,
-                  wed: 0,
-                  thur: 0,
-                  fri: 0,
-                  sat: 0,
-                  sun: 0,
+              await User.update({
+                where: {
+                  id,
                 },
-              }
-            );
+                lastUpdated: dateForLastUpdated,
+              });
+
+              // 원하는 행을 찾아서 해당 행의 데이터 변경
+              await WeekRecord.updateMany(
+                { userId: id },
+                {
+                  $set: {
+                    mon: 0,
+                    tue: 0,
+                    wed: 0,
+                    thur: 0,
+                    fri: 0,
+                    sat: 0,
+                    sun: 0,
+                  },
+                }
+              );
+            }
+          } else {
+            if (
+              lastUpdatedZeroHour <=
+              roomExitZeroHour - roomExitZeroHour.getDay() * oneDay ||
+              roomExitZeroHour + (8 - roomExitZeroHour.getDay()) * oneDay <=
+                lastUpdatedZeroHour
+            ) {
+              console.log("초기화 가즈아2");
+
+              const dateForLastUpdated = roomExitDate;
+
+              await User.update({
+                where: {
+                  id,
+                },
+                lastUpdated: dateForLastUpdated,
+              });
+
+              // 원하는 행을 찾아서 해당 행의 데이터 변경
+              await WeekRecord.updateMany(
+                { userId: id },
+                {
+                  $set: {
+                    mon: 0,
+                    tue: 0,
+                    wed: 0,
+                    thur: 0,
+                    fri: 0,
+                    sat: 0,
+                    sun: 0,
+                  },
+                }
+              );
+            }
           }
 
           //// <퇴장시간 저장>
@@ -952,6 +1127,7 @@ module.exports = {
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
               thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "study") {
             theBadge = await Badge.findOne({
@@ -967,6 +1143,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "sports") {
             theBadge = await Badge.findOne({
@@ -982,6 +1159,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "counseling") {
             theBadge = await Badge.findOne({
@@ -997,6 +1175,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else if (badgeCategory === "culture") {
             theBadge = await Badge.findOne({
@@ -1012,6 +1191,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           } else {
             theBadge = await Badge.findOne({
@@ -1027,6 +1207,7 @@ module.exports = {
             });
             if (60 <= categoryTotalTime && isGivenBadge !== []) {
               await thatUser.addMyBadges(theBadge.id);
+              newBadge = theBadge.id;
             }
           }
         }
@@ -1088,6 +1269,16 @@ module.exports = {
       } catch (error) {
         console.error(error);
       }
+    },
+
+    // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
+    newBadge: async (req, res) => {
+      console.log(newBadge, "일단 값이 넘어옴");
+      return newBadge;
+    },
+    newBadgeInit: async (req, res) => {
+      console.log(newBadge, "초기화는 여기서 진행");
+      newBadge = 0;
     },
 
     like: asyncWrapper(async (req, res) => {
