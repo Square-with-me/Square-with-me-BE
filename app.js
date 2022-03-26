@@ -4,8 +4,8 @@ const cors = require("cors");
 const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
-// const fs = require("fs");
 const cookieParser = require("cookie-parser");
+// const fs = require("fs");
 
 const app = express();
 
@@ -23,7 +23,7 @@ db.sequelize
     console.error(error);
   });
 
-// public 폴더 생성
+// public 폴더 생성  <= image local upload 할 때만 사용
 // try {
 //   fs.accessSync("public");
 // } catch (error) {
@@ -32,7 +32,7 @@ db.sequelize
 // }
 
 // static
-app.use("/", express.static(path.join(__dirname, "public")));
+// app.use("/", express.static(path.join(__dirname, "public")));
 
 const passportconfig = require("./passport/kakao");
 passportconfig();
@@ -42,13 +42,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === "production") {
-  app.use(morgan("combined"));
-  app.use(hpp());
-  app.use(helmet({ contentSecurityPolicy: false }));
+if(process.env.NODE_ENV === "production") {
+  app.use(morgan("dev"));
+  app.use(hpp());  // req.query 오염 방지
+  app.use(helmet.xssFilter());  // X-XSS-Protection 설정
+  app.use(helmet.frameguard());  // X-Frame-Options 헤더 설정하여 clickjacking에 대한 보호
+  app.use(helmet.contentSecurityPolicy());  // Content-Security-Policy 헤더 설정. XSS 공격 및 기타 교차 사이트 인젝션 예방.
   app.use(
     cors({
-      origin: "https://nemowithme.com",
+      origin: ["https://nemowithme.com", "http://localhost:3000"]
       // credentials: true,
     })
   );
