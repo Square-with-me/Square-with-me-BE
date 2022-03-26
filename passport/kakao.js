@@ -25,6 +25,7 @@ module.exports = () => {
         callbackURL: "https://nemowithme.com/api/auth/kakao/callback",
       }, async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log("프로필", profile);
           const exUser = await User.findOne({
             where: {
               origin: profile.id,
@@ -37,6 +38,7 @@ module.exports = () => {
               attributes: ["id", "name", "imageUrl"],
             }],
           });
+          console.log("exUser", exUser);
           if(exUser) {
             return done(null, exUser);
             // done(서버 에러, 성공)
