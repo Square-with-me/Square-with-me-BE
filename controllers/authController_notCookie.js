@@ -162,9 +162,7 @@ module.exports = {
             },
           });
           const isGivenBadge = await user.getMyBadges({
-            where: {
-              where: { id: firstComeBadge.id, },
-            },
+            where: { id: firstComeBadge.id, },
           });
 
           const leftBadge = firstComeBadge.leftBadges;
