@@ -344,7 +344,7 @@ module.exports = {
       // }
 
       ////////////// <월간 기록>
-      const monthRecord = await MonthRecord.find(
+      let monthRecord = await MonthRecord.find(
         { userId: id },
         { _id: 0, __v: 0 }
       );
