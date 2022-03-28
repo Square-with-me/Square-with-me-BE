@@ -141,7 +141,7 @@ module.exports = {
         attributes: ["id", "name", "imageUrl"],
       });
       
-      const newBadge = await RoomController.delete.newBadge();
+      const newBadge = RoomController.delete.newBadge();
 
       console.log(newBadge, "newBadge");
 
@@ -152,7 +152,7 @@ module.exports = {
           newBadge: newBadge,
         });
 
-        await RoomController.delete.newBadgeInit();
+        RoomController.delete.newBadgeInit();
       } else {
         res.status(200).json({
           isSuccess: true,
@@ -167,9 +167,9 @@ module.exports = {
       // 네모와 함께한 시간 주간, 월간 기록 가져오기
 
       //////////////////// <주간 기록>
-        const weekRecordReturn = await timeRecord.weekRecordInitChecking(id, krToday)
+        const weekdaysRecord = await timeRecord.weekRecordInitChecking(id, krToday)
       
-      if (weekRecordReturn.msg) {
+      if (weekdaysRecord.msg) {
         return res.status(400).json({
           isSuccess: false,
           msg: "일치하는 유저 정보가 없습니다.",
@@ -177,9 +177,9 @@ module.exports = {
       }
       
       //////////////////// <월간 기록>
-      const monthRecordReturn = await timeRecord.monthRecordInitChecking(id, krToday)
+      const monthRecord = await timeRecord.monthRecordInitChecking(id, krToday)
 
-      if (monthRecordReturn.msg) {
+      if (monthRecord.msg) {
         return res.status(400).json({
           isSuccess: false,
           msg: "일치하는 유저 정보가 없습니다.",
@@ -189,8 +189,8 @@ module.exports = {
       return res.status(200).json({
         isSuccess: true,
         data: {
-          weekRecordReturn,
-          monthRecordReturn,
+          weekdaysRecord,
+          monthRecord,
         },
       });
     }),
