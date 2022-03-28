@@ -4,9 +4,6 @@ const { asyncWrapper, regex } = require("../utils/util");
 // models
 const { User, Badge } = require("../models");
 
-// Mongo DB 시간기록
-const WeekRecord = require("../mongoSchemas/weekRecord");
-const MonthRecord = require("../mongoSchemas/monthRecord");
 
 // RoomController for newBadge
 const RoomController = require("./roomController");
@@ -15,11 +12,6 @@ const RoomController = require("./roomController");
 const timeRecord = require("../utils/date");
 const krToday = timeRecord.koreanDate();
 
-
-
-// Mongo DB 시간기록
-const WeekRecord = require("../mongoSchemas/weekRecord");
-const MonthRecord = require("../mongoSchemas/monthRecord");
 
 module.exports = {
   create: {},

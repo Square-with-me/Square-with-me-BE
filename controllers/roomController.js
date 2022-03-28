@@ -6,7 +6,7 @@ const { Room, Tag, Category, User, Viewer, Like, Badge } = require("../models");
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");
-const MonthRecord = require("../mongoSchemas/monthRecord");
+
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
@@ -686,7 +686,7 @@ module.exports = {
           }
 
         } else {
-          // 일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 = 뱃지 지급 여부 판단'
+          // 일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 - 뱃지 지급 여부 판단'
 
           // <시간 초기화>
 
