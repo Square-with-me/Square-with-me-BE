@@ -1,5 +1,3 @@
-const db = require(".");
-
 module.exports = (sequelize, DataTypes) => {
   const Badge = sequelize.define(
     'badge',
