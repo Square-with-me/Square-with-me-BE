@@ -18,6 +18,7 @@ const connect = require('./mongoSchemas/index');
 // 몽고 db 커넥트
 connect();
 
+
 // MySQL
 const db = require("./models");
 db.sequelize
