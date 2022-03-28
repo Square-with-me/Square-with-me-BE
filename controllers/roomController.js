@@ -14,7 +14,7 @@ let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 
 // korean local time
 const timeRecord = require("../utils/date");
-const krToday = timeRecord.koreanDate();
+const krToday = timeRecord.koreanDate;
 
 
 module.exports = {
@@ -955,11 +955,11 @@ module.exports = {
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
 
-    newBadge: async (req, res) => {
+    newBadge: async () => {
       console.log(newBadge, "일단 값이 넘어옴");
       return newBadge;
     },
-    newBadgeInit: async (req, res) => {
+    newBadgeInit: async () => {
       console.log(newBadge, "초기화는 여기서 진행");
       newBadge = 0;
     },

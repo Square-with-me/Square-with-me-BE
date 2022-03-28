@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
 const { MONGO_DB_URL } = process.env;
-const krToday = require("../utils/date").koreanDate()
+const krToday = require("../utils/date").koreanDate
 
 // Mongo DB 연결 부분
 const connect = () => {

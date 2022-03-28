@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const krToday = require("../utils/date").koreanDate()
+const krToday = require("../utils/date").koreanDate
 
 
 const monthRecordSchema = new mongoose.Schema({
