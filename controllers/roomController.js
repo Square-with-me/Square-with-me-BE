@@ -1,21 +1,29 @@
 const { Op } = require("sequelize");
 
-// models
-
+// MySQL models
 const { Room, Tag, Category, User, Viewer, Like, Badge } = require("../models");
 
-// Mongo DB 시간기록
+// Mongo collections
 const WeekRecord = require("../mongoSchemas/weekRecord");
-
+const MonthRecord = require("../mongoSchemas/monthRecord");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
-let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 
 // korean local time
 const timeRecord = require("../utils/date");
 const krToday = timeRecord.koreanDate();
 
+let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
+const CATEGORY = {  // 카테고리 목록
+  "뷰티": "beauty",
+  "운동": "sports",
+  "스터디": "study",
+  "상담": "counseling",
+  "문화": "culture",
+  "기타": "etc",
+}
+const CATEGORY_BADGE_CRITERIA = 60; // 카테고리 뱃지 지급 기준(단위 : 분)
 
 module.exports = {
   create: {
@@ -389,6 +397,7 @@ module.exports = {
 
   delete: {
     participant: async (data) => {
+      console.log("data", data);
       try {
         // asyncWrapper는 http 요청에 맞춰진 것이므로 여기선 try catch 구문으로 에러 캐치
 
@@ -418,9 +427,8 @@ module.exports = {
         const day = getDay(date);
         console.log("유저 아이디", userId, "요일", day);
        
-      // <월간기록>
-
-        const monthRecordReturn = await timeRecord.monthRecordInitChecking(userId, krToday)
+      // 월간 기록 초기화
+      const monthRecordReturn = await timeRecord.monthRecordInitChecking(userId, krToday)
 
       if (monthRecordReturn.msg) {
         return res.status(400).json({
@@ -429,38 +437,13 @@ module.exports = {
         });
       }
 
-
-
-        // <주간기록> - 가져오기와 카테고리별 뱃지 지급
-
-        /*
-    월 ~ 토 까지 이용, 다음 수요일에 이용 시 방나갈 때 어느시점에 시간을 초기화 하여야 하나?
-    1) 시간 기록 후, 뱃지 지급 전
-    지급 전에 초기화하면 문제 없음, 일요일에 이용하다가 월요일 새벽에 나가게 될 때, 월화수목금토일의 시간을 일단 한번 계산해보고 기준 충족하면 뱃지를 지급하기는 해야함
-    그러나 지난 주 월 ~ 토 까지 이용, 다음 수요일에 이용하는 경우 지난 주 기록을 초기화 한 다음 시간을 기록해야함
-
-    -> ************** 방에 입장한 날이 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화',
-    일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 = 뱃지 지급 여부 판단' **************
-
-    2) 시간 기록 후, 뱃지까지 지급 후
-    일요일에 이용하다가 월요일 새벽에 나가는 경우 문제가 없음
-    그러나 지난 주 월 ~ 토 까지 이용, 다음 수요일에 이용하는 경우 오늘 시간까지 기록하고 나서 지급해버리면 문제가 됨
-
-    3) 시간 기록 전 초기화
-    월 ~ 토 까지 이용, 다음 수요일에 이용 시 문제 없음, 일요일에 이용하다가 월요일 새벽에 나가게 될 때는 일요일 시간이 기록되고 뱃지지급여부 판단이 이뤄지지 않으므로 문제!
-
-*/
-
         let preRecord = null;
 
-        if (day === "sun") {
-          // 방에 입장한 날이 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
+        if (day === "sun") { // 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
 
-          //// <퇴장시간 저장>
+          // 주간 기록 저장
           const updateOption = {};
-          switch (
-            categoryId // 카테고리에 따라 시간 업데이트
-          ) {
+          switch (categoryId) {
             case 1:
               preRecord = await WeekRecord.findOne({
                 userId,
@@ -520,25 +503,34 @@ module.exports = {
               break;
           }
 
+          // 월간 기록 저장
+          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+          await preMonthRecord.updateOne({
+            time: preMonthRecord.time + time,
+          });
+
           // <뱃지 지급 여부 판단>
 
           // *****시간과 관련된 뱃지들 지급*****
           // 카테고리명은 한글, 뱃지 카테고리명은 영어, 둘 사이를 매치시켜주기 위함
 
-          let badgeCategory = "";
-          if (category === "뷰티") {
-            badgeCategory = "beauty";
-          } else if (category === "운동") {
-            badgeCategory = "sports";
-          } else if (category === "스터디") {
-            badgeCategory = "study";
-          } else if (category === "상담") {
-            badgeCategory = "counseling";
-          } else if (category === "문화") {
-            badgeCategory = "culture";
-          } else if (category === "기타") {
-            badgeCategory = "etc";
-          }
+          // 카테고리로 뱃지이름 가져오기
+          const badgeCategory = CATEGORY[category];
+          // let badgeCategory = "";
+          // if (category === "뷰티") {
+          //   badgeCategory = "beauty";
+          // } else if (category === "운동") {
+          //   badgeCategory = "sports";
+          // } else if (category === "스터디") {
+          //   badgeCategory = "study";
+          // } else if (category === "상담") {
+          //   badgeCategory = "counseling";
+          // } else if (category === "문화") {
+          //   badgeCategory = "culture";
+          // } else if (category === "기타") {
+          //   badgeCategory = "etc";
+          // }
+
 
           // 특정 유저의 특정 카테고리 기록 찾기
           const userRecords = await WeekRecord.findOne({
@@ -563,14 +555,8 @@ module.exports = {
             },
           });
 
-          /*
-      각각 카테고리별 시간 1시간 이상일 떄 해당 뱃지 지급하기로 함
-      기준 추후에 달라지면 각각 설정하기 위해 if (60 <= categoryTotalTime 이 구문을 각각의 if 절에 넣어줌
-      */
-
           // 뱃지 카테고리 종류별로 가져오기 beauty, study, sports, counseling, culture, etc
           let theBadge = [];
-
           if (badgeCategory === "beauty") {
             // Badge 테이블에 등록된 해당 뱃지 가져와야 함
             theBadge = await Badge.findOne({
@@ -586,7 +572,7 @@ module.exports = {
               },
             });
 
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
               thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
@@ -603,7 +589,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -619,7 +605,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -635,7 +621,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -650,8 +636,8 @@ module.exports = {
               where: {
                 id: theBadge.id,
               },
-            });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            }); // []
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -667,16 +653,14 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
           }
 
           // <시간 초기화>
-
-
-          const weekRecordReturn = await timeRecord.weekRecordInitChecking(id, krToday)
+          const weekRecordReturn = await timeRecord.weekRecordInitChecking(userId, krToday)
       
           if (weekRecordReturn.msg) {
             return res.status(400).json({
@@ -684,14 +668,9 @@ module.exports = {
               msg: "일치하는 유저 정보가 없습니다.",
             });
           }
-
-        } else {
-          // 일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 - 뱃지 지급 여부 판단'
-
-          // <시간 초기화>
-
-          const weekRecordReturn = await timeRecord.weekRecordInitChecking(id, krToday)
-      
+        } else { // 월 ~ 토 인 경우, '시간 초기화 - 퇴장 시간 저장 - 뱃지 지급 여부 판단'
+          // 주간 기록 초기화
+          const weekRecordReturn = await timeRecord.weekRecordInitChecking(userId, krToday)
           if (weekRecordReturn.msg) {
             return res.status(400).json({
               isSuccess: false,
@@ -699,12 +678,9 @@ module.exports = {
             });
           }
 
-
-          //// <퇴장시간 저장>
+          // 주간 기록 저장
           const updateOption = {};
-          switch (
-            categoryId // 카테고리에 따라 시간 업데이트
-          ) {
+          switch (categoryId) {
             case 1:
               preRecord = await WeekRecord.findOne({
                 userId,
@@ -764,25 +740,18 @@ module.exports = {
               break;
           }
 
+          // 월간 기록 저장
+          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+          await preMonthRecord.updateOne({
+            time: preMonthRecord.time + time,
+          });
+
           // <뱃지 지급 여부 판단>
 
           // *****시간과 관련된 뱃지들 지급*****
-          // 카테고리명은 한글, 뱃지 카테고리명은 영어, 둘 사이를 매치시켜주기 위함
 
-          let badgeCategory = "";
-          if (category === "뷰티") {
-            badgeCategory = "beauty";
-          } else if (category === "운동") {
-            badgeCategory = "sports";
-          } else if (category === "스터디") {
-            badgeCategory = "study";
-          } else if (category === "상담") {
-            badgeCategory = "counseling";
-          } else if (category === "문화") {
-            badgeCategory = "culture";
-          } else if (category === "기타") {
-            badgeCategory = "etc";
-          }
+          // 카테고리로 뱃지 이름 가져오기
+          const badgeCategory = CATEGORY[category];
 
           // 특정 유저의 특정 카테고리 기록 찾기
           const userRecords = await WeekRecord.findOne({
@@ -825,7 +794,7 @@ module.exports = {
               },
             });
 
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
               thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
@@ -842,7 +811,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -858,7 +827,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -874,7 +843,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -890,7 +859,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -906,7 +875,7 @@ module.exports = {
                 id: theBadge.id,
               },
             });
-            if (60 <= categoryTotalTime && isGivenBadge !== []) {
+            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
               await thatUser.addMyBadges(theBadge.id);
               newBadge = theBadge.id;
             }
@@ -955,12 +924,10 @@ module.exports = {
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
 
-    newBadge: async (req, res) => {
-      console.log(newBadge, "일단 값이 넘어옴");
+    newBadge: () => {
       return newBadge;
     },
-    newBadgeInit: async (req, res) => {
-      console.log(newBadge, "초기화는 여기서 진행");
+    newBadgeInit: () => {
       newBadge = 0;
     },
 
