@@ -9,10 +9,6 @@ const weekRecordSchema = new mongoose.Schema({
     type: String,
     allowNull: false,
   },
-  // lastUpdated: {
-  //       type: String,
-  //       default: new Date()
-  //   },  user모델로 이전
   mon: {
     type: Number,
     allowNull: false,
