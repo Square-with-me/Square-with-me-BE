@@ -2,8 +2,6 @@ const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
 const config = require('../config/config')[env];
 const db = {};
-const mongoose = require("mongoose");
-const { mongodbUrl } = process.env;
 
 
 // MySQL 연결 부분
@@ -23,7 +21,6 @@ db.Viewer = require("./viewer")(sequelize, Sequelize);
 db.Badge = require("./badge")(sequelize, Sequelize);
 db.Like = require("./like")(sequelize, Sequelize);
 db.RefreshToken = require("./refreshToken")(sequelize, Sequelize);
-
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
