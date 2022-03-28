@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 // const fs = require("fs");
 
+
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
@@ -16,12 +17,6 @@ const connect = require('./mongoSchemas/index');
 
 // 몽고 db 커넥트
 connect();
-console.log('몽고DB도 연결됨, app.js에서')
-
-
-const dotenv = require("dotenv");
-dotenv.config();
-
 
 // MySQL
 const db = require("./models");
