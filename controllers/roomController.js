@@ -783,12 +783,7 @@ module.exports = {
 
               const dateForLastUpdated = roomExitDate;
 
-              await User.update({
-                where: {
-                  id,
-                },
-                lastUpdated: dateForLastUpdated,
-              });
+              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
 
               // 원하는 행을 찾아서 해당 행의 데이터 변경
               await WeekRecord.updateMany(
@@ -817,12 +812,7 @@ module.exports = {
 
               const dateForLastUpdated = roomExitDate;
 
-              await User.update({
-                where: {
-                  id,
-                },
-                lastUpdated: dateForLastUpdated,
-              });
+              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
 
               // 원하는 행을 찾아서 해당 행의 데이터 변경
               await WeekRecord.updateMany(
@@ -940,12 +930,7 @@ module.exports = {
 
               const dateForLastUpdated = roomExitDate;
 
-              await User.update({
-                where: {
-                  id,
-                },
-                lastUpdated: dateForLastUpdated,
-              });
+              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
 
               // 원하는 행을 찾아서 해당 행의 데이터 변경
               await WeekRecord.updateMany(
@@ -974,12 +959,7 @@ module.exports = {
 
               const dateForLastUpdated = roomExitDate;
 
-              await User.update({
-                where: {
-                  id,
-                },
-                lastUpdated: dateForLastUpdated,
-              });
+              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
 
               // 원하는 행을 찾아서 해당 행의 데이터 변경
               await WeekRecord.updateMany(
