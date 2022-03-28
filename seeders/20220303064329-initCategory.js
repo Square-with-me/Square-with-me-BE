@@ -1,5 +1,5 @@
 'use strict';
-const krToday = require("../utils/date").koreanDate()
+const { koreanDate: krToday } = require("../utils/date")
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -16,28 +16,28 @@ module.exports = {
     await queryInterface.bulkInsert("categories", [
       {
         name: "뷰티",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }, {
         name: "운동",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }, {
         name: "스터디",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }, {
         name: "상담",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }, {
         name: "문화",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }, {
         name: "기타",
-        createdAt: krToday,
-        updatedAt: krToday,
+        createdAt: krToday(),
+        updatedAt: krToday(),
       }
     ]);
   },

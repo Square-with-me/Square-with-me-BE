@@ -8,9 +8,6 @@ module.exports = (sequelize, Sequelize) => {
     },
   });
 
-
-
-
   RefreshToken.associate = (db) => {
     db.RefreshToken.belongsTo(db.User)
   };
