@@ -27,18 +27,16 @@ module.exports = {
     );
 
     if (weekdaysRecord.length === 0) {
-      return res.status(400).json({
-        msg: "일치하는 유저 정보가 없습니다.",
-      });
+      return { msg: "일치하는 유저 정보가 없습니다.", };
     }
 
-    const thatUser = await User.findOne({
+    const user = await User.findOne({
       where: {
         id,
       },
     });
 
-    const lastUpdatedDate = thatUser.lastUpdated; // 여기에 마지막 업데이트 된 날짜 넣어야함
+    const lastUpdatedDate = user.lastUpdated; // 여기에 마지막 업데이트 된 날짜 넣어야함
     const checkingDate = krToday;
 
     const oneDay = 86400000; //  Milliseconds for a day
@@ -50,21 +48,19 @@ module.exports = {
       lastUpdatedDate.getDate(),
       0
     );
-
     const checkingZeroHour = new Date(
       checkingDate.getFullYear(),
       checkingDate.getMonth(),
       checkingDate.getDate(),
       0
-    );
+      );
 
     // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
-    if (checkingZeroHour.getDay() === 0) {
+    if (checkingZeroHour.getDay() === 0) {  // 일요일
       if (
-        lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay ||
+        lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay ||  // 주가 다를 때
         checkingZeroHour + 1 * oneDay <= lastUpdatedZeroHour
       ) {
-        // lastUpdatedZeroHour <= checkingZeroHour - 7*oneDay || checkingZeroHour + 1*oneDay <= lastUpdatedZeroHour
         // 요일 초기화 실행
         await User.update({ lastUpdated: checkingDate }, { where: { id } });
 
@@ -81,19 +77,16 @@ module.exports = {
           { _id: 0, __v: 0 }
         );
       }
-    } else {
+    } else {  // 월요일 ~ 토요일
       if (
-        lastUpdatedZeroHour <=
-          checkingZeroHour - checkingZeroHour.getDay() * oneDay ||
-        checkingZeroHour + (8 - checkingZeroHour.getDay()) * oneDay <=
-          lastUpdatedZeroHour
+        lastUpdatedZeroHour <= checkingZeroHour - checkingZeroHour.getDay() * oneDay ||
+        checkingZeroHour + ( 8 - checkingZeroHour.getDay() ) * oneDay <= lastUpdatedZeroHour
       ) {
         // 요일 초기화 실행
-
         await User.update({ lastUpdated: checkingDate }, { where: { id } });
 
         // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
-        await WeekRecord.updateMany(
+        const result = await WeekRecord.updateMany(
           { userId: id },
           {
             $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
@@ -117,9 +110,7 @@ module.exports = {
     );
 
     if (monthRecord.length === 0) {
-      return res.status(400).json({
-        msg: "일치하는 유저 정보가 없습니다.",
-      });
+      return { msg: "일치하는 유저 정보가 없습니다." };
     }
     const checkingDate = krToday;
 
@@ -128,14 +119,12 @@ module.exports = {
     // 마지막으로 업데이트된 날짜가 몇번째 달에 속해 있는지 구하기
     // 주는 같아도 월화수목금토일이 8월말 9월초 처럼 월이 달라지는 경우가 생기기 때문에 주간 기록의 lastUpdated와 별도의 열 lastUpdatedDate을 MonthRecord 모델에 생성
 
-    const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 배열 형태로 나올 것이기에 그 중 아무것이나 지정
-    const checkingMonth = checkingDate.getMonth() + 1; // since January gives 0
-
-    // 각각의 날짜가 속한 달이 같은지 혹은 같은 달에 속해있지만 연도가 다른지
+    const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 월간 기록의 최근 업데이트 된 달
+    const checkingMonth = checkingDate.getMonth() + 1; // 이번 달
+    
     if (
-      lastUpdatedMonth !== checkingMonth ||
-      monthRecord[0].lastUpdatedDate.getFullYear() !==
-        checkingDate.getFullYear()
+      lastUpdatedMonth !== checkingMonth ||  // 달이 다르거나
+      monthRecord[0].lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()  // 연도가 다를 때
     ) {
       await MonthRecord.updateMany(
         { userId: id },
