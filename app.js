@@ -22,6 +22,7 @@ console.log('몽고DB도 연결됨, app.js에서')
 const dotenv = require("dotenv");
 dotenv.config();
 
+
 // MySQL
 const db = require("./models");
 db.sequelize
