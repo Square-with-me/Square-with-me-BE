@@ -21,7 +21,6 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
-
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -134,6 +133,65 @@ module.exports = {
         { userId: user.id, date: 30, time: 0, lastUpdatedDate: krToday },
         { userId: user.id, date: 31, time: 0, lastUpdatedDate: krToday },
       ]);
+      // // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
+      // await BeautyRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await SportsRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await StudyRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await CounselingRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await CultureRecord.create({
+      //   userId: user.id,
+      // });
+
+      // await ETCRecord.create({
+      //   userId: user.id,
+      // });
+
+      await MonthRecord.insertMany([
+        { userId: user.id, date: 1, time: 0 },
+        { userId: user.id, date: 2, time: 0 },
+        { userId: user.id, date: 3, time: 0 },
+        { userId: user.id, date: 4, time: 0 },
+        { userId: user.id, date: 5, time: 0 },
+        { userId: user.id, date: 6, time: 0 },
+        { userId: user.id, date: 7, time: 0 },
+        { userId: user.id, date: 8, time: 0 },
+        { userId: user.id, date: 9, time: 0 },
+        { userId: user.id, date: 10, time: 0 },
+        { userId: user.id, date: 11, time: 0 },
+        { userId: user.id, date: 12, time: 0 },
+        { userId: user.id, date: 13, time: 0 },
+        { userId: user.id, date: 14, time: 0 },
+        { userId: user.id, date: 15, time: 0 },
+        { userId: user.id, date: 16, time: 0 },
+        { userId: user.id, date: 17, time: 0 },
+        { userId: user.id, date: 18, time: 0 },
+        { userId: user.id, date: 19, time: 0 },
+        { userId: user.id, date: 20, time: 0 },
+        { userId: user.id, date: 21, time: 0 },
+        { userId: user.id, date: 22, time: 0 },
+        { userId: user.id, date: 23, time: 0 },
+        { userId: user.id, date: 24, time: 0 },
+        { userId: user.id, date: 25, time: 0 },
+        { userId: user.id, date: 26, time: 0 },
+        { userId: user.id, date: 27, time: 0 },
+        { userId: user.id, date: 28, time: 0 },
+        { userId: user.id, date: 29, time: 0 },
+        { userId: user.id, date: 30, time: 0 },
+        { userId: user.id, date: 31, time: 0 },
+      ]);
+
 
 
       return res.status(201).json({
