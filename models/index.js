@@ -2,8 +2,6 @@ const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
 const config = require('../config/config')[env];
 const db = {};
-const mongoose = require("mongoose");
-const { mongodbUrl } = process.env;
 
 
 // MySQL 연결 부분
@@ -33,7 +31,7 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db, connect;
+module.exports = db;
 
 
 /////// MySQL만 있을 때 코드 ///////
