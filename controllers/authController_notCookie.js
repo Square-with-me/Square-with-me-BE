@@ -11,7 +11,7 @@ const {
 } = require("../utils/util");
 
 // korean local time
-const krToday = require("../utils/date").koreanDate()
+const krToday = require("../utils/date").koreanDate
 
 // models
 

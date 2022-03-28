@@ -12,7 +12,7 @@ const { asyncWrapper, getDay } = require("../utils/util");
 
 // korean local time
 const timeRecord = require("../utils/date");
-const krToday = timeRecord.koreanDate();
+const krToday = timeRecord.koreanDate;
 
 let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 const CATEGORY = {  // 카테고리 목록
