@@ -420,7 +420,7 @@ module.exports = {
        
       // <월간기록>
 
-        const monthRecordReturn = await timeRecord.monthRecordChecking(userId, krToday)
+        const monthRecordReturn = await timeRecord.monthRecordInitChecking(userId, krToday)
 
       if (monthRecordReturn.msg) {
         return res.status(400).json({
