@@ -5,7 +5,6 @@ const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-const connect = require('./mongoSchemas/index');
 // const fs = require("fs");
 
 const app = express();
