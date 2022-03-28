@@ -9,10 +9,13 @@ const cookieParser = require("cookie-parser");
 const connect = require('./mongoSchemas/index');
 
 const app = express();
+const dotenv = require("dotenv");
+dotenv.config();
 
 // 몽고 db 커넥트
 connect();
 console.log('몽고DB도 연결됨, app.js에서')
+
 
 // MySQL
 const db = require("./models");
@@ -35,9 +38,6 @@ try {
 
 // static
 app.use("/", express.static(path.join(__dirname, "public")));
-
-const dotenv = require("dotenv");
-dotenv.config();
 
 const passportconfig = require("./passport/kakao");
 passportconfig();
