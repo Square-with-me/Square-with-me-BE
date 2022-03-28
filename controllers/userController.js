@@ -236,12 +236,7 @@ module.exports = {
           // 요일 초기화 실행
           console.log("초기화 가즈아");
 
-          await User.update({
-            where: {
-              id,
-            },
-            lastUpdated: checkingDate,
-          });
+          await User.update({lastUpdated: checkingDate}, {where: {id}});
 
           console.log("1111업데이트는 됐나?");
           // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
@@ -263,13 +258,14 @@ module.exports = {
         ) {
           // 요일 초기화 실행
 
-          await User.update({
-            where: {
-              id,
-            },
-            lastUpdated: checkingDate,
-          });
+          // await User.update({
+          //   where: {
+          //     id,
+          //   },
+          //   lastUpdated: checkingDate,
+          // });
 
+          await User.update({lastUpdated: checkingDate}, {where: {id}});
           console.log("2222222업데이트는 됐나?");
           // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
           await WeekRecord.updateMany(
