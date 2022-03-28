@@ -1,5 +1,5 @@
 'use strict';
-// const krToday = require("../utils/timeRecord").koreanDate()
+// const krToday = require("../utils/date").koreanDate()
 
 module.exports = {
   async up (queryInterface, Sequelize) {

@@ -13,7 +13,8 @@ const { asyncWrapper, getDay } = require("../utils/util");
 let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 
 // korean local time
-const krToday = require("../utils/timeRecord").koreanDate()
+const timeRecord = require("../utils/date");
+const krToday = timeRecord.koreanDate();
 
 
 module.exports = {
@@ -393,7 +394,7 @@ module.exports = {
 
         const { roomId, userId, time, categoryId, date } = data; // 기존 코드는 받는 인자 data, 테스트 할 때는 req.body.data로 테스트, 썬더 클라이언트에서 body에 필요한 데이터 넣음
         // time은 분 단위로 넘어옴
-        console.log("data는 이것이다", data);
+        // date는 방 입장 시점을 나타냄
 
         // 특정 카테고리 이름 가져오기
 
@@ -416,48 +417,19 @@ module.exports = {
         // 날짜로 요일 가져오기
         const day = getDay(date);
         console.log("유저 아이디", userId, "요일", day);
-        // 일주일 기록 테이블의 요일과 카테고리에 시간 기록
-        // date는 방 입장 시점을 나타냄
+       
+      // <월간기록>
 
-        const roomExitDate = krToday;
+        const monthRecordReturn = await timeRecord.monthRecordChecking(userId, krToday)
 
-        // <월간 기록>
+      if (monthRecordReturn.msg) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "일치하는 유저 정보가 없습니다.",
+        });
+      }
 
-        /////////// 마지막으로 기록된 시점과 현재 기록 조회하는 시점이 동일한 월에 속해 있는지 비교하고 속해있지 않다면 몇월인지 알려주며 월간 기록 리셋해주기
-        // 주는 같아도 월화수목금토일이 8월말 9월초 처럼 월이 달라지는 경우가 생기기 떄문에 주간 기록의 lastUpdated와 별도의 열 lastUpdatedDate을 MonthRecord 모델에 생성
 
-        const monthRecord = await MonthRecord.find(
-          { userId: userId },
-          { _id: 0, __v: 0 }
-        );
-        console.log("월간 기록을 가져온다", monthRecord);
-        // date 는 사용자가 방에 들어온 시점을 가리킴
-        if (monthRecord.length === 0) {
-          return res.status(400).json({
-            isSuccess: false,
-            msg: "일치하는 유저 정보가 없습니다.",
-          });
-        }
-
-        // 마지막으로 업데이트된 날짜가 몇번째 달에 속해 있는지 구하기
-
-        const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 배열 형태로 나올 것이기에 그 중 아무것이나 지정
-
-        // 체크하는 시점이 몇 주차에 속해 있는지 구하기
-
-        const roomExitMonth = roomExitDate.getMonth() + 1; // Plus 1 since January gives 0
-
-        // 각각의 날짜가 속한 달이 같은지 혹은 같은 달에 속해있지만 연도가 다른지
-        if (
-          lastUpdatedMonth !== roomExitMonth ||
-          monthRecord[0].lastUpdatedDate.getFullYear() !==
-            roomExitDate.getFullYear()
-        ) {
-          await MonthRecord.updateMany(
-            { userId: userId },
-            { $set: { time: 0, lastUpdatedDate: roomExitDate } }
-          );
-        }
 
         // <주간기록> - 가져오기와 카테고리별 뱃지 지급
 
@@ -703,168 +675,30 @@ module.exports = {
 
           // <시간 초기화>
 
-          const lastUpdatedDate = await thatUser.lastUpdated;
-          
-          const oneDay = 86400000; //  Milliseconds for a day
 
-          // 시간 상관없이 요일끼리만 비교하기 위해 모든 시간은 0으로 설정
-          const lastUpdatedZeroHour = new Date(
-            lastUpdatedDate.getFullYear(),
-            lastUpdatedDate.getMonth(),
-            lastUpdatedDate.getDate(),
-            0
-          );
-
-          const roomExitZeroHour = new Date(
-            roomExitDate.getFullYear(),
-            roomExitDate.getMonth(),
-            roomExitDate.getDate(),
-            0
-          );
-
-          // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
-          if (roomExitZeroHour.getDay() === 0) {
-            if (
-              lastUpdatedZeroHour <= roomExitZeroHour - 7 * oneDay ||
-              roomExitZeroHour + 1 * oneDay <= lastUpdatedZeroHour
-            ) {
-              // 요일 초기화 실행
-              console.log("초기화 가즈아");
-
-              const dateForLastUpdated = roomExitDate;
-
-              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
-
-              // 원하는 행을 찾아서 해당 행의 데이터 변경
-              await WeekRecord.updateMany(
-                { userId: id },
-                {
-                  $set: {
-                    mon: 0,
-                    tue: 0,
-                    wed: 0,
-                    thur: 0,
-                    fri: 0,
-                    sat: 0,
-                    sun: 0,
-                  },
-                }
-              );
-            }
-          } else {
-            if (
-              lastUpdatedZeroHour <=
-              roomExitZeroHour - roomExitZeroHour.getDay() * oneDay ||
-              roomExitZeroHour + (8 - roomExitZeroHour.getDay()) * oneDay <=
-                lastUpdatedZeroHour
-            ) {
-              console.log("초기화 가즈아2");
-
-              const dateForLastUpdated = roomExitDate;
-
-              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
-
-              // 원하는 행을 찾아서 해당 행의 데이터 변경
-              await WeekRecord.updateMany(
-                { userId: id },
-                {
-                  $set: {
-                    mon: 0,
-                    tue: 0,
-                    wed: 0,
-                    thur: 0,
-                    fri: 0,
-                    sat: 0,
-                    sun: 0,
-                  },
-                }
-              );
-            }
+          const weekRecordReturn = await timeRecord.weekRecordInitChecking(id, krToday)
+      
+          if (weekRecordReturn.msg) {
+            return res.status(400).json({
+              isSuccess: false,
+              msg: "일치하는 유저 정보가 없습니다.",
+            });
           }
+
         } else {
           // 일요일이 아니라 그다음 주 월 ~ 토 중 하나인 경우 '시간 초기화 - 퇴장 시간 저장 = 뱃지 지급 여부 판단'
 
           // <시간 초기화>
 
-          const lastUpdatedDate = await thatUser.lastUpdated;
-          
-
-          const oneDay = 86400000; //  Milliseconds for a day
-
-          // 시간 상관없이 요일끼리만 비교하기 위해 모든 시간은 0으로 설정
-          const lastUpdatedZeroHour = new Date(
-            lastUpdatedDate.getFullYear(),
-            lastUpdatedDate.getMonth(),
-            lastUpdatedDate.getDate(),
-            0
-          );
-
-          const roomExitZeroHour = new Date(
-            roomExitDate.getFullYear(),
-            roomExitDate.getMonth(),
-            roomExitDate.getDate(),
-            0
-          );
-
-          // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
-          if (roomExitZeroHour.getDay() === 0) {
-            if (
-              lastUpdatedZeroHour <= roomExitZeroHour - 7 * oneDay ||
-              roomExitZeroHour + 1 * oneDay <= lastUpdatedZeroHour
-            ) {
-              // 요일 초기화 실행
-              console.log("초기화 가즈아");
-
-              const dateForLastUpdated = roomExitDate;
-
-              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
-
-              // 원하는 행을 찾아서 해당 행의 데이터 변경
-              await WeekRecord.updateMany(
-                { userId: id },
-                {
-                  $set: {
-                    mon: 0,
-                    tue: 0,
-                    wed: 0,
-                    thur: 0,
-                    fri: 0,
-                    sat: 0,
-                    sun: 0,
-                  },
-                }
-              );
-            }
-          } else {
-            if (
-              lastUpdatedZeroHour <=
-              roomExitZeroHour - roomExitZeroHour.getDay() * oneDay ||
-              roomExitZeroHour + (8 - roomExitZeroHour.getDay()) * oneDay <=
-                lastUpdatedZeroHour
-            ) {
-              console.log("초기화 가즈아2");
-
-              const dateForLastUpdated = roomExitDate;
-
-              await User.update({lastUpdated: dateForLastUpdated}, {where: {id}});
-
-              // 원하는 행을 찾아서 해당 행의 데이터 변경
-              await WeekRecord.updateMany(
-                { userId: id },
-                {
-                  $set: {
-                    mon: 0,
-                    tue: 0,
-                    wed: 0,
-                    thur: 0,
-                    fri: 0,
-                    sat: 0,
-                    sun: 0,
-                  },
-                }
-              );
-            }
+          const weekRecordReturn = await timeRecord.weekRecordInitChecking(id, krToday)
+      
+          if (weekRecordReturn.msg) {
+            return res.status(400).json({
+              isSuccess: false,
+              msg: "일치하는 유저 정보가 없습니다.",
+            });
           }
+
 
           //// <퇴장시간 저장>
           const updateOption = {};
@@ -1120,6 +954,7 @@ module.exports = {
     },
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
+
     newBadge: async (req, res) => {
       console.log(newBadge, "일단 값이 넘어옴");
       return newBadge;
