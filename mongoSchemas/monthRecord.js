@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const krToday = require("../utils/date").koreanDate()
-
+const { koreanDate: krToday } = require("../utils/date")
 
 const monthRecordSchema = new mongoose.Schema({
   userId: {
