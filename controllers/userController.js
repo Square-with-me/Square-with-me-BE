@@ -373,6 +373,8 @@ module.exports = {
       if (
         lastUpdatedMonth !== checkingMonth || monthRecord[0].lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()
       ) {
+
+        console.log(checkingDate, "잘 넘어오기는 하네 checkingDate는 이거다")
         await MonthRecord.updateMany(
           { userId: id },
           { $set: { time: 0, lastUpdatedDate: checkingDate } }

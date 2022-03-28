@@ -18,6 +18,18 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+// for local time
+
+// 1. 현재 PC 표준 시간
+const curr = new Date();
+
+// 2. UTC 시간 계산
+const utc = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
+
+// 3. UTC to KST (UTC + 9시간)
+const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+const kr_curr = new Date(utc + KR_TIME_DIFF);
+
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -80,7 +92,7 @@ module.exports = {
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
-        lastUpdated: new Date()
+        lastUpdated: kr_curr
       });
 
 
@@ -96,7 +108,7 @@ module.exports = {
         { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
       ]);
 
-      const today = new Date()
+      const today = kr_curr
       await MonthRecord.insertMany([
         { userId: user.id, date: 1, time: 0, lastUpdatedDate: today},
         { userId: user.id, date: 2, time: 0, lastUpdatedDate: today },
