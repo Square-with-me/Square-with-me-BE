@@ -1,0 +1,17 @@
+# 노드를 베이스로 생성
+FROM node:16.13.1
+
+# app 디렉토리 , working 디렉토리 생성
+RUN npm install -g nodemon
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Bundle app source
+COPY . .
+
+# Exports
+EXPOSE 443
