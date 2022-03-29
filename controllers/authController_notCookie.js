@@ -197,6 +197,8 @@ module.exports = {
     auth: asyncWrapper(async (req, res) => {
       const { origin, pwd } = req.body;
 
+      console.log(!origin, "!origin.      ")
+      console.log(!pwd, "!pwd.       ")
       if (!origin || !pwd) {
         return res.status(400).json({
           isSuccess: false,
