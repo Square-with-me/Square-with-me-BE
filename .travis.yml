@@ -1,0 +1,20 @@
+language: node_js - node
+
+branches:
+  only:
+  - deploy
+
+services:
+- docker
+
+before_install:
+- nvm install node
+
+script:
+- docker run -e CI=true --env-file .env wkdgusrhkd/nemo_with_me npm run test
+
+after_success:
+- echo "TEST complete, sending image to hub..."
+- docker build -t wkdgusrhkd/nemo_with_me -f ./Dockerfile.dev .
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+- docker push wkdgusrhkd/nemo_with_me
