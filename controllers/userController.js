@@ -8,9 +8,12 @@ const { User, Badge } = require("../models");
 // RoomController for newBadge
 const RoomController = require("./roomController");
 
+// authController_notCookie for newBadgeFirstCome
+const authController_notCookie = require("./authController_notCookie");
+
 // korean local time
 const dateUtil = require("../utils/date");
-const authController_notCookie = require("./authController_notCookie");
+
 
 module.exports = {
   create: {},
