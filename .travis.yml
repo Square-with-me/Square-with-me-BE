@@ -9,7 +9,7 @@ env:
   global:
     secure: W74mVoE63Zu1KB+xp2LmdS3dvNs4xhPVBtjEyL58hxhn/3cGbZ+dioPaUcX5FobWfm6x5WNs3IAIMCNVFXxYk8ZnIm0DlLAUQ8342uSqo0fkgC4PTT1LCcO0BlDdfAQ1ChoFAitZroDvz8ndA2l/7soQ3KSt6OMejS/vnGSiDpelflaoaK4Isio9+isRxE2d2s4cUpxnxGBT9OBe+sf1l+qMs5Mj3kCg904LyjsJSLGoiGD0CioKD+ZG9GIT5wyno8kuhCLjYVyV82/7osbTYr8l6E6GdibAq52fallA3mAQgvq/GmROj0q7mYzPMOOnZdy+05kaQEKQBNapkBr2G/EWgfNUR+2nwDtsOPdyvJ7eDEMZP6CrlPbC0CG8Ul9igeIcfVCLcWeuhxVO7PiUTnbtRFHXLF0TDQUmAzmX2dcHJPMm9nfm9mUy0nqb4TX7NHYlLL+vjMvUDEgzwdICwXG4fkjpRar1BqBbJ8DJWzsuc1aYqpVT6d+1DuMhn5W3NN/YZr3xF+/kghIg96rCXowXyLapEh2268ZwBGNjHCULlRuHc37M84qymCBUofvUtYGkWEXhnWSwdNXDo7KuVba8bQRZF/KkpdW18exfIsSP98v2JH9KbK0dqFOhXmjUXnKRTKxOuVssb+wEITVckhyCQf7Y8pa9laGDo2PpwZU=
 before_install:
-- openssl aes-256-cbc -k "$ENCRYPT_PASSWORD" -in .env.enc -out .env -d
+- openssl aes-256-cbc -k "$ENCRYPT_PASSWORD" -in .env.enc -out .env -d -pbkdf2 -iter 1000
 - nvm install node
 - docker build -t wkdgusrhkd/nemo_with_me -f ./Dockerfile.dev .
 script:
