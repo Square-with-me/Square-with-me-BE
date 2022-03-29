@@ -1,0 +1,10 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "wkdgusrhkd/nemo_with_me:latest",
+    "Update": "true",
+    "essential": false,
+    "memory": 128
+  },
+  "Ports": [{ "ContainerPort": 443, "HostPort": 443 }]
+}
