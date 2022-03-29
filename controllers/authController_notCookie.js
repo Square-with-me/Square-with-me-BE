@@ -18,6 +18,8 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
+
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -165,13 +167,14 @@ module.exports = {
             await user.addMyBadges(
               firstComeBadge.id
             );
+            newBadge = firstComeBadge.id 
 
             res.status(200).json({
               isSuccess: true,
               data: {
                 token,
-                newBadge: firstComeBadge,
               },
+              // newBadge: firstComeBadge,
             });
           } else {
             res.status(200).json({
@@ -255,14 +258,19 @@ module.exports = {
       console.log("leftBadge", leftBadge)
 
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
+        
+        await firstComeBadge.decrement("leftBadges");
+        console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ")
         await user.addMyBadges(firstComeBadge.id);
+        newBadge = firstComeBadge.id
+
 
         return res.status(200).json({
           isSuccess: true,
           data: {
             token,
           },
-          newBadge: firstComeBadge
+          
         });
       } else {
         return res.status(200).json({
@@ -273,7 +281,14 @@ module.exports = {
         });
       }
     }),
+    newBadge: () => {
+      return newBadge;
+    },
+    newBadgeInit: () => {
+      newBadge = 0;
+    },
   },
+  
 
   delete: {
     auth: asyncWrapper(async (req, res) => {
