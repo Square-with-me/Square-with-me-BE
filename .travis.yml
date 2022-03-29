@@ -1,18 +1,15 @@
 language: node_js - node
-
 branches:
   only:
   - deploy
-
 services:
 - docker
-
 before_install:
+- openssl aes-256-cbc -K $encrypted_3c84dcdc6bbe_key -iv $encrypted_3c84dcdc6bbe_iv
+  -in .env.enc -out .env -d
 - nvm install node
-
 script:
 - docker run -e CI=true --env-file .env wkdgusrhkd/nemo_with_me npm run test
-
 after_success:
 - echo "TEST complete, sending image to hub..."
 - docker build -t wkdgusrhkd/nemo_with_me -f ./Dockerfile.dev .
