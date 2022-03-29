@@ -10,6 +10,7 @@ const RoomController = require("./roomController");
 
 // korean local time
 const dateUtil = require("../utils/date");
+const authController_notCookie = require("./authController_notCookie");
 
 module.exports = {
   create: {},
@@ -139,18 +140,22 @@ module.exports = {
         attributes: ["id", "name", "imageUrl"],
       });
       
+
       const newBadge = RoomController.delete.newBadge();
+      const newBadgeFirstCome = authController_notCookie.get.newBadge();
 
-      console.log(newBadge, "newBadge");
+      console.log(newBadge, "newBadge-------");
+      console.log(newBadgeFirstCome, "newBadgeFirstCome--------");
 
-      if (newBadge !== 0) {
+      if (newBadge !== 0 || newBadgeFirstCome !== 0) {
         res.status(200).json({
           isSuccess: true,
           data: badges,
-          newBadge: newBadge,
+          newBadge: { newBadge, newBadgeFirstCome }
         });
 
         RoomController.delete.newBadgeInit();
+        authController_notCookie.get.newBadgeInit();
       } else {
         res.status(200).json({
           isSuccess: true,
