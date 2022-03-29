@@ -18,3 +18,15 @@ after_success:
 - echo "TEST complete, sending image to hub..."
 - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 - docker push wkdgusrhkd/nemo_with_me
+deploy:
+- provider: elasticbeanstalk
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: ap-northeast-2
+  app: nemo-with-me-EB
+  env: Nemowithmeeb-env
+  bucket_name: square-with-me-bucket
+  skip_cleanup: true
+  wait_until_deployed : true
+  on:
+    branch: deploy
