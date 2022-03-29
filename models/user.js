@@ -1,5 +1,3 @@
-const { koreanDate: krToday } = require("../utils/date")
-
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "user",
@@ -33,7 +31,6 @@ module.exports = (sequelize, DataTypes) => {
       lastUpdated: {
         type: DataTypes.DATE,
         allowNull: false,
-        default: krToday,
       },
     },
     {

@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 
 // MySQL models
-const { Room, Tag, Category, User, Viewer, Like, Badge } = require("../models");
+const { Room, Tag, Category, User, Like, Badge } = require("../models");
 
 // Mongo collections
 const WeekRecord = require("../mongoSchemas/weekRecord");
@@ -11,8 +11,7 @@ const MonthRecord = require("../mongoSchemas/monthRecord");
 const { asyncWrapper, getDay } = require("../utils/util");
 
 // korean local time
-const timeRecord = require("../utils/date");
-const krToday = timeRecord.koreanDate;
+const dateUtil = require("../utils/date");
 
 let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 const CATEGORY = {  // 카테고리 목록
@@ -399,20 +398,21 @@ module.exports = {
     participant: async (data) => {
       console.log("data", data);
       try {
-        // asyncWrapper는 http 요청에 맞춰진 것이므로 여기선 try catch 구문으로 에러 캐치
-
-        const { roomId, userId, time, categoryId, date } = data; // 기존 코드는 받는 인자 data, 테스트 할 때는 req.body.data로 테스트, 썬더 클라이언트에서 body에 필요한 데이터 넣음
-        // time은 분 단위로 넘어옴
-        // date는 방 입장 시점을 나타냄
+        const { roomId, userId, time, categoryId, date } = data; // time: 분 단위, date: 방 입장 시점의 날짜
+        
+        const user = await User.findOne({
+          where: {
+            id: userId,
+          },
+        });
 
         // 특정 카테고리 이름 가져오기
-
-        const theCategory = await Category.findOne({
+        const category = await Category.findOne({
           where: {
             id: categoryId,
           },
         });
-        const category = theCategory.name; // 카테고리명은 한글
+        const categoryName = category.name; // 카테고리명은 한글
 
         const room = await Room.findOne({
           where: { id: roomId },
@@ -425,462 +425,303 @@ module.exports = {
         }
         // 날짜로 요일 가져오기
         const day = getDay(date);
-        console.log("유저 아이디", userId, "요일", day);
+        // 한국 시간 가져오기
+        const checkingDate = dateUtil.koreanDate();
        
-      // 월간 기록 초기화
-      const monthRecordReturn = await timeRecord.monthRecordInitChecking(userId, krToday)
+        // 월간 기록 초기화 Start
+        let monthRecord = await MonthRecord.find(
+          { userId: userId },
+          { _id: 0, __v: 0 }
+        );
+        if(monthRecord.length === 0) {
+          return res.status(400).json({
+            isSuccess: false,
+            msg: "일치하는 유저 정보가 없습니다.",
+          });
+        };
 
-      if (monthRecordReturn.msg) {
-        return res.status(400).json({
-          isSuccess: false,
-          msg: "일치하는 유저 정보가 없습니다.",
-        });
-      }
+        const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 월간 기록의 최근 업데이트 된 달
+        const checkingMonth = checkingDate.getMonth() + 1; // 이번 달
 
-        let preRecord = null;
+        if (
+          lastUpdatedMonth !== checkingMonth ||  // 달이 다르거나
+          monthRecord[0].lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()  // 연도가 다를 때
+        ) {
+          await MonthRecord.updateMany(
+            { userId: id },
+            { $set: { time: 0, lastUpdatedDate: checkingDate } }
+          );
+          await MonthRecord.find({ userId: id }, { _id: 0, __v: 0 });
+        }
+        // 월간 기록 초기화 End
 
-        if (day === "sun") { // 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
+        // 주간 기록 초기화 Start
+        let weekdaysRecord = await WeekRecord.find(
+          { userId: userId },
+          { _id: 0, __v: 0 }
+        );
+    
+        if(weekdaysRecord.length === 0) {
+          return res.status(400).json({
+            isSuccess: false,
+            msg: "일치하는 유저 정보가 없습니다.",
+          });
+        }
+        const lastUpdatedDate = user.lastUpdated;
 
-          // 주간 기록 저장
-          const updateOption = {};
-          switch (categoryId) {
-            case 1:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "beauty",
-              });
+        const oneDay = 86400000; //  Milliseconds for a day
 
-              updateOption[day] = preRecord[day] + time;
+        // 시간 상관없이 요일끼리만 비교하기 위해 모든 시간은 0으로 설정
+        const lastUpdatedZeroHour = new Date(
+          lastUpdatedDate.getFullYear(),
+          lastUpdatedDate.getMonth(),
+          lastUpdatedDate.getDate(),
+          0
+        );
+        const checkingZeroHour = new Date(
+          checkingDate.getFullYear(),
+          checkingDate.getMonth(),
+          checkingDate.getDate(),
+          0
+        );
 
-              await preRecord.update(updateOption);
-              break;
-            case 2:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "sports",
-              });
+        if (checkingZeroHour.getDay() === 0) {  // 일요일
+          if (
+            lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay ||  // 주가 다를 때
+            checkingZeroHour + 1 * oneDay <= lastUpdatedZeroHour
+          ) {
+            await User.update({ lastUpdated: checkingDate }, { where: { id } });
 
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 3:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "study",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 4:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "counseling",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 5:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "culture",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 6:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "etc",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.updateOne(updateOption);
-              break;
-            default:
-              break;
+            await WeekRecord.updateMany(
+              { userId: userId },
+              {
+                $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
+              }
+            );
+    
+            weekdaysRecord = await WeekRecord.find(
+              { userId: id },
+              { _id: 0, __v: 0 }
+            );
           }
+        } else {  // 월요일 ~ 토요일
+          if (
+            lastUpdatedZeroHour <= checkingZeroHour - checkingZeroHour.getDay() * oneDay ||
+            checkingZeroHour + ( 8 - checkingZeroHour.getDay() ) * oneDay <= lastUpdatedZeroHour
+          ) {
+            await User.update({ lastUpdated: checkingDate }, { where: { id } });
+    
+            await WeekRecord.updateMany(
+              { userId: userId },
+              {
+                $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
+              }
+            );
 
-          // 월간 기록 저장
-          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
-          await preMonthRecord.updateOne({
-            time: preMonthRecord.time + time,
-          });
-
-          // <뱃지 지급 여부 판단>
-
-          // *****시간과 관련된 뱃지들 지급*****
-          // 카테고리명은 한글, 뱃지 카테고리명은 영어, 둘 사이를 매치시켜주기 위함
-
-          // 카테고리로 뱃지이름 가져오기
-          const badgeCategory = CATEGORY[category];
-          // let badgeCategory = "";
-          // if (category === "뷰티") {
-          //   badgeCategory = "beauty";
-          // } else if (category === "운동") {
-          //   badgeCategory = "sports";
-          // } else if (category === "스터디") {
-          //   badgeCategory = "study";
-          // } else if (category === "상담") {
-          //   badgeCategory = "counseling";
-          // } else if (category === "문화") {
-          //   badgeCategory = "culture";
-          // } else if (category === "기타") {
-          //   badgeCategory = "etc";
-          // }
-
-
-          // 특정 유저의 특정 카테고리 기록 찾기
-          const userRecords = await WeekRecord.findOne({
-            userId,
-            category: badgeCategory,
-          });
-
-          // 특정 유저의 특정 분야의 시간 총합
-          const categoryTotalTime =
-            userRecords.mon +
-            userRecords.tue +
-            userRecords.wed +
-            userRecords.thur +
-            userRecords.fri +
-            userRecords.sat +
-            userRecords.sun;
-
-          // 유저가 누군지 지정해주기
-          const thatUser = await User.findOne({
-            where: {
-              id: userId,
-            },
-          });
-
-          // 뱃지 카테고리 종류별로 가져오기 beauty, study, sports, counseling, culture, etc
-          let theBadge = [];
-          if (badgeCategory === "beauty") {
-            // Badge 테이블에 등록된 해당 뱃지 가져와야 함
-            theBadge = await Badge.findOne({
-              where: {
-                name: "beauty",
-              },
-            });
-
-            // 그 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-              thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "study") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "study",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "sports") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "sports",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "counseling") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "counseling",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "culture") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "culture",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            }); // []
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "etc",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          }
-
-          // <시간 초기화>
-          const weekRecordReturn = await timeRecord.weekRecordInitChecking(userId, krToday)
-      
-          if (weekRecordReturn.msg) {
-            return res.status(400).json({
-              isSuccess: false,
-              msg: "일치하는 유저 정보가 없습니다.",
-            });
-          }
-        } else { // 월 ~ 토 인 경우, '시간 초기화 - 퇴장 시간 저장 - 뱃지 지급 여부 판단'
-          // 주간 기록 초기화
-          const weekRecordReturn = await timeRecord.weekRecordInitChecking(userId, krToday)
-          if (weekRecordReturn.msg) {
-            return res.status(400).json({
-              isSuccess: false,
-              msg: "일치하는 유저 정보가 없습니다.",
-            });
-          }
-
-          // 주간 기록 저장
-          const updateOption = {};
-          switch (categoryId) {
-            case 1:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "beauty",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-
-              await preRecord.update(updateOption);
-              break;
-            case 2:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "sports",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 3:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "study",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 4:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "counseling",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 5:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "culture",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.update(updateOption);
-              break;
-            case 6:
-              preRecord = await WeekRecord.findOne({
-                userId,
-                category: "etc",
-              });
-
-              updateOption[day] = preRecord[day] + time;
-              await preRecord.updateOne(updateOption);
-              break;
-            default:
-              break;
-          }
-
-          // 월간 기록 저장
-          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
-          await preMonthRecord.updateOne({
-            time: preMonthRecord.time + time,
-          });
-
-          // <뱃지 지급 여부 판단>
-
-          // *****시간과 관련된 뱃지들 지급*****
-
-          // 카테고리로 뱃지 이름 가져오기
-          const badgeCategory = CATEGORY[category];
-
-          // 특정 유저의 특정 카테고리 기록 찾기
-          const userRecords = await WeekRecord.findOne({
-            userId,
-            category: badgeCategory,
-          });
-
-          // 특정 유저의 특정 분야의 시간 총합
-          const categoryTotalTime =
-            userRecords.mon +
-            userRecords.tue +
-            userRecords.wed +
-            userRecords.thur +
-            userRecords.fri +
-            userRecords.sat +
-            userRecords.sun;
-
-          // 유저가 누군지 지정해주기
-          const thatUser = await User.findOne({
-            where: {
-              id: userId,
-            },
-          });
-
-          // 뱃지 카테고리 종류별로 가져오기 beauty, study, sports, counseling, culture, etc
-          let theBadge = [];
-
-          if (badgeCategory === "beauty") {
-            // Badge 테이블에 등록된 해당 뱃지 가져와야 함
-            theBadge = await Badge.findOne({
-              where: {
-                name: "beauty",
-              },
-            });
-
-            // 그 특정 유저의 뱃지 리스트를 가져옴, user 모델에서 MyBadges로 정의된 상태
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-              thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "study") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "study",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "sports") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "sports",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "counseling") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "counseling",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else if (badgeCategory === "culture") {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "culture",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
-          } else {
-            theBadge = await Badge.findOne({
-              where: {
-                name: "etc",
-              },
-            });
-
-            const isGivenBadge = await thatUser.getMyBadges({
-              where: {
-                id: theBadge.id,
-              },
-            });
-            if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && isGivenBadge.length === 0) {
-              await thatUser.addMyBadges(theBadge.id);
-              newBadge = theBadge.id;
-            }
+            weekdaysRecord = await WeekRecord.find(
+              { userId: id },
+              { _id: 0, __v: 0 }
+            );
           }
         }
+        // 주간 기록 초기화 End
+
+        let preRecord = null;
+        const badgeCategory = CATEGORY[categoryName];
+        const categoryBadge = await Badge.findOne({  // 해당 카테고리의 뱃지 가져오기
+          where: {
+            name: badgeCategory,
+          },
+        });
+
+        const userCategoryBadge = await user.getMyBadges({  // 유저의 카테고리 뱃지 소유 여부
+          where: {
+            id: categoryBadge.id,
+          },
+        });
+
+        if (day === "sun") { // 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
+          // 주간 기록 저장
+          const updateOption = {};
+          switch (categoryId) {
+            case 1:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "beauty",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+
+              await preRecord.update(updateOption);
+              break;
+            case 2:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "sports",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 3:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "study",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 4:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "counseling",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 5:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "culture",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 6:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "etc",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.updateOne(updateOption);
+              break;
+            default:
+              break;
+          }
+
+          // 월간 기록 저장
+          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+          await preMonthRecord.updateOne({
+            time: preMonthRecord.time + time,
+          });
+
+          // 카테고리 뱃지 지급 여부 판단
+          // 특정 유저의 특정 카테고리 기록 찾기
+          const userRecords = await WeekRecord.findOne({
+            userId,
+            category: badgeCategory,
+          });
+          // 유저의 해당 카테고리의 시간 총합
+          const categoryTotalTime =
+            userRecords.mon +
+            userRecords.tue +
+            userRecords.wed +
+            userRecords.thur +
+            userRecords.fri +
+            userRecords.sat +
+            userRecords.sun;
+
+          // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
+          if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
+            await user.addMyBadges(categoryBadge.id);
+            newBadge = categoryBadge.id;
+          };
+
+        } else { // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
+          // 주간 기록 저장
+          const updateOption = {};
+          switch (categoryId) {
+            case 1:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "beauty",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+
+              await preRecord.update(updateOption);
+              break;
+            case 2:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "sports",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 3:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "study",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 4:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "counseling",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 5:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "culture",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.update(updateOption);
+              break;
+            case 6:
+              preRecord = await WeekRecord.findOne({
+                userId,
+                category: "etc",
+              });
+
+              updateOption[day] = preRecord[day] + time;
+              await preRecord.updateOne(updateOption);
+              break;
+            default:
+              break;
+          }
+
+          // 월간 기록 저장
+          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+          await preMonthRecord.updateOne({
+            time: preMonthRecord.time + time,
+          });
+
+          // 카테고리 뱃지 지급 여부 판단
+          // 특정 유저의 특정 카테고리 기록 찾기
+          const userRecords = await WeekRecord.findOne({
+            userId,
+            category: badgeCategory,
+          });
+          // 유저의 해당 카테고리의 시간 총합
+          const categoryTotalTime =
+            userRecords.mon +
+            userRecords.tue +
+            userRecords.wed +
+            userRecords.thur +
+            userRecords.fri +
+            userRecords.sat +
+            userRecords.sun;
+
+          // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
+          if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
+            await user.addMyBadges(categoryBadge.id);
+            newBadge = categoryBadge.id;
+          };
+        };
 
         // 방장인지 확인
         const isMasterUser = userId === room.masterUserId;
@@ -923,7 +764,6 @@ module.exports = {
     },
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
-
     newBadge: () => {
       return newBadge;
     },

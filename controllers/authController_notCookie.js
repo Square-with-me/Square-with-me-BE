@@ -9,15 +9,12 @@ const {
   createStatusMsg,
   createAnonOrigin,
 } = require("../utils/util");
+const { koreanDate } = require("../utils/date");
 
-// korean local time
-const krToday = require("../utils/date").koreanDate
-
-// models
-
+// MySQL models
 const { User, Badge } = require("../models");
 
-// Mongo DB 시간기록
+// Mongo collections
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
@@ -76,20 +73,16 @@ module.exports = {
 
       const hashedPwd = bcrypt.hashSync(pwd, 10);
 
-
       const user = await User.create({
         origin,
         nickname,
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
-        lastUpdated: krToday
+        lastUpdated: koreanDate(),
       });
 
-
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-      
-
       await WeekRecord.insertMany([
         { userId: user.id, category: "beauty",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
         { userId: user.id, category: "sports",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
@@ -99,41 +92,39 @@ module.exports = {
         { userId: user.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
       ]);
 
-      
       await MonthRecord.insertMany([
-        { userId: user.id, date: 1, time: 0, lastUpdatedDate: krToday},
-        { userId: user.id, date: 2, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 3, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 4, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 5, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 6, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 7, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 8, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 9, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 10, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 11, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 12, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 13, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 14, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 15, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 16, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 17, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 18, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 19, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 20, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 21, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 22, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 23, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 24, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 25, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 26, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 27, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 28, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 29, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 30, time: 0, lastUpdatedDate: krToday },
-        { userId: user.id, date: 31, time: 0, lastUpdatedDate: krToday },
+        { userId: user.id, date: 1, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 2, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 3, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 4, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 5, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 6, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 7, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 8, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 9, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 10, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 11, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 12, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 13, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 14, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 15, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 16, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 17, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 18, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 19, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 20, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 21, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 22, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 23, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 24, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 25, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 26, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 27, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 28, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 29, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 30, time: 0, lastUpdatedDate: koreanDate() },
+        { userId: user.id, date: 31, time: 0, lastUpdatedDate: koreanDate() },
       ]);
-    
 
       return res.status(201).json({
         isSuccess: true,
