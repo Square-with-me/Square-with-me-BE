@@ -6,5 +6,5 @@
     "essential": false,
     "memory": 128
   },
-  "Ports": [{ "ContainerPort": 443, "HostPort": 443 }]
+  "Ports": [{ "ContainerPort": 80, "HostPort": 80 }]
 }
