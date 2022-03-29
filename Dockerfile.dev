@@ -15,3 +15,5 @@ COPY . .
 
 # Exports
 EXPOSE 443
+
+CMD ["npm", "run", "dev"]
