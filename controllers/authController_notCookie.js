@@ -79,7 +79,7 @@ module.exports = {
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
-        lastUpdated: koreanDate(),
+        lastUpdated: new Date(), // DB 시간을 한국 시간으로 맞추어 놓았으므로 별도로 계산하지 않음, koreanDate()를 쓸 경우 9시간 후의 미래시간이 찍히는 문제 발생
       });
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
@@ -154,11 +154,13 @@ module.exports = {
           const isGivenBadge = await user.getMyBadges({
             where: { id: firstComeBadge.id, },
           });
-
+            console.log("isGivenBadge다ㅏㅏㅏㅏ", isGivenBadge)
           const leftBadge = firstComeBadge.leftBadges;
 
+          console.log(leftBadge, "leftbadge aaaaaaa")
           if (isGivenBadge.length === 0 && 0 < leftBadge) {
             await firstComeBadge.decrement("leftBadges");
+          console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ")
 
             await user.addMyBadges(
               firstComeBadge.id
@@ -249,6 +251,8 @@ module.exports = {
 
       // 100번째 까지 모두 지급되었는지 확인
       const leftBadge = firstComeBadge.leftBadges;
+      console.log("firstComeBadge", firstComeBadge)
+      console.log("leftBadge", leftBadge)
 
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
         await user.addMyBadges(firstComeBadge.id);
@@ -257,8 +261,8 @@ module.exports = {
           isSuccess: true,
           data: {
             token,
-            newBadge: firstComeBadge,
           },
+          newBadge: firstComeBadge
         });
       } else {
         return res.status(200).json({
