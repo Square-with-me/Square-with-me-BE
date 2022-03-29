@@ -550,6 +550,7 @@ module.exports = {
                 category: "beauty",
               });
 
+              console.log("뷰티 시간 저장아 되어랏, 일요일")
               updateOption[day] = preRecord[day] + time;
 
               await preRecord.update(updateOption);
@@ -640,7 +641,7 @@ module.exports = {
                 userId,
                 category: "beauty",
               });
-
+              console.log(`뷰티 시간 저장아 되어랏, ${day}`)
               updateOption[day] = preRecord[day] + time;
 
               await preRecord.update(updateOption);
@@ -695,6 +696,8 @@ module.exports = {
           }
 
           // 월간 기록 저장
+          console.log("월간에 저장될 time", time);
+          
           const preMonthRecord = await MonthRecord.findOne({ userId, date, });
           await preMonthRecord.updateOne({
             time: preMonthRecord.time + time,
@@ -778,7 +781,7 @@ module.exports = {
       const isLiking = await Like.findOne({
         where: {
           roomId,
-          likedId: userId,
+          likedId: userId, 
         },
       });
       if (!isLiking) {
