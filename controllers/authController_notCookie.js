@@ -194,12 +194,10 @@ module.exports = {
     auth: asyncWrapper(async (req, res) => {
       const { origin, pwd } = req.body;
 
-      console.log(!origin, "!origin.      ")
-      console.log(!pwd, "!pwd.       ")
       if (!origin || !pwd) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "이메일 혹은 비밀번호를 입력하세요.",
+          msg: "이메일 혹은 비밀번호를 입력하세요.", 
         });
       }
 
@@ -209,7 +207,7 @@ module.exports = {
       if (!user) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "존재하지 않는 이메일입니다.",
+          msg: "이메일 혹은 비밀번호를 확인해주세요.", 
         });
       }
 
@@ -217,7 +215,7 @@ module.exports = {
       if (!pwdCheck) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "비밀번호가 틀렸습니다.",
+          msg: "이메일 혹은 비밀번호를 확인해주세요.", 
         });
       }
 
@@ -256,28 +254,22 @@ module.exports = {
 
       // 100번째 까지 모두 지급되었는지 확인
       const leftBadge = firstComeBadge.leftBadges;
-      console.log("firstComeBadge", firstComeBadge)
-      console.log("leftBadge", leftBadge)
-
+      
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
         
         await firstComeBadge.decrement("leftBadges");
-        console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ local에서")
+        
         await user.addMyBadges(firstComeBadge.id);
         newBadge = firstComeBadge.id
       }
-
 
         return res.status(200).json({
           isSuccess: true,
           data: {
             token,
           },
-          
         });
       
-      
-    
       // else {
       //   return res.status(200).json({
       //     isSuccess: true,
@@ -288,9 +280,11 @@ module.exports = {
       // }
     }),
     newBadge: () => {
+      console.log("autoController_notCookie쪽에서 newBadge 호출됐을 때");
       return newBadge;
     },
     newBadgeInit: () => {
+      console.log("Init이 되어버린다ㅏㅏㅏㅏㅏㅏㅏㅏ");
       newBadge = 0;
     },
   },
