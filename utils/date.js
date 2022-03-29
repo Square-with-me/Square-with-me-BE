@@ -16,7 +16,6 @@ module.exports = {
     // 3. UTC to KST (UTC + 9시간)
     const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
     const kr_curr = new Date(utc + KR_TIME_DIFF);
-
     return kr_curr;
   },
 
@@ -37,7 +36,7 @@ module.exports = {
     });
 
     const lastUpdatedDate = user.lastUpdated; // 여기에 마지막 업데이트 된 날짜 넣어야함
-    const checkingDate = krToday;
+    const checkingDate = krToday();
 
     const oneDay = 86400000; //  Milliseconds for a day
 
@@ -86,7 +85,7 @@ module.exports = {
         await User.update({ lastUpdated: checkingDate }, { where: { id } });
 
         // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
-        const result = await WeekRecord.updateMany(
+        await WeekRecord.updateMany(
           { userId: id },
           {
             $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
@@ -112,8 +111,7 @@ module.exports = {
     if (monthRecord.length === 0) {
       return { msg: "일치하는 유저 정보가 없습니다." };
     }
-    const checkingDate = krToday;
-
+    const checkingDate = krToday();
     /////////// 마지막으로 기록된 시점과 현재 기록 조회하는 시점이 동일한 월에 속해 있는지 비교하고 속해있지 않다면 몇월인지 알려주며 월간 기록 리셋해주기
 
     // 마지막으로 업데이트된 날짜가 몇번째 달에 속해 있는지 구하기

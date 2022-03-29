@@ -9,9 +9,7 @@ const { User, Badge } = require("../models");
 const RoomController = require("./roomController");
 
 // korean local time
-const timeRecord = require("../utils/date");
-const krToday = timeRecord.koreanDate;
-
+const dateUtil = require("../utils/date");
 
 module.exports = {
   create: {},
@@ -166,8 +164,8 @@ module.exports = {
 
       // 네모와 함께한 시간 주간, 월간 기록 가져오기
 
-      //////////////////// <주간 기록>
-        const weekdaysRecord = await timeRecord.weekRecordInitChecking(id, krToday)
+      // <주간 기록>
+      const weekdaysRecord = await dateUtil.weekRecordInitChecking(id, dateUtil.koreanDate)
       
       if (weekdaysRecord.msg) {
         return res.status(400).json({
@@ -175,9 +173,9 @@ module.exports = {
           msg: "일치하는 유저 정보가 없습니다.",
         });
       }
-      
-      //////////////////// <월간 기록>
-      const monthRecord = await timeRecord.monthRecordInitChecking(id, krToday)
+
+      // <월간 기록>
+      const monthRecord = await dateUtil.monthRecordInitChecking(id, dateUtil.koreanDate)
 
       if (monthRecord.msg) {
         return res.status(400).json({
