@@ -181,7 +181,7 @@ module.exports = {
               isSuccess: true,
               data: {
                 token,
-                user,
+                user, // ch: 왜 주는 걸까?? 이유가 없다면 없애버리고 return 통합하는게 좋을 듯
               },
             });
           }
@@ -262,9 +262,10 @@ module.exports = {
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
         
         await firstComeBadge.decrement("leftBadges");
-        console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ")
+        console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ local에서")
         await user.addMyBadges(firstComeBadge.id);
         newBadge = firstComeBadge.id
+      }
 
 
         return res.status(200).json({
@@ -274,14 +275,17 @@ module.exports = {
           },
           
         });
-      } else {
-        return res.status(200).json({
-          isSuccess: true,
-          data: {
-            token,
-          },
-        });
-      }
+      
+      
+    
+      // else {
+      //   return res.status(200).json({
+      //     isSuccess: true,
+      //     data: {
+      //       token,
+      //     },
+      //   });
+      // }
     }),
     newBadge: () => {
       return newBadge;
