@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server",
+    "test": "jest",
     "start": "pm2 start server.js",
     "prettify": "prettier --wrtie *.js **/*.js"
   },
