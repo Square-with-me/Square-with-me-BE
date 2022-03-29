@@ -23,8 +23,8 @@ deploy:
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_ACCESS_KEY
   region: ap-northeast-2
-  app: nemo-with-me-EB
-  env: Nemowithmeeb-env
+  app: Nemo-with-me
+  env: Nemowithme-env
   bucket_name: elasticbeanstalk-ap-northeast-2-921455630750
   skip_cleanup: true
   wait_until_deployed : true
