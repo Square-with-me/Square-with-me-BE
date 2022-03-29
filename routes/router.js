@@ -43,7 +43,7 @@ router.delete("/room/:roomId/like", middleware.auth, RoomController.delete.like)
 
 // api/rooms
 router.get("/rooms", RoomController.get.rooms);   // 방 목록 불러오기
-router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms);   // 방 목록 불러오기
+router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms); // 방 목록 불러오기
 
 // /api/upload
 // router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {

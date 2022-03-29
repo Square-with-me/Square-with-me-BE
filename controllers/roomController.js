@@ -336,11 +336,15 @@ module.exports = {
       const { categoryId } = req.params;
       const { p: page } = req.query;
 
+      console.log(page, "page는 이것이다.")
+      console.log(categoryId, "categoryId는 이것이다")
+
       let offset = 0;
       if (page > 1) {
         offset = 8 * (page - 1);
       }
 
+      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏ");
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
@@ -360,15 +364,16 @@ module.exports = {
             attributes: ["id", "name"],
           },
           {
-            model: Tag,
+            model: Tag, 
             as: "Tags",
             attributes: ["id", "name"],
-            through: { attributes: [] },
+            through: { attributes: [] }, // 관계형 자료들은 
           },
         ],
         order: [["createdAt", "desc"]],
       });
 
+      console.log(rooms, "romms는 이것이다ㅏㅏㅏㅏㅏㅏ")
       return res.status(200).json({
         isSuccess: true,
         data: rooms,
