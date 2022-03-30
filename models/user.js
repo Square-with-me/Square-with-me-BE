@@ -1,4 +1,4 @@
-const krToday = require("../utils/date").koreanDate()
+const { koreanDate: krToday } = require("../utils/date")
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
