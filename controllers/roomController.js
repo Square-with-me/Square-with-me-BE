@@ -199,13 +199,9 @@ module.exports = {
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
       let roomSearchingLimit = 0
-
-      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ")
-      console.log(typeof page, "type을 확인해보자ㅏㅏㅏㅏㅏㅏㅏ");
-      console.log(page === 1, "page === 1는 참인가 거짓인가");
-      console.log(page/1 === 1, "page/1 === 1는 참인가 거짓인가");
-      if (page/1 === 1) { // page === 1가 false가 나오므로 숫자로 형변환해주기 위해 /1을 넣는다.
-        roomSearchingLimit = 7
+    
+      if (page/1 === 1) { // req.query로 넘어오는 모든 것들은 문자열로 넘어온다. page === 1가 false가 나오므로 숫자로 형변환해주기 위해 /1을 넣는다.
+        roomSearchingLimit = 7 // 처음에는 7개만 보내줌
       } else {
         roomSearchingLimit = 8
       }
@@ -213,14 +209,13 @@ module.exports = {
       console.log("roomSearchingLimit", roomSearchingLimit);
       let offset = 0;
       
-      if (page/1 === 2) { // 처음에는 7개만 보내줌
+      if (page/1 === 2) { // 처음에는 7개만 보내주니까 처음에는 7개만 상쇄(offset)
         offset = 7;
       }
       else if (page/1 > 2) {
         offset = 7 + 8 * (page/1 - 2);
       }
 
-      console.log("offset 이거다adsfadsfgasdfgdsadfds", offset)
       let rooms = [];
       switch (query) {
         case "hot": // 인기 방 목록 가져오기
@@ -360,24 +355,21 @@ module.exports = {
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
       let roomSearchingLimit = 0
 
-      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ카테고리카테고리카테고리카테고리")
       if (page/1 === 1) {
         roomSearchingLimit = 7
       } else {
         roomSearchingLimit = 8
       }
 
-      console.log("roomSearchingLimit 카테고리카테고리카테고리카테고리카테고리", roomSearchingLimit);
       let offset = 0;
       
-      if (page/1 === 2) { // 처음에는 7개만 보내줌
+      if (page/1 === 2) {
         offset = 7;
       }
       else if (page/1 > 2) {
         offset = 7 + 8 * (page/1 - 2);
       }
 
-      console.log("offset 이거다adsfadsfgasdfgdsadfds카테고리카테고리카테고리카테고리", offset)
 
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
@@ -401,7 +393,7 @@ module.exports = {
             model: Tag, 
             as: "Tags",
             attributes: ["id", "name"],
-            through: { attributes: [] }, // 관계형 자료들은 
+            through: { attributes: [] },
           },
         ],
         order: [["createdAt", "desc"]],
