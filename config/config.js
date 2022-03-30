@@ -18,19 +18,11 @@ module.exports = {
     "dialect": "mysql"
   },
   "production": {
-<<<<<<< HEAD
     "username": process.env.MYSQL_PRODUCTION_DB_USERNAME,
     "password": process.env.MYSQL_PRODUCTION_DB_PASSWORD,
     "database": "nemo_with_me_database",
     "host": process.env.MYSQL_PRODUCTION_DB_HOST,
     "dialect": "mysql",
     "timezone": "+09:00"
-=======
-    "username": "root",
-    "password": process.env.MYSQL_PRODUCTION_DB_PASSWORD,
-    "database": "nemo_with_me_database",
-    "host": process.env.MYSQL_PRODUCTION_DB_HOST,
-    "dialect": "mysql"
->>>>>>> d1625e6 (FIX: master branch and ch_mongo branch merged)
   }
 }
