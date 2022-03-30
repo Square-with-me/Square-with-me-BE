@@ -16,6 +16,9 @@ const dateUtil = require("../utils/date");
 
 
 
+// Mongo DB 시간기록
+const WeekRecord = require("../mongoSchemas/weekRecord");
+const MonthRecord = require("../mongoSchemas/monthRecord");
 
 module.exports = {
   create: {},
