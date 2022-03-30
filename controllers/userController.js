@@ -241,8 +241,8 @@ module.exports = {
       return res.status(200).json({
         isSuccess: true,
         data: {
-          weekdaysRecord,
-          monthRecord,
+          weekRecordReturn,
+          monthRecordReturn,
         },
       });
     }),

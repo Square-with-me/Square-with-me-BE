@@ -12,6 +12,15 @@ const { koreanDate } = require("../utils/date");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+// Mongo DB 시간기록
+const WeekRecord = require("../mongoSchemas/weekRecord");
+const MonthRecord = require("../mongoSchemas/monthRecord");
+
+// korean local time
+const krToday = require("../utils/date").koreanDate()
+
+
+
 module.exports = () => {
   passport.use(
     new KakaoStrategy(
@@ -61,6 +70,7 @@ module.exports = () => {
     
           
           await MonthRecord.insertMany([
+<<<<<<< HEAD
             { userId: newUser.id, date: 1, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 2, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 3, time: 0, lastUpdatedDate: koreanDate() },
@@ -92,6 +102,39 @@ module.exports = () => {
             { userId: newUser.id, date: 29, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 30, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 31, time: 0, lastUpdatedDate: koreanDate() },
+=======
+            { userId: newUser.id, date: 1, time: 0, lastUpdatedDate: krToday},
+            { userId: newUser.id, date: 2, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 3, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 4, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 5, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 6, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 7, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 8, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 9, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 10, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 11, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 12, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 13, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 14, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 15, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 16, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 17, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 18, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 19, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 20, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 21, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 22, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 23, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 24, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 25, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 26, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 27, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 28, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 29, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 30, time: 0, lastUpdatedDate: krToday },
+            { userId: newUser.id, date: 31, time: 0, lastUpdatedDate: krToday },
+>>>>>>> 616dd87 (FIX: week/month record util Arranged, util applied to kakao.js)
           ]);
 
           return done(null, newUser);
