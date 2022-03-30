@@ -10,7 +10,7 @@ const RoomController = require("./roomController");
 
 // korean local time
 const timeRecord = require("../utils/date");
-const krToday = timeRecord.koreanDate();
+const krToday = timeRecord.koreanDate;
 
 
 module.exports = {
