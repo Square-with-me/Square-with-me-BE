@@ -15,7 +15,6 @@ db.User = require("./user")(sequelize, Sequelize);
 db.Room = require("./room")(sequelize, Sequelize);
 db.Category = require("./category")(sequelize, Sequelize);
 db.Tag = require("./tag")(sequelize, Sequelize);
-// db.Viewer = require("./viewer")(sequelize, Sequelize);
 db.Badge = require("./badge")(sequelize, Sequelize);
 db.Like = require("./like")(sequelize, Sequelize);
 // db.RefreshToken = require("./refreshToken")(sequelize, Sequelize);
