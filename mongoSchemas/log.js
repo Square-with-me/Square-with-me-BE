@@ -20,7 +20,7 @@ const userLogSchema = new mongoose.Schema({
     allowNull: false,
   },
   category: {
-    type: number,
+    type: Number,
     allowNull: false,
   },
   roomName: {
