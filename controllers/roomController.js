@@ -198,14 +198,15 @@ module.exports = {
 
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
+      let roomSearchingLimit = 0
 
       if (page === 1) {
-        RoomSearchingLimit = 7
+        roomSearchingLimit = 7
       } else {
-        RoomSearchingLimit = 8
+        roomSearchingLimit = 8
       }
 
+      console.log("roomSearchingLimit", roomSearchingLimit);
       let offset = 0;
       
       if (page === 2) { // 처음에는 7개만 보내줌
@@ -215,6 +216,7 @@ module.exports = {
         offset = 7 + 8 * (page - 2);
       }
 
+      console.log("offset 이거다adsfadsfgasdfgdsadfds", offset)
       let rooms = [];
       switch (query) {
         case "hot": // 인기 방 목록 가져오기
@@ -248,7 +250,7 @@ module.exports = {
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -282,7 +284,7 @@ module.exports = {
               ],
             },
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -314,7 +316,7 @@ module.exports = {
               title: { [Op.like]: `%${query}%` },
             },
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -352,14 +354,15 @@ module.exports = {
       // const page = req.query.p와 같은 형태
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
+      let roomSearchingLimit = 0
 
       if (page === 1) {
-        RoomSearchingLimit = 7
+        roomSearchingLimit = 7
       } else {
-        RoomSearchingLimit = 8
+        roomSearchingLimit = 8
       }
 
+      console.log("roomSearchingLimit 카테고리카테고리카테고리카테고리카테고리", roomSearchingLimit);
       let offset = 0;
       
       if (page === 2) { // 처음에는 7개만 보내줌
@@ -369,11 +372,13 @@ module.exports = {
         offset = 7 + 8 * (page - 2);
       }
 
+      console.log("offset 이거다adsfadsfgasdfgdsadfds카테고리카테고리카테고리카테고리", offset)
+
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
         offset: offset,
-        limit: RoomSearchingLimit,
+        limit: roomSearchingLimit,
         attributes: [
           "id",
           "title",
