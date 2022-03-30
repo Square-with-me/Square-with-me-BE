@@ -58,6 +58,7 @@ io.on("connection", (socket) => {
       statusMsg: payload.statusMsg,
     }
 
+    console.log(payload.masterBadge, "payload.masterBadgepayload.masterBadgepayload.masterBadge")
     let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
     const otherSockets = others.map((socketId) => {
@@ -70,6 +71,7 @@ io.on("connection", (socket) => {
       return socketToUser[socketId]
     });
 
+    console.log(otherUsers, "otherUsers다ㅏㅏㅏㅏㅏㅏㅏㅏ")
     socket.emit("send users", { otherSockets, otherUsers });
   });
 
