@@ -3,10 +3,10 @@ dotenv.config();
 
 module.exports = {
   "development": {
-    "username": process.env.MYSQL_PRODUCTION_DB_USERNAME,
-    "password": process.env.MYSQL_PRODUCTION_DB_PASSWORD,
+    "username": "root",
+    "password": process.env.SQUARE_WITH_ME_DB_PASSWORD,
     "database": "nemo_with_me_database",
-    "host": process.env.MYSQL_PRODUCTION_DB_HOST,
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "timezone": "+09:00"
   },
