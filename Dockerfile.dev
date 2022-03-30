@@ -13,6 +13,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN ./node_modules/.bin/sequelize db:create
+
 # Exports
 EXPOSE 80
 
