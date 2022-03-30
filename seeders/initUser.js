@@ -13,10 +13,10 @@ module.exports = {
      * }], {});
     */
   //  일회성 컬럼 추가용
-    //  queryInterface.addColumn('users', 'newBadge', {
-    //   type: Sequelize.INTEGER,
-    //     allowNull: true,
-    // })
+     queryInterface.addColumn('users', 'newBadge', {
+      type: Sequelize.INTEGER,
+        allowNull: true,
+    })
 
   },
 

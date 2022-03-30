@@ -201,6 +201,7 @@ module.exports = {
       let roomSearchingLimit = 0
 
       console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ")
+      console.log(page === 1, "page === 1는 참인가 거짓인가");
       if (page === 1) {
         roomSearchingLimit = 7
       } else {
