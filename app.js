@@ -8,9 +8,12 @@ const cookieParser = require("cookie-parser");
 // const fs = require("fs");
 
 const app = express();
+const dotenv = require("dotenv");
+dotenv.config();
 
 const dotenv = require("dotenv");
 dotenv.config();
+
 
 // MySQL
 const db = require("./models");
