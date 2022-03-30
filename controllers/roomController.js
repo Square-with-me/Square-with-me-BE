@@ -6,6 +6,7 @@ const { Room, Tag, Category, User, Like, Badge } = require("../models");
 // Mongo collections
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
+const Log = require("../mongoSchemas/log");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
@@ -13,14 +14,15 @@ const { asyncWrapper, getDay } = require("../utils/util");
 // korean local time
 const dateUtil = require("../utils/date");
 
-const CATEGORY = {  // 카테고리 목록
-  "뷰티": "beauty",
-  "운동": "sports",
-  "스터디": "study",
-  "상담": "counseling",
-  "문화": "culture",
-  "기타": "etc",
-}
+const CATEGORY = {
+  // 카테고리 목록
+  뷰티: "beauty",
+  운동: "sports",
+  스터디: "study",
+  상담: "counseling",
+  문화: "culture",
+  기타: "etc",
+};
 const CATEGORY_BADGE_CRITERIA = 2; // 카테고리 뱃지 지급 기준(단위 : 분)
 
 module.exports = {
@@ -146,6 +148,20 @@ module.exports = {
       // 참가자 수 + 1
       await room.increment("participantCnt");
 
+      // 입장시 로그 기록
+      // userId, entryTime, exitTime, roomId, category, roomName
+      const category = room.category.name;
+      const entryTime = dateUtil.koreanDate();
+      const roomName = room.title;
+      const createLog = new Log({
+        userId,
+        entryTime,
+        roomId,
+        category,
+        roomName,
+      });
+      await createLog.save();
+
       res.status(201).json({
         isSuccess: true,
         data: room,
@@ -195,22 +211,21 @@ module.exports = {
     rooms: asyncWrapper(async (req, res) => {
       const { q: query, p: page } = req.query;
 
-
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
+      let RoomSearchingLimit = 0;
 
       if (page === 1) {
-        RoomSearchingLimit = 7
+        RoomSearchingLimit = 7;
       } else {
-        RoomSearchingLimit = 8
+        RoomSearchingLimit = 8;
       }
 
       let offset = 0;
-      
-      if (page === 2) { // 처음에는 7개만 보내줌
+
+      if (page === 2) {
+        // 처음에는 7개만 보내줌
         offset = 7;
-      }
-      else if (page > 2) {
+      } else if (page > 2) {
         offset = 7 + 8 * (page - 2);
       }
 
@@ -351,20 +366,20 @@ module.exports = {
       // const page = req.query.p와 같은 형태
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
+      let RoomSearchingLimit = 0;
 
       if (page === 1) {
-        RoomSearchingLimit = 7
+        RoomSearchingLimit = 7;
       } else {
-        RoomSearchingLimit = 8
+        RoomSearchingLimit = 8;
       }
 
       let offset = 0;
-      
-      if (page === 2) { // 처음에는 7개만 보내줌
+
+      if (page === 2) {
+        // 처음에는 7개만 보내줌
         offset = 7;
-      }
-      else if (page > 2) {
+      } else if (page > 2) {
         offset = 7 + 8 * (page - 2);
       }
 
@@ -387,15 +402,15 @@ module.exports = {
             attributes: ["id", "name"],
           },
           {
-            model: Tag, 
+            model: Tag,
             as: "Tags",
             attributes: ["id", "name"],
-            through: { attributes: [] }, // 관계형 자료들은 
+            through: { attributes: [] }, // 관계형 자료들은
           },
         ],
         order: [["createdAt", "desc"]],
       });
-      
+
       return res.status(200).json({
         isSuccess: true,
         data: rooms,
@@ -426,7 +441,7 @@ module.exports = {
       console.log("data", data);
       try {
         const { roomId, userId, time, categoryId, date } = data; // time: 분 단위, date: 방 입장 시점의 날짜
-        
+
         const user = await User.findOne({
           where: {
             id: userId,
@@ -454,25 +469,26 @@ module.exports = {
         const day = getDay(date);
         // 한국 시간 가져오기
         const checkingDate = dateUtil.koreanDate();
-       
+
         // 월간 기록 초기화 Start
         let monthRecord = await MonthRecord.find(
           { userId: userId },
           { _id: 0, __v: 0 }
         );
-        if(monthRecord.length === 0) {
+        if (monthRecord.length === 0) {
           return res.status(400).json({
             isSuccess: false,
             msg: "일치하는 유저 정보가 없습니다.",
           });
-        };
+        }
 
         const lastUpdatedMonth = monthRecord[0].lastUpdatedDate.getMonth() + 1; // 월간 기록의 최근 업데이트 된 달
         const checkingMonth = checkingDate.getMonth() + 1; // 이번 달
 
         if (
-          lastUpdatedMonth !== checkingMonth ||  // 달이 다르거나
-          monthRecord[0].lastUpdatedDate.getFullYear() !== checkingDate.getFullYear()  // 연도가 다를 때
+          lastUpdatedMonth !== checkingMonth || // 달이 다르거나
+          monthRecord[0].lastUpdatedDate.getFullYear() !==
+            checkingDate.getFullYear() // 연도가 다를 때
         ) {
           await MonthRecord.updateMany(
             { userId: id },
@@ -487,8 +503,8 @@ module.exports = {
           { userId: userId },
           { _id: 0, __v: 0 }
         );
-    
-        if(weekdaysRecord.length === 0) {
+
+        if (weekdaysRecord.length === 0) {
           return res.status(400).json({
             isSuccess: false,
             msg: "일치하는 유저 정보가 없습니다.",
@@ -512,9 +528,10 @@ module.exports = {
           0
         );
 
-        if (checkingZeroHour.getDay() === 0) {  // 일요일
+        if (checkingZeroHour.getDay() === 0) {
+          // 일요일
           if (
-            lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay ||  // 주가 다를 때
+            lastUpdatedZeroHour <= checkingZeroHour - 7 * oneDay || // 주가 다를 때
             checkingZeroHour + 1 * oneDay <= lastUpdatedZeroHour
           ) {
             await User.update({ lastUpdated: checkingDate }, { where: { id } });
@@ -522,26 +539,45 @@ module.exports = {
             await WeekRecord.updateMany(
               { userId: userId },
               {
-                $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
+                $set: {
+                  mon: 0,
+                  tue: 0,
+                  wed: 0,
+                  thur: 0,
+                  fri: 0,
+                  sat: 0,
+                  sun: 0,
+                },
               }
             );
-    
+
             weekdaysRecord = await WeekRecord.find(
               { userId: id },
               { _id: 0, __v: 0 }
             );
           }
-        } else {  // 월요일 ~ 토요일
+        } else {
+          // 월요일 ~ 토요일
           if (
-            lastUpdatedZeroHour <= checkingZeroHour - checkingZeroHour.getDay() * oneDay ||
-            checkingZeroHour + ( 8 - checkingZeroHour.getDay() ) * oneDay <= lastUpdatedZeroHour
+            lastUpdatedZeroHour <=
+              checkingZeroHour - checkingZeroHour.getDay() * oneDay ||
+            checkingZeroHour + (8 - checkingZeroHour.getDay()) * oneDay <=
+              lastUpdatedZeroHour
           ) {
             await User.update({ lastUpdated: checkingDate }, { where: { id } });
-    
+
             await WeekRecord.updateMany(
               { userId: userId },
               {
-                $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
+                $set: {
+                  mon: 0,
+                  tue: 0,
+                  wed: 0,
+                  thur: 0,
+                  fri: 0,
+                  sat: 0,
+                  sun: 0,
+                },
               }
             );
 
@@ -555,19 +591,22 @@ module.exports = {
 
         let preRecord = null;
         const badgeCategory = CATEGORY[categoryName];
-        const categoryBadge = await Badge.findOne({  // 해당 카테고리의 뱃지 가져오기
+        const categoryBadge = await Badge.findOne({
+          // 해당 카테고리의 뱃지 가져오기
           where: {
             name: badgeCategory,
           },
         });
 
-        const userCategoryBadge = await user.getMyBadges({  // 유저의 카테고리 뱃지 소유 여부
+        const userCategoryBadge = await user.getMyBadges({
+          // 유저의 카테고리 뱃지 소유 여부
           where: {
             id: categoryBadge.id,
           },
         });
 
-        if (day === "sun") { // 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
+        if (day === "sun") {
+          // 일요일인 경우 '퇴장시간 저장 - 뱃지 지급 여부 판단 - 시간 초기화'
           // 주간 기록 저장
           const updateOption = {};
           switch (categoryId) {
@@ -577,7 +616,7 @@ module.exports = {
                 category: "beauty",
               });
 
-              console.log("뷰티 시간 저장아 되어랏, 일요일")
+              console.log("뷰티 시간 저장아 되어랏, 일요일");
               updateOption[day] = preRecord[day] + time;
 
               await preRecord.update(updateOption);
@@ -632,7 +671,7 @@ module.exports = {
           }
 
           // 월간 기록 저장
-          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+          const preMonthRecord = await MonthRecord.findOne({ userId, date });
           await preMonthRecord.updateOne({
             time: preMonthRecord.time + time,
           });
@@ -654,12 +693,15 @@ module.exports = {
             userRecords.sun;
 
           // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-          if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
+          if (
+            CATEGORY_BADGE_CRITERIA <= categoryTotalTime &&
+            userCategoryBadge.length === 0
+          ) {
             await user.addMyBadges(categoryBadge.id);
-            await user.update({newBadge: categoryBadge.id})
-          };
-
-        } else { // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
+            await user.update({ newBadge: categoryBadge.id });
+          }
+        } else {
+          // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
           // 주간 기록 저장
           const updateOption = {};
           switch (categoryId) {
@@ -668,7 +710,7 @@ module.exports = {
                 userId,
                 category: "beauty",
               });
-              console.log(`뷰티 시간 저장아 되어랏, ${day}`)
+              console.log(`뷰티 시간 저장아 되어랏, ${day}`);
               updateOption[day] = preRecord[day] + time;
 
               await preRecord.update(updateOption);
@@ -724,8 +766,8 @@ module.exports = {
 
           // 월간 기록 저장
           console.log("월간에 저장될 time", time);
-          
-          const preMonthRecord = await MonthRecord.findOne({ userId, date, });
+
+          const preMonthRecord = await MonthRecord.findOne({ userId, date });
           await preMonthRecord.updateOne({
             time: preMonthRecord.time + time,
           });
@@ -747,11 +789,19 @@ module.exports = {
             userRecords.sun;
 
           // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
-          if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
+          if (
+            CATEGORY_BADGE_CRITERIA <= categoryTotalTime &&
+            userCategoryBadge.length === 0
+          ) {
             await user.addMyBadges(categoryBadge.id);
-            await user.update({newBadge: categoryBadge.id})
-          };
-        };
+            await user.update({ newBadge: categoryBadge.id });
+          }
+        }
+        // 퇴장시 로그 기록
+        // userId, entryTime, exitTime, roomId, category, roomName
+
+        const exitTime = dateUtil.koreanDate();
+        await Log.findOneAndUpdate({ userId, roomId }, { exitTime });
 
         // 방장인지 확인
         const isMasterUser = userId === room.masterUserId;
@@ -787,7 +837,6 @@ module.exports = {
             where: { id: roomId },
           });
         }
-
       } catch (error) {
         console.error(error);
       }
@@ -800,7 +849,7 @@ module.exports = {
       const isLiking = await Like.findOne({
         where: {
           roomId,
-          likedId: userId, 
+          likedId: userId,
         },
       });
       if (!isLiking) {
