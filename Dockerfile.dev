@@ -13,6 +13,9 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+# Set env
+# RUN /usr/src/app -c ".env"
+
 RUN npm install -dev sequelize-cli
 RUN npx sequelize db:create
 
