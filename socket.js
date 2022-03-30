@@ -113,6 +113,18 @@ io.on("connection", (socket) => {
     };
 
     await RoomController.delete.participant(data);
+    // if(result에 뱃지 있으면) {
+      // disconnecting에선 data를 리턴 해줄 수 없음
+      // 그럼 뱃지를 새로운 socket event를 emit 해주면서 건네줄 수도 있음
+      // 근데 프론트는 페이지가 바뀌기 때문에 event를 받을 수 있을지는 의문.
+
+      // 두 번째 방법은 뱃지를 저장만 하고 건네주지 않는 것임.
+      // 뱃지를 저장할 때 상태도 함께 저장. 유저에게 전달이 됐는지 안됐는지를.
+      // 로그인 할 때마다 보유 뱃지 목록에서 지급이 안된 뱃지를 검사하여 반환하도록 할 수 있음. => 두번째가 더욱 확싫한 방법이기에 이것으로 선택, 로그인 할 때마다가 아닌 방을 나갈 때 마다 검사
+    // } else {
+
+    // }
+
 
 
     if(users[roomId]) {

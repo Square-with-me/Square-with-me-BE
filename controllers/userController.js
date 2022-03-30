@@ -170,11 +170,10 @@ module.exports = {
         },
       });
     }),
-
     // 보유한 뱃지 정보 가져오기
     badges: asyncWrapper(async (req, res) => {
       const { user } = res.locals;
-
+      
       const badges = await user.getMyBadges({
         attributes: ["id", "name", "imageUrl"],
       });

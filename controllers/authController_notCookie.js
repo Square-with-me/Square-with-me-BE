@@ -18,6 +18,9 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+// let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
+
+
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -126,41 +129,6 @@ module.exports = {
         { userId: user.id, date: 31, time: 0, lastUpdatedDate: koreanDate() },
       ]);
 
-      await MonthRecord.insertMany([
-        { userId: user.id, date: 1, time: 0 },
-        { userId: user.id, date: 2, time: 0 },
-        { userId: user.id, date: 3, time: 0 },
-        { userId: user.id, date: 4, time: 0 },
-        { userId: user.id, date: 5, time: 0 },
-        { userId: user.id, date: 6, time: 0 },
-        { userId: user.id, date: 7, time: 0 },
-        { userId: user.id, date: 8, time: 0 },
-        { userId: user.id, date: 9, time: 0 },
-        { userId: user.id, date: 10, time: 0 },
-        { userId: user.id, date: 11, time: 0 },
-        { userId: user.id, date: 12, time: 0 },
-        { userId: user.id, date: 13, time: 0 },
-        { userId: user.id, date: 14, time: 0 },
-        { userId: user.id, date: 15, time: 0 },
-        { userId: user.id, date: 16, time: 0 },
-        { userId: user.id, date: 17, time: 0 },
-        { userId: user.id, date: 18, time: 0 },
-        { userId: user.id, date: 19, time: 0 },
-        { userId: user.id, date: 20, time: 0 },
-        { userId: user.id, date: 21, time: 0 },
-        { userId: user.id, date: 22, time: 0 },
-        { userId: user.id, date: 23, time: 0 },
-        { userId: user.id, date: 24, time: 0 },
-        { userId: user.id, date: 25, time: 0 },
-        { userId: user.id, date: 26, time: 0 },
-        { userId: user.id, date: 27, time: 0 },
-        { userId: user.id, date: 28, time: 0 },
-        { userId: user.id, date: 29, time: 0 },
-        { userId: user.id, date: 30, time: 0 },
-        { userId: user.id, date: 31, time: 0 },
-      ]);
-
-
       return res.status(201).json({
         isSuccess: true,
         msg: "회원가입에 성공하였습니다.",
@@ -200,6 +168,7 @@ module.exports = {
             await user.addMyBadges(
               firstComeBadge.id
             );
+            // newBadge = firstComeBadge.id 
 
             await user.update({newBadge: firstComeBadge.id})
 
@@ -208,7 +177,7 @@ module.exports = {
               data: {
                 token,
               },
-      
+              // newBadge: firstComeBadge,
             });
           } else {
             res.status(200).json({
@@ -296,6 +265,7 @@ module.exports = {
         await user.addMyBadges(firstComeBadge.id);
 
         await user.update({newBadge: firstComeBadge.id})
+        // newBadge = firstComeBadge.id
       }
 
         return res.status(200).json({
@@ -314,6 +284,14 @@ module.exports = {
       //   });
       // }
     }),
+    // newBadge: () => {
+    //   console.log("autoController_notCookie쪽에서 newBadge 호출됐을 때");
+    //   return newBadge;
+    // },
+    // newBadgeInit: () => {
+    //   console.log("Init이 되어버린다ㅏㅏㅏㅏㅏㅏㅏㅏ");
+    //   newBadge = 0;
+    // },
   },
   
 
