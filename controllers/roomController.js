@@ -5,7 +5,7 @@ const { Room, Tag, Category, User, Like, Badge } = require("../models");
 
 // Mongo collections
 const WeekRecord = require("../mongoSchemas/weekRecord");
-
+const MonthRecord = require("../mongoSchemas/monthRecord");
 
 // utils
 const { asyncWrapper, getDay } = require("../utils/util");
