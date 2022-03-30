@@ -409,7 +409,7 @@ module.exports = {
             model: Tag,
             as: "Tags",
             attributes: ["id", "name"],
-            through: { attributes: [] }, // 관계형 자료들은
+            through: { attributes: [] },
           },
         ],
         order: [["createdAt", "desc"]],
