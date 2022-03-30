@@ -157,6 +157,7 @@ module.exports = {
           newBadge: { newBadge, newBadgeFirstCome }
         });
 
+        console.log("newbadge초기화를 usercontroller에서 요청했다.");
         RoomController.delete.newBadgeInit();
         authController_notCookie.get.newBadgeInit();
       } else {
