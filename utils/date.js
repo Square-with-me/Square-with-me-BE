@@ -85,7 +85,7 @@ module.exports = {
         await User.update({ lastUpdated: checkingDate }, { where: { id } });
 
         // 원하는 행들을 찾아서 해당 행들의 데이터 변경, 변경된 데이터를 반환
-        await WeekRecord.updateMany(
+        const result = await WeekRecord.updateMany(
           { userId: id },
           {
             $set: { mon: 0, tue: 0, wed: 0, thur: 0, fri: 0, sat: 0, sun: 0 },
