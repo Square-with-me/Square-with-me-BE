@@ -12,9 +12,6 @@ const { koreanDate } = require("../utils/date");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
-// Mongo DB 시간기록
-const WeekRecord = require("../mongoSchemas/weekRecord");
-const MonthRecord = require("../mongoSchemas/monthRecord");
 
 module.exports = () => {
   passport.use(
