@@ -16,13 +16,6 @@ const timeRecord = require("../utils/date");
 const krToday = timeRecord.koreanDate();
 
 
-
-// Mongo DB 시간기록
-const WeekRecord = require("../mongoSchemas/weekRecord");
-const MonthRecord = require("../mongoSchemas/monthRecord");
-
-
-
 module.exports = {
   create: {},
 
