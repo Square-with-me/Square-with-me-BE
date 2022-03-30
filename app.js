@@ -23,6 +23,7 @@ connect();
 connect();
 console.log('몽고DB도 연결됨, app.js에서')
 
+
 // MySQL
 const db = require("./models");
 db.sequelize
