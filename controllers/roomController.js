@@ -211,23 +211,24 @@ module.exports = {
     rooms: asyncWrapper(async (req, res) => {
       const { q: query, p: page } = req.query;
 
+     
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0;
-
-      if (page === 1) {
-        RoomSearchingLimit = 7;
+      let roomSearchingLimit = 0
+    
+      if (page/1 === 1) { // req.query로 넘어오는 모든 것들은 문자열로 넘어온다. page === 1가 false가 나오므로 숫자로 형변환해주기 위해 /1을 넣는다.
+        roomSearchingLimit = 7 // 처음에는 7개만 보내줌
       } else {
-        RoomSearchingLimit = 8;
+        roomSearchingLimit = 8
       }
 
       console.log("roomSearchingLimit", roomSearchingLimit);
       let offset = 0;
-
-      if (page === 2) {
-        // 처음에는 7개만 보내줌
+      
+      if (page/1 === 2) { // 처음에는 7개만 보내주니까 처음에는 7개만 상쇄(offset)
         offset = 7;
-      } else if (page > 2) {
-        offset = 7 + 8 * (page - 2);
+      }
+      else if (page/1 > 2) {
+        offset = 7 + 8 * (page/1 - 2);
       }
 
       let rooms = [];
@@ -366,23 +367,24 @@ module.exports = {
       const { p: page } = req.query;
       // const page = req.query.p와 같은 형태
 
-      // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0;
+        // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
+        let roomSearchingLimit = 0
 
-      if (page === 1) {
-        RoomSearchingLimit = 7;
-      } else {
-        RoomSearchingLimit = 8;
-      }
-
-      let offset = 0;
-
-      if (page === 2) {
-        // 처음에는 7개만 보내줌
-        offset = 7;
-      } else if (page > 2) {
-        offset = 7 + 8 * (page - 2);
-      }
+        if (page/1 === 1) {
+          roomSearchingLimit = 7
+        } else {
+          roomSearchingLimit = 8
+        }
+  
+        let offset = 0;
+        
+        if (page/1 === 2) {
+          offset = 7;
+        }
+        else if (page/1 > 2) {
+          offset = 7 + 8 * (page/1 - 2);
+        }
+  
 
 
       // categoryId로 방 검색해서 가져오기
