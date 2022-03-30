@@ -13,26 +13,6 @@ const {
 
 // models
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-// 원래 코드
-// const {
-//   User,
-//   Badge,
-//   RefreshToken,
-//   MonthRecord,
-//   BeautyRecord,
-//   SportsRecord,
-//   StudyRecord,
-//   CounselingRecord,
-//   CultureRecord,
-//   ETCRecord,
-//   BeautyRecord,
-// } = require("../models");
->>>>>>> 0019190 (FIX: time code adjusted for Mongo DB)
-=======
->>>>>>> db21985 (FIX: time record code adjusted for Mongo DB, badges are provided by time.)
 
 const { User, Badge, RefreshToken } = require("../models");
 
@@ -102,18 +82,11 @@ module.exports = {
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
-<<<<<<< HEAD
 
       });
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
 
-=======
-      });
-
-      // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-
->>>>>>> 0019190 (FIX: time code adjusted for Mongo DB)
       await WeekRecord.insertMany([
         { userId: user.id, category: "beauty", mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
         { userId: user.id, category: "sports", mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
@@ -123,39 +96,6 @@ module.exports = {
         { userId: user.id, category: "etc", mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
       ]);
 
-<<<<<<< HEAD
-=======
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "beauty"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "sports"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "study"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "counseling"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "culture"
-      // });
-
-      // await WeekRecord.create({
-      //   userId: user.id,
-      //   category: "etc"
-      // });
-
->>>>>>> 0019190 (FIX: time code adjusted for Mongo DB)
       await MonthRecord.insertMany([
         { userId: user.id, date: 1, time: 0 },
         { userId: user.id, date: 2, time: 0 },
