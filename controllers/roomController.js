@@ -13,7 +13,6 @@ const { asyncWrapper, getDay } = require("../utils/util");
 // korean local time
 const dateUtil = require("../utils/date");
 
-// let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 const CATEGORY = {  // 카테고리 목록
   "뷰티": "beauty",
   "운동": "sports",
@@ -658,7 +657,6 @@ module.exports = {
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
             await user.update({newBadge: categoryBadge.id})
-            // newBadge = categoryBadge.id;
           };
 
         } else { // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
@@ -752,7 +750,6 @@ module.exports = {
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
             await user.update({newBadge: categoryBadge.id})
-            // newBadge = categoryBadge.id;
           };
         };
 
@@ -795,16 +792,6 @@ module.exports = {
         console.error(error);
       }
     },
-
-    // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
-    // newBadge: () => {
-    //   console.log("newbadge가 룸컨트롤러에서 실행되었을 때에ㅔㅔㅔㅔ")
-    //   return newBadge;
-    // },
-    // newBadgeInit: () => {
-    //   console.log("룸 컨트롤러에서 초기화아ㅏㅏㅏㅏ");
-    //   newBadge = 0;
-    // },
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;

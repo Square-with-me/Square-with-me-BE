@@ -18,9 +18,6 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
-// let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
-
-
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -168,7 +165,6 @@ module.exports = {
             await user.addMyBadges(
               firstComeBadge.id
             );
-            // newBadge = firstComeBadge.id 
 
             await user.update({newBadge: firstComeBadge.id})
 
@@ -177,7 +173,7 @@ module.exports = {
               data: {
                 token,
               },
-              // newBadge: firstComeBadge,
+      
             });
           } else {
             res.status(200).json({
@@ -265,7 +261,6 @@ module.exports = {
         await user.addMyBadges(firstComeBadge.id);
 
         await user.update({newBadge: firstComeBadge.id})
-        // newBadge = firstComeBadge.id
       }
 
         return res.status(200).json({
@@ -284,14 +279,6 @@ module.exports = {
       //   });
       // }
     }),
-    // newBadge: () => {
-    //   console.log("autoController_notCookie쪽에서 newBadge 호출됐을 때");
-    //   return newBadge;
-    // },
-    // newBadgeInit: () => {
-    //   console.log("Init이 되어버린다ㅏㅏㅏㅏㅏㅏㅏㅏ");
-    //   newBadge = 0;
-    // },
   },
   
 

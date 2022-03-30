@@ -12,12 +12,11 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 
-const dotenv = require("dotenv");
-dotenv.config();
 
+const connect = require('./mongoSchemas/index');
 
-const dotenv = require("dotenv");
-dotenv.config();
+// 몽고 db 커넥트
+connect();
 
 
 // MySQL
