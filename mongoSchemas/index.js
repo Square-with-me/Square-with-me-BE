@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const { koreanDate: krToday } = require("../utils/date");
+const { koreanDate } = require("../utils/date");
+
+console.log("Mongo production:", process.env.NODE_ENV);
 
 
 // Mongo DB 연결 부분
@@ -14,8 +16,8 @@ const connect = () => {
         useUnifiedTopology: true,
         ignoreUndefined: true,
       })
-    .then(() => console.log("MongoDB Connected", krToday()))
-    .catch(err => console.log(err));
+    .then(() => console.log("MongoDB Connected", koreanDate()))
+    .catch(err => console.log("MongoDB Connect error:", err));
 };
 
 mongoose.connection.on("error", err => {
