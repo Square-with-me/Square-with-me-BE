@@ -335,6 +335,10 @@ module.exports = {
     categoryRooms: asyncWrapper(async (req, res) => {
       const { categoryId } = req.params;
       const { p: page } = req.query;
+      // const page = req.query.p;
+
+      console.log(req, "reqlllllllll")
+      console.log(req.query, "req.querylll")
 
       console.log(page, "page는 이것이다.")
       console.log(categoryId, "categoryId는 이것이다")
@@ -344,7 +348,7 @@ module.exports = {
         offset = 8 * (page - 1);
       }
 
-      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏ");
+      console.log(offset, "offset는 이것이다ㅏㅏㅏㅏㅏ");
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
@@ -773,9 +777,11 @@ module.exports = {
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
     newBadge: () => {
+      console.log("newbadge가 룸컨트롤러에서 실행되었을 때에ㅔㅔㅔㅔ")
       return newBadge;
     },
     newBadgeInit: () => {
+      console.log("룸 컨트롤러에서 초기화아ㅏㅏㅏㅏ");
       newBadge = 0;
     },
 

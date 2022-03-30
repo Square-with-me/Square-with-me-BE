@@ -20,6 +20,7 @@ const MonthRecord = require("../mongoSchemas/monthRecord");
 
 let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 
+
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
