@@ -128,30 +128,7 @@ module.exports = {
         { userId: user.id, date: 30, time: 0, lastUpdatedDate: koreanDate() },
         { userId: user.id, date: 31, time: 0, lastUpdatedDate: koreanDate() },
       ]);
-      // // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
-      // await BeautyRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await SportsRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await StudyRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await CounselingRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await CultureRecord.create({
-      //   userId: user.id,
-      // });
-
-      // await ETCRecord.create({
-      //   userId: user.id,
-      // });
+    
 
       await MonthRecord.insertMany([
         { userId: user.id, date: 1, time: 0 },
