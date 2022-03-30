@@ -94,10 +94,10 @@ module.exports = {
           },
         ],
       });
-     // 입장시 로그 기록
+      // 입장시 로그 기록
       // userId, entryTime, exitTime, roomId, category, roomName
       const roomId = fullRoom.id
-      const category = fullRoom.category.name;
+      const category = fullRoom.category.id;
       const entryTime = dateUtil.koreanDate();
       const roomName = fullRoom.title;
       const createLog = new Log({
@@ -108,7 +108,7 @@ module.exports = {
         roomName,
       });
       await createLog.save();
-      
+
       return res.status(201).json({
         isSuccess: true,
         data: fullRoom,
@@ -164,7 +164,7 @@ module.exports = {
 
       // 입장시 로그 기록
       // userId, entryTime, exitTime, roomId, category, roomName
-      const category = room.category.name;
+      const category = room.category.id;
       const entryTime = dateUtil.koreanDate();
       const roomName = room.title;
       const createLog = new Log({

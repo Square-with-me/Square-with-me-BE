@@ -34,6 +34,7 @@ module.exports = {
       };
 
       await user.addMyBadges(bugBadgeId);
+      await user.update({ newBadge: bugBadgeId }); // 버그뱃지도 지급 시 뉴 뱃지로 추가
 
       return res.status(201).json({
         isSuccess: true,
