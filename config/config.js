@@ -13,7 +13,7 @@ module.exports = {
   "test": {
     "username": "root",
     "password": process.env.SQUARE_WITH_ME_DB_PASSWORD,
-    "database": "Square_with_me_database",
+    "database": "nemo_with_me_database",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
