@@ -143,24 +143,33 @@ module.exports = {
         attributes: ["id", "name", "imageUrl"],
       });
       
+      // newBadge가 있으면 숫자, 없으면 null 값임
+      const newBadge =  await User.findOne({
+        where: {
+          id: user.id
+        },
+        attributes: ["newBadge"]
+      })
+      
+      // newBadge 가 있는 경우
+      if (newBadge.dataValues.newBadge !== null ) {
 
-      const newBadge = RoomController.delete.newBadge();
-      const newBadgeFirstCome = authController_notCookie.get.newBadge();
-
-      console.log(newBadge, "newBadge-------");
-      console.log(newBadgeFirstCome, "newBadgeFirstCome--------");
-
-      if (newBadge !== 0 || newBadgeFirstCome !== 0) {
         res.status(200).json({
           isSuccess: true,
           data: badges,
-          newBadge: { newBadge, newBadgeFirstCome }
+          newBadge: newBadge.dataValues.newBadge
         });
 
-        console.log("newbadge초기화를 usercontroller에서 요청했다.");
-        RoomController.delete.newBadgeInit();
-        authController_notCookie.get.newBadgeInit();
-      } else {
+        // 값 넘겨주고 나서 해당 유저의 newBadge 칼럼 초기화
+        await User.update({
+          newBadge: null
+        }, 
+        {
+          where: {
+            id: user.id
+        }})
+        
+      } else { // newBadge로 넘어온 것이 없는 경우
         res.status(200).json({
           isSuccess: true,
           data: badges,

@@ -13,7 +13,7 @@ const { asyncWrapper, getDay } = require("../utils/util");
 // korean local time
 const dateUtil = require("../utils/date");
 
-let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
+// let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 const CATEGORY = {  // 카테고리 목록
   "뷰티": "beauty",
   "운동": "sports",
@@ -196,9 +196,23 @@ module.exports = {
     rooms: asyncWrapper(async (req, res) => {
       const { q: query, p: page } = req.query;
 
+
+      // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
+      let RoomSearchingLimit = 0
+
+      if (page === 1) {
+        RoomSearchingLimit = 7
+      } else {
+        RoomSearchingLimit = 8
+      }
+
       let offset = 0;
-      if (page > 1) {
-        offset = 8 * (page - 1);
+      
+      if (page === 2) { // 처음에는 7개만 보내줌
+        offset = 7;
+      }
+      else if (page > 2) {
+        offset = 7 + 8 * (page - 2);
       }
 
       let rooms = [];
@@ -234,7 +248,7 @@ module.exports = {
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
             offset: offset,
-            limit: 8,
+            limit: RoomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -268,7 +282,7 @@ module.exports = {
               ],
             },
             offset: offset,
-            limit: 8,
+            limit: RoomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -300,7 +314,7 @@ module.exports = {
               title: { [Op.like]: `%${query}%` },
             },
             offset: offset,
-            limit: 8,
+            limit: RoomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -335,25 +349,31 @@ module.exports = {
     categoryRooms: asyncWrapper(async (req, res) => {
       const { categoryId } = req.params;
       const { p: page } = req.query;
-      // const page = req.query.p;
+      // const page = req.query.p와 같은 형태
 
-      console.log(req, "reqlllllllll")
-      console.log(req.query, "req.querylll")
+      // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
+      let RoomSearchingLimit = 0
 
-      console.log(page, "page는 이것이다.")
-      console.log(categoryId, "categoryId는 이것이다")
-
-      let offset = 0;
-      if (page > 1) {
-        offset = 8 * (page - 1);
+      if (page === 1) {
+        RoomSearchingLimit = 7
+      } else {
+        RoomSearchingLimit = 8
       }
 
-      console.log(offset, "offset는 이것이다ㅏㅏㅏㅏㅏ");
+      let offset = 0;
+      
+      if (page === 2) { // 처음에는 7개만 보내줌
+        offset = 7;
+      }
+      else if (page > 2) {
+        offset = 7 + 8 * (page - 2);
+      }
+
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
         offset: offset,
-        limit: 8,
+        limit: RoomSearchingLimit,
         attributes: [
           "id",
           "title",
@@ -376,8 +396,7 @@ module.exports = {
         ],
         order: [["createdAt", "desc"]],
       });
-
-      console.log(rooms, "romms는 이것이다ㅏㅏㅏㅏㅏㅏ")
+      
       return res.status(200).json({
         isSuccess: true,
         data: rooms,
@@ -638,7 +657,8 @@ module.exports = {
           // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
-            newBadge = categoryBadge.id;
+            await user.update({newBadge: categoryBadge.id})
+            // newBadge = categoryBadge.id;
           };
 
         } else { // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
@@ -731,7 +751,8 @@ module.exports = {
           // 해당 카테고리 기준을 충족하고 해당 뱃지가 해당 유저에게 없을 경우 그 유저에게 뱃지 추가
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
-            newBadge = categoryBadge.id;
+            await user.update({newBadge: categoryBadge.id})
+            // newBadge = categoryBadge.id;
           };
         };
 
@@ -776,14 +797,14 @@ module.exports = {
     },
 
     // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
-    newBadge: () => {
-      console.log("newbadge가 룸컨트롤러에서 실행되었을 때에ㅔㅔㅔㅔ")
-      return newBadge;
-    },
-    newBadgeInit: () => {
-      console.log("룸 컨트롤러에서 초기화아ㅏㅏㅏㅏ");
-      newBadge = 0;
-    },
+    // newBadge: () => {
+    //   console.log("newbadge가 룸컨트롤러에서 실행되었을 때에ㅔㅔㅔㅔ")
+    //   return newBadge;
+    // },
+    // newBadgeInit: () => {
+    //   console.log("룸 컨트롤러에서 초기화아ㅏㅏㅏㅏ");
+    //   newBadge = 0;
+    // },
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;
