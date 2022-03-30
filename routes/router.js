@@ -45,6 +45,10 @@ router.delete("/room/:roomId/like", middleware.auth, RoomController.delete.like)
 router.get("/rooms", RoomController.get.rooms);   // 방 목록 불러오기
 router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms); // 방 목록 불러오기
 
+// For admin
+router.get("/admin/users", UserController.get.users);  // 전체 유저 목록 불러오기
+router.post("/admin/user/:userId/badge/bug", UserController.giveBadge.bug);  // 전체 유저 목록 불러오기
+
 // /api/upload
 // router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
 //   res.json(req.file.filename);

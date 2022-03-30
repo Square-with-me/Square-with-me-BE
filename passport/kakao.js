@@ -12,6 +12,10 @@ const { koreanDate } = require("../utils/date");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+// Mongo DB 시간기록
+const WeekRecord = require("../mongoSchemas/weekRecord");
+const MonthRecord = require("../mongoSchemas/monthRecord");
+
 module.exports = () => {
   passport.use(
     new KakaoStrategy(
@@ -49,7 +53,6 @@ module.exports = () => {
           });
 
           // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가 
-          
           await WeekRecord.insertMany([
             { userId: newUser.id, category: "beauty",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
             { userId: newUser.id, category: "sports",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
@@ -58,8 +61,7 @@ module.exports = () => {
             { userId: newUser.id, category: "culture",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
             { userId: newUser.id, category: "etc",mon: 0, tue: 0, wed: 0, thur:0, fri:0, sat:0, sun:0 },
           ]);
-    
-          
+
           await MonthRecord.insertMany([
             { userId: newUser.id, date: 1, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 2, time: 0, lastUpdatedDate: koreanDate() },

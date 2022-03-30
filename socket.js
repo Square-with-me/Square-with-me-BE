@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
       id: payload.userId,
       nickname: payload.nickname,
       profileImg: payload.profileImg,
-      masterBadgeSrc: payload.masterBadgeSrc,
+      masterBadge: payload.masterBadge,
       statusMsg: payload.statusMsg,
     }
 
@@ -113,6 +113,7 @@ io.on("connection", (socket) => {
     };
 
     await RoomController.delete.participant(data);
+
 
 
     if(users[roomId]) {

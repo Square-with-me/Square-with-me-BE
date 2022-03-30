@@ -15,8 +15,32 @@ const authController_notCookie = require("./authController_notCookie");
 const dateUtil = require("../utils/date");
 
 
+
 module.exports = {
   create: {},
+  giveBadge: {
+    bug: asyncWrapper(async (req, res) => {
+      const { userId } = req.params;
+      const bugBadgeId = 8;
+
+      const user = await User.findOne({
+        where: { id: userId },
+      });
+      if(!user) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "일치하는 유저 정보가 없습니다.",
+        });
+      };
+
+      await user.addMyBadges(bugBadgeId);
+
+      return res.status(201).json({
+        isSuccess: true,
+        msg: "버그/리뷰 뱃지 지급 성공"
+      });
+    }),
+  },
 
   update: {
     profileImg: asyncWrapper(async (req, res) => {
@@ -124,6 +148,19 @@ module.exports = {
   },
 
   get: {
+    users: asyncWrapper(async (req, res) => {
+      const users = await User.findAll({
+        order: [["origin"]],
+      });
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: {
+          users,
+        },
+      });
+    }),
+
     user: asyncWrapper(async (req, res) => {
       const { user } = res.locals;
 
