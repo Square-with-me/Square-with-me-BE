@@ -19,6 +19,10 @@ const connect = require('./mongoSchemas/index');
 connect();
 
 
+// 몽고 db 커넥트
+connect();
+console.log('몽고DB도 연결됨, app.js에서')
+
 // MySQL
 const db = require("./models");
 db.sequelize
