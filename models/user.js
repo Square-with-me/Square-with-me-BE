@@ -32,6 +32,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      newBadge: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      lastUpdated: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        default: new Date(),
+      },
     },
     {
       charset: "utf8",

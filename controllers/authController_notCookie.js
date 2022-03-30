@@ -18,6 +18,9 @@ const { User, Badge } = require("../models");
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
 
+
+
+
 module.exports = {
   create: {
     local: asyncWrapper(async (req, res) => {
@@ -79,7 +82,7 @@ module.exports = {
         pwd: hashedPwd,
         statusMsg: createStatusMsg(),
         type: "local",
-        lastUpdated: koreanDate(),
+        lastUpdated: new Date(), // DB 시간을 한국 시간으로 맞추어 놓았으므로 별도로 계산하지 않음, koreanDate()를 쓸 경우 9시간 후의 미래시간이 찍히는 문제 발생
       });
 
       // 회원가입 할 때 주/월 기록 테이블에 유저 레코드 추가
@@ -154,29 +157,34 @@ module.exports = {
           const isGivenBadge = await user.getMyBadges({
             where: { id: firstComeBadge.id, },
           });
-
+            console.log("isGivenBadge다ㅏㅏㅏㅏ", isGivenBadge)
           const leftBadge = firstComeBadge.leftBadges;
 
+          console.log(leftBadge, "leftbadge aaaaaaa")
           if (isGivenBadge.length === 0 && 0 < leftBadge) {
             await firstComeBadge.decrement("leftBadges");
+          console.log("decrement가 실행되었다ㅏㅏㅏㅏㅏㅏ")
 
             await user.addMyBadges(
               firstComeBadge.id
             );
+            
+
+            await user.update({newBadge: firstComeBadge.id})
 
             res.status(200).json({
               isSuccess: true,
               data: {
                 token,
-                newBadge: firstComeBadge,
               },
+              
             });
           } else {
             res.status(200).json({
               isSuccess: true,
               data: {
                 token,
-                user,
+                user, // ch: 왜 주는 걸까?? 이유가 없다면 없애버리고 return 통합하는게 좋을 듯
               },
             });
           }
@@ -192,7 +200,7 @@ module.exports = {
       if (!origin || !pwd) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "이메일 혹은 비밀번호를 입력하세요.",
+          msg: "이메일 혹은 비밀번호를 입력하세요.", 
         });
       }
 
@@ -202,7 +210,7 @@ module.exports = {
       if (!user) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "존재하지 않는 이메일입니다.",
+          msg: "이메일 혹은 비밀번호를 확인해주세요.", 
         });
       }
 
@@ -210,7 +218,7 @@ module.exports = {
       if (!pwdCheck) {
         return res.status(400).json({
           isSuccess: false,
-          msg: "비밀번호가 틀렸습니다.",
+          msg: "이메일 혹은 비밀번호를 확인해주세요.", 
         });
       }
 
@@ -249,27 +257,36 @@ module.exports = {
 
       // 100번째 까지 모두 지급되었는지 확인
       const leftBadge = firstComeBadge.leftBadges;
-
+      
       if (isGivenBadge.length === 0 && user.type === "local" && 0 < leftBadge) {
+        
+        await firstComeBadge.decrement("leftBadges");
+        
         await user.addMyBadges(firstComeBadge.id);
 
-        return res.status(200).json({
-          isSuccess: true,
-          data: {
-            token,
-            newBadge: firstComeBadge,
-          },
-        });
-      } else {
-        return res.status(200).json({
-          isSuccess: true,
-          data: {
-            token,
-          },
-        });
+        await user.update({newBadge: firstComeBadge.id})
+        
       }
+
+        return res.status(200).json({
+          isSuccess: true,
+          data: {
+            token,
+          },
+        });
+      
+      // else {
+      //   return res.status(200).json({
+      //     isSuccess: true,
+      //     data: {
+      //       token,
+      //     },
+      //   });
+      // }
     }),
+    
   },
+  
 
   delete: {
     auth: asyncWrapper(async (req, res) => {

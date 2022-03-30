@@ -54,10 +54,11 @@ io.on("connection", (socket) => {
       id: payload.userId,
       nickname: payload.nickname,
       profileImg: payload.profileImg,
-      masterBadgeSrc: payload.masterBadgeSrc,
+      masterBadge: payload.masterBadge,
       statusMsg: payload.statusMsg,
     }
 
+    console.log(payload.masterBadge, "payload.masterBadgepayload.masterBadgepayload.masterBadge")
     let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
     const otherSockets = others.map((socketId) => {
@@ -70,6 +71,7 @@ io.on("connection", (socket) => {
       return socketToUser[socketId]
     });
 
+    console.log(otherUsers, "otherUsers다ㅏㅏㅏㅏㅏㅏㅏㅏ")
     socket.emit("send users", { otherSockets, otherUsers });
   });
 
@@ -113,6 +115,7 @@ io.on("connection", (socket) => {
     };
 
     await RoomController.delete.participant(data);
+
 
 
     if(users[roomId]) {

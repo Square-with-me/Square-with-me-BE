@@ -8,11 +8,39 @@ const { User, Badge } = require("../models");
 // RoomController for newBadge
 const RoomController = require("./roomController");
 
+// authController_notCookie for newBadgeFirstCome
+const authController_notCookie = require("./authController_notCookie");
+
 // korean local time
 const dateUtil = require("../utils/date");
 
+
+
 module.exports = {
   create: {},
+  giveBadge: {
+    bug: asyncWrapper(async (req, res) => {
+      const { userId } = req.params;
+      const bugBadgeId = 8;
+
+      const user = await User.findOne({
+        where: { id: userId },
+      });
+      if(!user) {
+        return res.status(400).json({
+          isSuccess: false,
+          msg: "일치하는 유저 정보가 없습니다.",
+        });
+      };
+
+      await user.addMyBadges(bugBadgeId);
+
+      return res.status(201).json({
+        isSuccess: true,
+        msg: "버그/리뷰 뱃지 지급 성공"
+      });
+    }),
+  },
 
   update: {
     profileImg: asyncWrapper(async (req, res) => {
@@ -120,6 +148,19 @@ module.exports = {
   },
 
   get: {
+    users: asyncWrapper(async (req, res) => {
+      const users = await User.findAll({
+        order: [["origin"]],
+      });
+
+      return res.status(200).json({
+        isSuccess: true,
+        data: {
+          users,
+        },
+      });
+    }),
+
     user: asyncWrapper(async (req, res) => {
       const { user } = res.locals;
 
@@ -139,19 +180,33 @@ module.exports = {
         attributes: ["id", "name", "imageUrl"],
       });
       
-      const newBadge = RoomController.delete.newBadge();
+      // newBadge가 있으면 숫자, 없으면 null 값임
+      const newBadge =  await User.findOne({
+        where: {
+          id: user.id
+        },
+        attributes: ["newBadge"]
+      })
+      
+      // newBadge 가 있는 경우
+      if (newBadge.dataValues.newBadge !== null ) {
 
-      console.log(newBadge, "newBadge");
-
-      if (newBadge !== 0) {
         res.status(200).json({
           isSuccess: true,
           data: badges,
-          newBadge: newBadge,
+          newBadge: newBadge.dataValues.newBadge
         });
 
-        RoomController.delete.newBadgeInit();
-      } else {
+        // 값 넘겨주고 나서 해당 유저의 newBadge 칼럼 초기화
+        await User.update({
+          newBadge: null
+        }, 
+        {
+          where: {
+            id: user.id
+        }})
+        
+      } else { // newBadge로 넘어온 것이 없는 경우
         res.status(200).json({
           isSuccess: true,
           data: badges,
