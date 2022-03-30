@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     );
   
     Viewer.associate = (db) => {
-      db.Viewer.belongsTo(db.Room);
+      // db.Viewer.belongsTo(db.Room);
     };
 
     return Viewer;
