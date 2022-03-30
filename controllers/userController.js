@@ -4,7 +4,6 @@ const { asyncWrapper, regex } = require("../utils/util");
 // models
 const { User, Badge } = require("../models");
 
-
 // RoomController for newBadge
 const RoomController = require("./roomController");
 
@@ -13,8 +12,6 @@ const authController_notCookie = require("./authController_notCookie");
 
 // korean local time
 const dateUtil = require("../utils/date");
-
-
 
 module.exports = {
   create: {},
@@ -136,14 +133,14 @@ module.exports = {
       await user.update({
         masterBadgeId: badgeId,
       });
-      const myMasterBadge = await Badge.findOne({
+      const badge = await Badge.findOne({
         where: { id: badgeId },
+        attributes: ["id", "name", "imageUrl"]
       });
-      const imageUrl = await myMasterBadge.imageUrl;
 
       return res.status(200).json({
         isSuccess: true,
-        data: imageUrl,
+        data: badge,
       });
     }),
   },
