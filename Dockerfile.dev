@@ -16,8 +16,9 @@ COPY . .
 # Set env
 # RUN /usr/src/app -c ".env"
 
-RUN npm install -dev sequelize-cli
-RUN npx sequelize db:seed:all
+# RUN npm install -dev sequelize-cli
+# RUN npx sequelize db:create
+# RUN npx sequelize db:seed:all
 
 # Exports
 EXPOSE 80
