@@ -200,6 +200,7 @@ module.exports = {
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
       let roomSearchingLimit = 0
 
+      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ")
       if (page === 1) {
         roomSearchingLimit = 7
       } else {
@@ -356,6 +357,7 @@ module.exports = {
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
       let roomSearchingLimit = 0
 
+      console.log(page, "page는 이것이다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ카테고리카테고리카테고리카테고리")
       if (page === 1) {
         roomSearchingLimit = 7
       } else {
