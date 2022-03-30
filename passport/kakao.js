@@ -7,19 +7,17 @@ const { User, Badge } = require("../models");
 // utils
 const { createStatusMsg } = require("../utils/util");
 const { koreanDate } = require("../utils/date");
+<<<<<<< HEAD
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
+=======
+>>>>>>> ab9e0e1 (refactoring)
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");
 const MonthRecord = require("../mongoSchemas/monthRecord");
-
-// korean local time
-const krToday = require("../utils/date").koreanDate()
-
-
 
 module.exports = () => {
   passport.use(
@@ -71,6 +69,9 @@ module.exports = () => {
           
           await MonthRecord.insertMany([
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ab9e0e1 (refactoring)
             { userId: newUser.id, date: 1, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 2, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 3, time: 0, lastUpdatedDate: koreanDate() },
@@ -102,6 +103,7 @@ module.exports = () => {
             { userId: newUser.id, date: 29, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 30, time: 0, lastUpdatedDate: koreanDate() },
             { userId: newUser.id, date: 31, time: 0, lastUpdatedDate: koreanDate() },
+<<<<<<< HEAD
 =======
             { userId: newUser.id, date: 1, time: 0, lastUpdatedDate: krToday},
             { userId: newUser.id, date: 2, time: 0, lastUpdatedDate: krToday },
@@ -135,6 +137,8 @@ module.exports = () => {
             { userId: newUser.id, date: 30, time: 0, lastUpdatedDate: krToday },
             { userId: newUser.id, date: 31, time: 0, lastUpdatedDate: krToday },
 >>>>>>> 616dd87 (FIX: week/month record util Arranged, util applied to kakao.js)
+=======
+>>>>>>> ab9e0e1 (refactoring)
           ]);
 
           return done(null, newUser);
