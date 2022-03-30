@@ -13,14 +13,14 @@ const userLogSchema = new mongoose.Schema({
   },
   exitTime: {
     type: Date,
-    default: krToday,
+    default: null,
   },
   roomId: {
     type: Number,
     allowNull: false,
   },
   category: {
-    type: String,
+    type: number,
     allowNull: false,
   },
   roomName: {
