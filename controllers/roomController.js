@@ -13,6 +13,7 @@ const { asyncWrapper, getDay } = require("../utils/util");
 // korean local time
 const dateUtil = require("../utils/date");
 
+// let newBadge = 0; // UserController에 전달될 newBadge 전역변수 저장
 const CATEGORY = {  // 카테고리 목록
   "뷰티": "beauty",
   "운동": "sports",
@@ -197,21 +198,22 @@ module.exports = {
 
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
-
-      if (page === 1) {
-        RoomSearchingLimit = 7
+      let roomSearchingLimit = 0
+    
+      if (page/1 === 1) { // req.query로 넘어오는 모든 것들은 문자열로 넘어온다. page === 1가 false가 나오므로 숫자로 형변환해주기 위해 /1을 넣는다.
+        roomSearchingLimit = 7 // 처음에는 7개만 보내줌
       } else {
-        RoomSearchingLimit = 8
+        roomSearchingLimit = 8
       }
 
+      console.log("roomSearchingLimit", roomSearchingLimit);
       let offset = 0;
       
-      if (page === 2) { // 처음에는 7개만 보내줌
+      if (page/1 === 2) { // 처음에는 7개만 보내주니까 처음에는 7개만 상쇄(offset)
         offset = 7;
       }
-      else if (page > 2) {
-        offset = 7 + 8 * (page - 2);
+      else if (page/1 > 2) {
+        offset = 7 + 8 * (page/1 - 2);
       }
 
       let rooms = [];
@@ -247,7 +249,7 @@ module.exports = {
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -281,7 +283,7 @@ module.exports = {
               ],
             },
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -313,7 +315,7 @@ module.exports = {
               title: { [Op.like]: `%${query}%` },
             },
             offset: offset,
-            limit: RoomSearchingLimit,
+            limit: roomSearchingLimit,
             attributes: [
               "id",
               "title",
@@ -351,28 +353,29 @@ module.exports = {
       // const page = req.query.p와 같은 형태
 
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-      let RoomSearchingLimit = 0
+      let roomSearchingLimit = 0
 
-      if (page === 1) {
-        RoomSearchingLimit = 7
+      if (page/1 === 1) {
+        roomSearchingLimit = 7
       } else {
-        RoomSearchingLimit = 8
+        roomSearchingLimit = 8
       }
 
       let offset = 0;
       
-      if (page === 2) { // 처음에는 7개만 보내줌
+      if (page/1 === 2) {
         offset = 7;
       }
-      else if (page > 2) {
-        offset = 7 + 8 * (page - 2);
+      else if (page/1 > 2) {
+        offset = 7 + 8 * (page/1 - 2);
       }
+
 
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
         where: { categoryId },
         offset: offset,
-        limit: RoomSearchingLimit,
+        limit: roomSearchingLimit,
         attributes: [
           "id",
           "title",
@@ -390,7 +393,7 @@ module.exports = {
             model: Tag, 
             as: "Tags",
             attributes: ["id", "name"],
-            through: { attributes: [] }, // 관계형 자료들은 
+            through: { attributes: [] },
           },
         ],
         order: [["createdAt", "desc"]],
@@ -657,6 +660,7 @@ module.exports = {
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
             await user.update({newBadge: categoryBadge.id})
+            // newBadge = categoryBadge.id;
           };
 
         } else { // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
@@ -750,6 +754,7 @@ module.exports = {
           if (CATEGORY_BADGE_CRITERIA <= categoryTotalTime && userCategoryBadge.length === 0) {
             await user.addMyBadges(categoryBadge.id);
             await user.update({newBadge: categoryBadge.id})
+            // newBadge = categoryBadge.id;
           };
         };
 
@@ -792,6 +797,16 @@ module.exports = {
         console.error(error);
       }
     },
+
+    // 새로운 뱃지가 지급되면 프론트로 한번 보내주고 초기화
+    // newBadge: () => {
+    //   console.log("newbadge가 룸컨트롤러에서 실행되었을 때에ㅔㅔㅔㅔ")
+    //   return newBadge;
+    // },
+    // newBadgeInit: () => {
+    //   console.log("룸 컨트롤러에서 초기화아ㅏㅏㅏㅏ");
+    //   newBadge = 0;
+    // },
 
     like: asyncWrapper(async (req, res) => {
       const { roomId } = req.params;

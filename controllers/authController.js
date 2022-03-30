@@ -14,6 +14,7 @@ const {
 // models
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // 원래 코드
 // const {
@@ -30,6 +31,8 @@ const {
 //   BeautyRecord,
 // } = require("../models");
 >>>>>>> 0019190 (FIX: time code adjusted for Mongo DB)
+=======
+>>>>>>> db21985 (FIX: time record code adjusted for Mongo DB, badges are provided by time.)
 
 const { User, Badge, RefreshToken } = require("../models");
 
