@@ -216,7 +216,6 @@ module.exports = {
         offset = 7 + 8 * (page/1 - 2);
       }
 
-      console.log("offset 이거다adsfadsfgasdfgdsadfds", offset)
       let rooms = [];
       switch (query) {
         case "hot": // 인기 방 목록 가져오기
@@ -362,7 +361,6 @@ module.exports = {
         roomSearchingLimit = 8
       }
 
-      console.log("roomSearchingLimit 카테고리카테고리카테고리카테고리카테고리", roomSearchingLimit);
       let offset = 0;
       
       if (page/1 === 2) {
