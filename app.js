@@ -1,17 +1,15 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const path = require("path");
+// const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 // const fs = require("fs");
 
-
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
-
 
 const connect = require('./mongoSchemas/index');
 
