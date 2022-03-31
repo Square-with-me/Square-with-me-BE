@@ -143,7 +143,6 @@ module.exports = {
         }],
       })
 
-      console.log(user, "미들웨어에서 토큰이 유효한지 아닌지를 확인하기 위해 user를 불러온다")
       if(!user) {
         return res.status(400).json({
           isSuccess: false,

@@ -3,7 +3,6 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
-    // credentials: true,
   },
 });
 
@@ -25,9 +24,9 @@ io.on("connection", (socket) => {
 
   socket.on("join room", async (payload, done) => {
     roomId = payload.roomId;
-    userId = payload.userId; // payload에 userId 추가 필요
-    categoryId = payload.categoryId;  // payload 추가 필요
-    date = payload.date;  // payload 추가 필요
+    userId = payload.userId;
+    categoryId = payload.categoryId;
+    date = payload.date;
 
     if (!roomId) {
       socket.emit("no data");
@@ -58,7 +57,6 @@ io.on("connection", (socket) => {
       statusMsg: payload.statusMsg,
     }
 
-    console.log(payload.masterBadge, "payload.masterBadgepayload.masterBadgepayload.masterBadge")
     let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
     const otherSockets = others.map((socketId) => {
@@ -71,7 +69,6 @@ io.on("connection", (socket) => {
       return socketToUser[socketId]
     });
 
-    console.log(otherUsers, "otherUsers다ㅏㅏㅏㅏㅏㅏㅏㅏ")
     socket.emit("send users", { otherSockets, otherUsers });
   });
 
@@ -105,33 +102,6 @@ io.on("connection", (socket) => {
     time = payload; // data received for every 1500 seconds
   });
 
-  socket.on("disconnecting", async () => {
-    const data = {
-      roomId,
-      userId,
-      time: time,
-      categoryId: categoryId,
-      date: date,
-    };
-
-    await RoomController.delete.participant(data);
-
-
-
-    if(users[roomId]) {
-      users[roomId] = users[roomId].filter((id) => id !== socket.id);
-    }
-    const userInfo = socketToUser[socket.id];
-
-    socket.broadcast.to(roomId).emit("user left", {
-      socketId: socket.id,
-      userInfo,
-    });
-
-    delete socketToNickname[socket.id];
-    delete socketToUser[socket.id];
-  });
-
   // 타이머
   socket.on("start_timer", (payload) => {
     socket.broadcast.to(payload.roomId).emit("start_receive", payload);
@@ -143,6 +113,39 @@ io.on("connection", (socket) => {
 
   socket.on("reset_time", (roomId) => {
     socket.broadcast.to(roomId).emit("reset_receive");
+  });
+
+  socket.on("check absence", () => {
+    socket.emit("resend check absence", { socketId: socket.id, roomId: socketToRoom[socket.id] });
+  });
+
+  socket.on("quit room", async () => {
+    const data = {
+      roomId,
+      userId,
+      time: time,
+      categoryId: categoryId,
+      date: date,
+    };
+
+    await RoomController.delete.participant(data);
+
+    if(users[roomId]) {
+      users[roomId] = users[roomId].filter((id) => id !== socket.id);
+    };
+    const userInfo = socketToUser[socket.id];
+
+    socket.broadcast.to(roomId).emit("user left", {
+      socketId: socket.id,
+      userInfo,
+    });
+
+    delete socketToNickname[socket.id];
+    delete socketToUser[socket.id];
+  });
+
+  socket.on("disconnecting", async () => {
+    console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
   });
 });
 
