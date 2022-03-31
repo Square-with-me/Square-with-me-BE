@@ -97,7 +97,7 @@ module.exports = {
       // 입장시 로그 기록
       // userId, entryTime, exitTime, roomId, category, roomName
       const roomId = fullRoom.id
-      const category = fullRoom.category.name;
+      const category = fullRoom.category.id;
       const entryTime = dateUtil.koreanDate();
       const roomName = fullRoom.title;
       const createLog = new Log({
