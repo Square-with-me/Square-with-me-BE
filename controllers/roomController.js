@@ -509,10 +509,10 @@ module.exports = {
             checkingDate.getFullYear() // 연도가 다를 때
         ) {
           await MonthRecord.updateMany(
-            { userId: id },
+            { userId: userId },
             { $set: { time: 0, lastUpdatedDate: checkingDate } }
           );
-          await MonthRecord.find({ userId: id }, { _id: 0, __v: 0 });
+          await MonthRecord.find({ userId: userId }, { _id: 0, __v: 0 });
         }
         // 월간 기록 초기화 End
 
