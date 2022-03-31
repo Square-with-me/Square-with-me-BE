@@ -1,3 +1,4 @@
+const { log } = require("console");
 const app = require("./app");
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
@@ -113,6 +114,10 @@ io.on("connection", (socket) => {
       categoryId: categoryId,
       date: date,
     };
+    console.log("socket disconnecting이 실행된다. 이다음은 await RoomController.delete.participant(data);이다ㅏㅏㅏ")
+    console.log("socket time은 여기다ㅏㅏㅏㅏㅏㅏㅏㅏㅏ", time);
+    console.log("socket data socket data socket data socket data ", data);
+
 
     await RoomController.delete.participant(data);
 

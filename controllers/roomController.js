@@ -456,10 +456,11 @@ module.exports = {
 
   delete: {
     participant: async (data) => {
-      console.log("data", data);
+      console.log("datadatadatadatadata", data);
       try {
         const { roomId, userId, time, categoryId, date } = data; // time: 분 단위, date: 방 입장 시점의 날짜
 
+        console.log("time timetimetimetime", time)
         const user = await User.findOne({
           where: {
             id: userId,
@@ -821,6 +822,8 @@ module.exports = {
         const exitTime = dateUtil.koreanDate();
         await Log.findOneAndUpdate({ userId, roomId }, { exitTime });
 
+        console.log("퇴장 시 로그 기록은 여기다", exitTime)
+
         // 방장인지 확인
         const isMasterUser = userId === room.masterUserId;
         switch (isMasterUser) {
@@ -854,6 +857,8 @@ module.exports = {
           await Room.destroy({
             where: { id: roomId },
           });
+
+          console.log("방 삭제가 이루어졌다! 룸컨트롤러에서!!")
         }
       } catch (error) {
         console.error(error);
