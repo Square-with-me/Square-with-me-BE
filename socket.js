@@ -4,7 +4,6 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
-    // credentials: true,
   },
 });
 
@@ -26,9 +25,9 @@ io.on("connection", (socket) => {
 
   socket.on("join room", async (payload, done) => {
     roomId = payload.roomId;
-    userId = payload.userId; // payload에 userId 추가 필요
-    categoryId = payload.categoryId;  // payload 추가 필요
-    date = payload.date;  // payload 추가 필요
+    userId = payload.userId;
+    categoryId = payload.categoryId;
+    date = payload.date;
 
     if (!roomId) {
       socket.emit("no data");
@@ -59,7 +58,6 @@ io.on("connection", (socket) => {
       statusMsg: payload.statusMsg,
     }
 
-    console.log(payload.masterBadge, "payload.masterBadgepayload.masterBadgepayload.masterBadge")
     let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
     const otherSockets = others.map((socketId) => {
@@ -72,7 +70,6 @@ io.on("connection", (socket) => {
       return socketToUser[socketId]
     });
 
-    console.log(otherUsers, "otherUsers다ㅏㅏㅏㅏㅏㅏㅏㅏ")
     socket.emit("send users", { otherSockets, otherUsers });
   });
 
@@ -106,7 +103,24 @@ io.on("connection", (socket) => {
     time = payload; // data received for every 1500 seconds
   });
 
-  socket.on("disconnecting", async () => {
+  // 타이머
+  socket.on("start_timer", (payload) => {
+    socket.broadcast.to(payload.roomId).emit("start_receive", payload);
+  });
+
+  socket.on("stop_time", (roomId) => {
+    socket.broadcast.to(roomId).emit("stop_receive");
+  });
+
+  socket.on("reset_time", (roomId) => {
+    socket.broadcast.to(roomId).emit("reset_receive");
+  });
+
+  socket.on("check absence", () => {
+    socket.emit("resend check absence", { socketId: socket.id, roomId: socketToRoom[socket.id] });
+  });
+
+  socket.on("quit room", async () => {
     const data = {
       roomId,
       userId,
@@ -119,12 +133,9 @@ io.on("connection", (socket) => {
     console.log("socket data socket data socket data socket data ", data);
 
 
-    await RoomController.delete.participant(data);
-
-
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
-    }
+    };
     const userInfo = socketToUser[socket.id];
 
     socket.broadcast.to(roomId).emit("user left", {
@@ -137,29 +148,8 @@ io.on("connection", (socket) => {
 
   });
 
-
-// // 정말로 방에서 나갔는지 확인
-
-// function checkLeftUser (id) {
-//   console.log("socket id socket id socket id",socket.id);
-//   console.log("users[roomId] users[roomId] users[roomId]", users[roomId]);
-//   console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
-// }
-
-// setInterval(checkLeftUser, 5000, socket.id) => 확인 결과 뒤로가기 하여도 특정 방에서 disconnecting이 발생하지 않으면 그 유저의 소켓아이디는 그 방에 여전히 남아 있음
-
-
-  // 타이머
-  socket.on("start_timer", (payload) => {
-    socket.broadcast.to(payload.roomId).emit("start_receive", payload);
-  });
-
-  socket.on("stop_time", (roomId) => {
-    socket.broadcast.to(roomId).emit("stop_receive");
-  });
-
-  socket.on("reset_time", (roomId) => {
-    socket.broadcast.to(roomId).emit("reset_receive");
+  socket.on("disconnecting", async () => {
+    console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
   });
 });
 
