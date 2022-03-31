@@ -122,8 +122,6 @@ io.on("connection", (socket) => {
     await RoomController.delete.participant(data);
 
 
-    
-
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
     }
@@ -139,16 +137,16 @@ io.on("connection", (socket) => {
 
   });
 
-// 정말로 방에서 나갔는지 확인
 
+// // 정말로 방에서 나갔는지 확인
 
-function checkLeftUser (id) {
-  console.log("socket id socket id socket id",socket.id);
-  console.log("users[roomId] users[roomId] users[roomId]", users[roomId]);
-  console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
-}
+// function checkLeftUser (id) {
+//   console.log("socket id socket id socket id",socket.id);
+//   console.log("users[roomId] users[roomId] users[roomId]", users[roomId]);
+//   console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
+// }
 
-setInterval(checkLeftUser, 5000, socket.id)
+// setInterval(checkLeftUser, 5000, socket.id) => 확인 결과 뒤로가기 하여도 특정 방에서 disconnecting이 발생하지 않으면 그 유저의 소켓아이디는 그 방에 여전히 남아 있음
 
 
   // 타이머
