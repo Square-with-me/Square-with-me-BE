@@ -144,6 +144,7 @@ io.on("connection", (socket) => {
 
 function checkLeftUser (id) {
   console.log("socket id socket id socket id",socket.id);
+  console.log("users[roomId] users[roomId] users[roomId]", users[roomId]);
   console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
 }
 
