@@ -23,7 +23,7 @@ const CATEGORY = {
   문화: "culture",
   기타: "etc",
 };
-const CATEGORY_BADGE_CRITERIA = 2; // 카테고리 뱃지 지급 기준(단위 : 분)
+const CATEGORY_BADGE_CRITERIA = 60; // 카테고리 뱃지 지급 기준(단위 : 분)
 
 module.exports = {
   create: {
