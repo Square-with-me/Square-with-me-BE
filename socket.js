@@ -143,7 +143,6 @@ io.on("connection", (socket) => {
 // 정말로 방에서 나갔는지 확인
 
 function checkLeftUser (id) {
-  console.log("userInfoe 다ㅏㅏㅏㅏㅏㅏ", userInfo)
   console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
 }
 
