@@ -122,6 +122,7 @@ io.on("connection", (socket) => {
     await RoomController.delete.participant(data);
 
 
+    
 
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
@@ -135,6 +136,16 @@ io.on("connection", (socket) => {
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
+
+    // 정말로 방에서 나갔는지 확인
+
+    checkLeftUser = (id) => {
+      console.log("userInfoe 다ㅏㅏㅏㅏㅏㅏ", userInfo)
+      console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
+    }
+
+    setInterval(checkLeftUser(socket.id), 5000)
+
   });
 
   // 타이머
