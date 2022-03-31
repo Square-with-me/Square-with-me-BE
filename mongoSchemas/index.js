@@ -3,7 +3,6 @@ const { koreanDate } = require("../utils/date");
 
 console.log("Mongo production:", process.env.NODE_ENV);
 
-
 // Mongo DB 연결 부분
 const connect = () => {
   mongoose
