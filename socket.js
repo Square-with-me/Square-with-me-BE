@@ -137,16 +137,18 @@ io.on("connection", (socket) => {
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
 
-
   });
 
 // 정말로 방에서 나갔는지 확인
 
+
 function checkLeftUser (id) {
+  console.log("socket id socket id socket id",socket.id);
   console.log("users[roomId].includes(id) 다ㅏㅏㅏㅏㅏㅏ",users[roomId].includes(id))
 }
 
 setInterval(checkLeftUser, 5000, socket.id)
+
 
   // 타이머
   socket.on("start_timer", (payload) => {
