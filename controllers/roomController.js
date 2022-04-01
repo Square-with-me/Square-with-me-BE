@@ -40,7 +40,7 @@ module.exports = {
           isSuccess: false,
           msg: "이미 존재하는 방 제목입니다.",
         });
-      }
+      };
 
       // 방 생성
       const newRoom = await Room.create({
@@ -65,7 +65,7 @@ module.exports = {
       // 참가자 추가
       await newRoom.addParticipants(userId);
 
-      const fullRoom = await Room.findOne({
+      const roomInfo = await Room.findOne({
         where: { id: newRoom.id },
         attributes: [
           "id",
@@ -95,23 +95,22 @@ module.exports = {
         ],
       });
       // 입장시 로그 기록
-      // userId, entryTime, exitTime, roomId, category, roomName
-      const roomId = fullRoom.id
-      const category = fullRoom.category.id;
+      const roomId = roomInfo.id
+      const category = roomInfo.category.id;
       const entryTime = dateUtil.koreanDate();
-      const roomName = fullRoom.title;
+      const roomTitle = roomInfo.title;
       const createLog = new Log({
         userId,
         entryTime,
         roomId,
         category,
-        roomName,
+        roomTitle,
       });
       await createLog.save();
 
       return res.status(201).json({
         isSuccess: true,
-        data: fullRoom,
+        data: roomInfo,
       });
     }),
 
@@ -119,7 +118,7 @@ module.exports = {
       const { roomId, userId } = req.params;
 
       // roomId로 방 찾기
-      const room = await Room.findOne({
+      const roomInfo = await Room.findOne({
         where: { id: roomId },
         attributes: [
           "id",
@@ -150,7 +149,7 @@ module.exports = {
       });
 
       // 현재 참가자 수 확인
-      if (room.participantCnt >= 4) {
+      if (roomInfo.participantCnt >= 4) {
         return res.status(400).json({
           isSuccess: false,
           msg: "인원이 모두 찼습니다.",
@@ -158,122 +157,90 @@ module.exports = {
       }
 
       // 참가자 추가
-      await room.addParticipants(userId);
+      await roomInfo.addParticipants(userId);
       // 참가자 수 + 1
-      await room.increment("participantCnt");
+      await roomInfo.increment("participantCnt");
 
       // 입장시 로그 기록
-      // userId, entryTime, exitTime, roomId, category, roomName
-      const category = room.category.id;
+      const category = roomInfo.category.id;
       const entryTime = dateUtil.koreanDate();
-      const roomName = room.title;
+      const roomTitle = roomInfo.title;
       const createLog = new Log({
         userId,
         entryTime,
         roomId,
         category,
-        roomName,
+        roomTitle,
       });
       await createLog.save();
 
       res.status(201).json({
         isSuccess: true,
-        data: room,
+        data: roomInfo,
       });
     }),
 
-    like: asyncWrapper(async (req, res) => {
-      const { roomId } = req.params;
-      const { id: userId } = res.locals.user;
+    // like: asyncWrapper(async (req, res) => {
+    //   const { roomId } = req.params;
+    //   const { id: userId } = res.locals.user;
 
-      const [like, isFirst] = await Like.findOrCreate({
-        // 좋아요 목록에 없으면 생성
-        where: {
-          roomId: roomId,
-          likedId: userId,
-        },
-        defaults: {
-          likedId: userId,
-        },
-      });
-      if (!isFirst) {
-        return res.status(400).json({
-          isSuccess: false,
-          msg: "이미 좋아요를 눌렀습니다.",
-        });
-      }
+    //   const [like, isFirst] = await Like.findOrCreate({
+    //     // 좋아요 목록에 없으면 생성
+    //     where: {
+    //       roomId: roomId,
+    //       likedId: userId,
+    //     },
+    //     defaults: {
+    //       likedId: userId,
+    //     },
+    //   });
+    //   if (!isFirst) {
+    //     return res.status(400).json({
+    //       isSuccess: false,
+    //       msg: "이미 좋아요를 눌렀습니다.",
+    //     });
+    //   }
 
-      const room = await Room.findOne({
-        where: { id: roomId },
-      });
+    //   const room = await Room.findOne({
+    //     where: { id: roomId },
+    //   });
 
-      await room.increment("likeCnt"); // 좋아요 수 +1
+    //   await room.increment("likeCnt"); // 좋아요 수 +1
 
-      return res.status(201).json({
-        isSuccess: true,
-        data: {
-          isLiking: true,
-          likeCnt: room.likeCnt + 1,
-        },
-      });
-    }),
+    //   return res.status(201).json({
+    //     isSuccess: true,
+    //     data: {
+    //       isLiking: true,
+    //       likeCnt: room.likeCnt + 1,
+    //     },
+    //   });
+    // }),
   },
 
   update: {},
 
   get: {
     rooms: asyncWrapper(async (req, res) => {
-      const { q: query, p: page } = req.query;
+      let { q: query, p: page } = req.query;
+      let offset = 0;
+      page /= 1  // 문자 => 숫자 변환
 
-     
       // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
       let roomSearchingLimit = 0
-    
-      if (page/1 === 1) { // req.query로 넘어오는 모든 것들은 문자열로 넘어온다. page === 1가 false가 나오므로 숫자로 형변환해주기 위해 /1을 넣는다.
-        roomSearchingLimit = 7 // 처음에는 7개만 보내줌
-      } else {
-        roomSearchingLimit = 8
-      }
 
-      console.log("roomSearchingLimit", roomSearchingLimit);
-      let offset = 0;
-      
-      if (page/1 === 2) { // 처음에는 7개만 보내주니까 처음에는 7개만 상쇄(offset)
+      if (page === 2) { // 처음에는 7개만 보내주니까 처음에는 7개만 상쇄(offset)
         offset = 7;
       }
-      else if (page/1 > 2) {
-        offset = 7 + 8 * (page/1 - 2);
+      else if (page > 2) {
+        offset = 7 + 8 * (page - 2);
       }
+
+      page === 1
+        ? roomSearchingLimit = 7  // 첫 페이지만 7개 리턴
+        : roomSearchingLimit = 8
 
       let rooms = [];
       switch (query) {
-        case "hot": // 인기 방 목록 가져오기
-          rooms = await Room.findAll({
-            attributes: [
-              "id",
-              "title",
-              "isSecret",
-              "createdAt",
-              "likeCnt",
-              "participantCnt",
-            ],
-            include: [
-              {
-                model: Category,
-                attributes: ["id", "name"],
-              },
-              {
-                model: Tag,
-                as: "Tags",
-                attributes: ["id", "name"],
-                through: { attributes: [] },
-              },
-            ],
-            order: [["likeCnt", "desc"]],
-            limit: 3,
-          });
-          break;
-
         case "all":
           // 전체 방 목록 가져오기
           rooms = await Room.findAll({
@@ -368,7 +335,7 @@ module.exports = {
             order: [["createdAt", "desc"]],
           });
           break;
-      }
+      };
 
       return res.status(200).json({
         isSuccess: true,
@@ -378,28 +345,24 @@ module.exports = {
 
     categoryRooms: asyncWrapper(async (req, res) => {
       const { categoryId } = req.params;
-      const { p: page } = req.query;
-      // const page = req.query.p와 같은 형태
+      let { p: page } = req.query;
+      let offset = 0;
+      
+      page /= 1; // 숫자로 변환
 
-        // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
-        let roomSearchingLimit = 0
+      // 처음에 방 7개만을 가지고 오기위해 만들어낸 수, 처음 이후론 8개씩 가져오기
+      let roomSearchingLimit = 0
 
-        if (page/1 === 1) {
-          roomSearchingLimit = 7
-        } else {
-          roomSearchingLimit = 8
-        }
+      if (page === 2) {
+        offset = 7;
+      }
+      else if (page > 2) {
+        offset = 7 + 8 * (page - 2);
+      }
   
-        let offset = 0;
-        
-        if (page/1 === 2) {
-          offset = 7;
-        }
-        else if (page/1 > 2) {
-          offset = 7 + 8 * (page/1 - 2);
-        }
-  
-
+      page === 1
+      ? roomSearchingLimit = 7
+      : roomSearchingLimit = 8
 
       // categoryId로 방 검색해서 가져오기
       const rooms = await Room.findAll({
@@ -447,7 +410,7 @@ module.exports = {
           isSuccess: false,
           msg: "비밀번호가 일치하지 않습니다.",
         });
-      }
+      };
       return res.status(200).json({
         isSuccess: true,
       });
@@ -728,7 +691,6 @@ module.exports = {
                 userId,
                 category: "beauty",
               });
-              console.log(`뷰티 시간 저장아 되어랏, ${day}`);
               updateOption[day] = preRecord[day] + time;
 
               await preRecord.update(updateOption);
@@ -780,11 +742,9 @@ module.exports = {
               break;
             default:
               break;
-          }
+          };
 
           // 월간 기록 저장
-          console.log("월간에 저장될 time", time);
-
           const preMonthRecord = await MonthRecord.findOne({ userId, date });
           await preMonthRecord.updateOne({
             time: preMonthRecord.time + time,
@@ -815,9 +775,8 @@ module.exports = {
             await user.update({ newBadge: categoryBadge.id });
           }
         }
-        // 퇴장시 로그 기록
-        // userId, entryTime, exitTime, roomId, category, roomName
 
+        // 퇴장시 로그 기록
         const exitTime = dateUtil.koreanDate();
         await Log.findOneAndUpdate({ userId, roomId }, { exitTime });
 
@@ -860,43 +819,42 @@ module.exports = {
       }
     },
 
+    // like: asyncWrapper(async (req, res) => {
+    //   const { roomId } = req.params;
+    //   const { id: userId } = res.locals.user;
 
-    like: asyncWrapper(async (req, res) => {
-      const { roomId } = req.params;
-      const { id: userId } = res.locals.user;
+    //   const isLiking = await Like.findOne({
+    //     where: {
+    //       roomId,
+    //       likedId: userId,
+    //     },
+    //   });
+    //   if (!isLiking) {
+    //     return res.status(400).json({
+    //       isSuccess: false,
+    //       msg: "좋아요를 하지 않은 상태입니다.",
+    //     });
+    //   }
 
-      const isLiking = await Like.findOne({
-        where: {
-          roomId,
-          likedId: userId,
-        },
-      });
-      if (!isLiking) {
-        return res.status(400).json({
-          isSuccess: false,
-          msg: "좋아요를 하지 않은 상태입니다.",
-        });
-      }
+    //   await Like.destroy({
+    //     where: {
+    //       roomId,
+    //       likedId: userId,
+    //     },
+    //   });
 
-      await Like.destroy({
-        where: {
-          roomId,
-          likedId: userId,
-        },
-      });
+    //   const room = await Room.findOne({
+    //     where: { id: roomId },
+    //   });
+    //   await room.decrement("likeCnt");
 
-      const room = await Room.findOne({
-        where: { id: roomId },
-      });
-      await room.decrement("likeCnt");
-
-      return res.status(200).json({
-        isSuccess: true,
-        data: {
-          isLiking: false,
-          likeCnt: room.likeCnt - 1,
-        },
-      });
-    }),
+    //   return res.status(200).json({
+    //     isSuccess: true,
+    //     data: {
+    //       isLiking: false,
+    //       likeCnt: room.likeCnt - 1,
+    //     },
+    //   });
+    // }),
   },
 };

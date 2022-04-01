@@ -28,21 +28,18 @@ io.on("connection", (socket) => {
     categoryId = payload.categoryId;
     date = payload.date;
 
-    if (!roomId) {
-      socket.emit("no data");
-    }
+    if (!roomId) { socket.emit("no data") };
 
     if (users[roomId]) { // 기존 참가자 있음
-      
       if (users[roomId].length >= 4) { // 참가자 풀방
         return done();
-      }
+      };
 
       users[roomId].push(socket.id);
     } else {
       // 첫 참가자
       users[roomId] = [socket.id];
-    }
+    };
    
     socket.join(roomId);
 
@@ -55,7 +52,7 @@ io.on("connection", (socket) => {
       profileImg: payload.profileImg,
       masterBadge: payload.masterBadge,
       statusMsg: payload.statusMsg,
-    }
+    };
 
     let others = users[roomId].filter((socketId) => socketId !== socket.id);
 
@@ -140,14 +137,16 @@ io.on("connection", (socket) => {
       userInfo,
     });
 
-    socket.leave(roomId)
+    socket.leave(roomId);
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
+    delete socketToRoom[socket.id];
   });
- 
+
   socket.on("disconnecting", async () => {
     console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
+    // 방 정보 남아있으면은 방 나가기 처리하도록
   });
 });
 

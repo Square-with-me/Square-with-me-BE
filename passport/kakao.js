@@ -21,7 +21,6 @@ module.exports = () => {
         callbackURL: "https://nemowithme.com/api/auth/kakao/callback",
       }, async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log("프로필", profile);
           const exUser = await User.findOne({
             where: {
               origin: profile.id,

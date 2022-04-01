@@ -12,11 +12,7 @@ const {
 } = require("../utils/util");
 
 // models
-
-
 const { User, Badge, RefreshToken } = require("../models");
-
-const db = require("../models");
 
 // Mongo DB 시간기록
 const WeekRecord = require("../mongoSchemas/weekRecord");

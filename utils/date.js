@@ -52,7 +52,7 @@ module.exports = {
       checkingDate.getMonth(),
       checkingDate.getDate(),
       0
-      );
+    );
 
     // 요일초기화 기준, 각 요일에 따라 며칠을 더한 값보다 크거나 며칠을 더한 값보다 작아 일 -> 월 혹은 월 -> 일 이렇게 주가 바뀌게 될 때 0으로 초기화
     if (checkingZeroHour.getDay() === 0) {  // 일요일

@@ -1,11 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-// const path = require("path");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-// const fs = require("fs");
 
 const app = express();
 const dotenv = require("dotenv");
@@ -26,17 +24,6 @@ db.sequelize
   .catch((error) => {
     console.error(error);
   });
-
-// public 폴더 생성  <= image local upload 할 때만 사용
-// try {
-//   fs.accessSync("public");
-// } catch (error) {
-//   console.log("public 폴더가 없습니다. 새로 생성합니다.");
-//   fs.mkdirSync("public");
-// }
-
-// static
-// app.use("/", express.static(path.join(__dirname, "public")));
 
 const passportconfig = require("./passport/kakao");
 passportconfig();

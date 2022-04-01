@@ -5,12 +5,11 @@ const router = express.Router();
 // const AuthController = require("../controllers/authController");  // 쿠키 버전
 const AuthController = require("../controllers/authController_notCookie");  // 쿠키 x 버전
 
-
 const UserController = require("../controllers/userController");
 const RoomController = require("../controllers/roomController");
 
 // utils
-const { localUpload, s3Upload } = require("../utils/util");
+const { s3Upload } = require("../utils/util");
 
 // middlewares
 const middleware = require("../utils/middleware");
@@ -48,11 +47,6 @@ router.get("/rooms/category/:categoryId", RoomController.get.categoryRooms); // 
 // For admin
 router.get("/admin/users", UserController.get.users);  // 전체 유저 목록 불러오기
 router.post("/admin/user/:userId/badge/bug", UserController.giveBadge.bug);  // 전체 유저 목록 불러오기
-
-// /api/upload
-// router.post("/upload/image", middleware.auth, localUpload.single("image"), (req, res, next) => {
-//   res.json(req.file.filename);
-// });   // 이미지 업로드
 
 // /api/upload
 router.post("/upload/image", middleware.auth, s3Upload.single("image"), (req, res, next) => {

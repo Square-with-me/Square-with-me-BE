@@ -4,12 +4,6 @@ const { asyncWrapper, regex } = require("../utils/util");
 // models
 const { User, Badge } = require("../models");
 
-// RoomController for newBadge
-const RoomController = require("./roomController");
-
-// authController_notCookie for newBadgeFirstCome
-const authController_notCookie = require("./authController_notCookie");
-
 // korean local time
 const dateUtil = require("../utils/date");
 
@@ -18,7 +12,7 @@ module.exports = {
   giveBadge: {
     bug: asyncWrapper(async (req, res) => {
       const { userId } = req.params;
-      const bugBadgeId = 8;
+      const bugBadgeId = 8;  // 버그 뱃지 = 8
 
       const user = await User.findOne({
         where: { id: userId },
@@ -56,7 +50,7 @@ module.exports = {
       return res.status(200).json({
         isSuccess: true,
         data: {
-          profileImg: profileImg,
+          profileImg,
         },
       });
     }),
@@ -70,14 +64,14 @@ module.exports = {
           isSuccess: false,
           msg: "닉네임은 2글자 ~ 8글자로 적어주세요.",
         });
-      }
+      };
 
       if (!regex.checkNickname(nickname)) {
         return res.status(400).json({
           isSuccess: false,
           msg: "닉네임에 특수문자를 사용할 수 없습니다.",
         });
-      }
+      };
 
       const user = await User.findOne({
         where: { id: userId },
@@ -104,7 +98,7 @@ module.exports = {
           isSuccess: false,
           msg: "상태 메시지는 1글자 ~ 20글자로 적어주세요.",
         });
-      }
+      };
 
       const user = await User.findOne({
         where: { id: userId },
