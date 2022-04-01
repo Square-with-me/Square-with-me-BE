@@ -7,19 +7,6 @@ const io = require("socket.io")(server, {
 });
 
 
-// const {
-//   sockets: {
-//       adapter: { sids, rooms },
-//   },
-// } = wsServer;
-
-// sids는 key값에는 socket id가 적혀있고 value에는 그 socket id가 접속해 있는 방의 이름이 적혀있다.
-
-const {
-  sockets: {
-      adapter: { sids, rooms },
-  },
-} = io;
 
 //controller
 const RoomController = require("./controllers/roomController");
@@ -37,7 +24,7 @@ io.on("connection", (socket) => {
   let categoryId;
   let date;
 
-	// console.log("전역변수 roomId 이다ㅏㅏㅏㅏㅏㅏㅏㅏ", roomId)
+	
 
   socket.on("join room", async (payload, done) => {
     roomId = payload.roomId;
@@ -45,7 +32,7 @@ io.on("connection", (socket) => {
     categoryId = payload.categoryId;
     date = payload.date;
 
-	  // console.log("join room 했을 때 roomId", roomId)
+	  
     if (!roomId) {
       socket.emit("no data");
     }
@@ -61,13 +48,9 @@ io.on("connection", (socket) => {
       // 첫 참가자
       users[roomId] = [socket.id];
     }
-   console.log("그 유저의 socket.id", socket.id);
-    // console.log("rooms socket join 하기 전", rooms);
-    // console.log("users 정보, socket join 하기 전, socket leave 하기 전", users)
-    console.log("socket join 하기 전 sids, sids는 key값에는 socket id가 적혀있고 value에는 그 socket id가 접속해 있는 방의 이름이 적혀있다.",sids );
+   
     socket.join(roomId);
-    // console.log("rooms socket join 하고난 후후", rooms);
-    console.log("socket join 하고난 후 하고난 후 하고난 후 하고난 후",sids );
+    
 
     socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
     socketToNickname[socket.id] = payload.nickname;
@@ -91,9 +74,7 @@ io.on("connection", (socket) => {
     const otherUsers = others.map((socketId) => {
       return socketToUser[socketId]
     });
-    console.log(otherUsers, "otherUsers");
-    console.log("socket leave 하기전, otherUsers 하고난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
-
+    
     socket.emit("send users", { otherSockets, otherUsers });
   });
 
@@ -173,16 +154,9 @@ io.on("connection", (socket) => {
     });
 
     
-    console.log("leave 하기 전",sids);
+    
     socket.leave(roomId)
 
-    console.log("socket leave 하고 난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
-    // console.log("users 정보, socket leave 하고난 후", users)
-    // console.log("rooms socket join 하고난 후 socket leave까지 하고난 후", rooms);
-
-    // console.log("io.sockets io.sockets io.sockets io.sockets io.sockets", io.sockets)
-
-    console.log("leave 하고나서 leave 하고나서 leave 하고나서",sids);
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
