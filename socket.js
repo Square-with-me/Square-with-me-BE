@@ -6,6 +6,19 @@ const io = require("socket.io")(server, {
   },
 });
 
+
+// const {
+//   sockets: {
+//       adapter: { sids, rooms },
+//   },
+// } = wsServer;
+
+const {
+  sockets: {
+      adapter: { sids, rooms },
+  },
+} = io;
+
 //controller
 const RoomController = require("./controllers/roomController");
 
@@ -47,8 +60,10 @@ io.on("connection", (socket) => {
       users[roomId] = [socket.id];
     }
 
-    console.log("users 정보, socket leave 하기 전", users)
+    console.log("rooms socket join 하기 전", rooms);
+    console.log("users 정보, socket join 하기 전, socket leave 하기 전", users)
     socket.join(roomId);
+    console.log("rooms socket join 하고난 후후", rooms);
 
     socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
     socketToNickname[socket.id] = payload.nickname;
@@ -157,6 +172,9 @@ io.on("connection", (socket) => {
 
     console.log("socket leave 하고 난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
     console.log("users 정보, socket leave 하고난 후", users)
+    console.log("rooms socket join 하고난 후 socket leave까지 하고난 후", rooms);
+
+    console.log("io.sockets io.sockets io.sockets io.sockets io.sockets", io.sockets)
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
