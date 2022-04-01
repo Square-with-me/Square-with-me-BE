@@ -22,12 +22,15 @@ io.on("connection", (socket) => {
   let categoryId;
   let date;
 
+	console.log("전역변수 roomId 이다ㅏㅏㅏㅏㅏㅏㅏㅏ", roomId)
+
   socket.on("join room", async (payload, done) => {
     roomId = payload.roomId;
     userId = payload.userId;
     categoryId = payload.categoryId;
     date = payload.date;
 
+	  console.log("join room 했을 때 roomId", roomId)
     if (!roomId) {
       socket.emit("no data");
     }
@@ -93,6 +96,8 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (payload) => {
     socket.broadcast.to(payload.roomId).emit('receive_message', payload);
+
+	  console.log("send_message할 때 roomId", roomId)
   });
   socket.on("send_emoji", (payload) => {
     socket.broadcast.to(payload.roomId).emit('receive_emoji', payload);
@@ -129,6 +134,8 @@ io.on("connection", (socket) => {
     };
 
     await RoomController.delete.participant(data);
+
+	  console.log("quit room 다 하고나서 roomId", roomId)
 
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
