@@ -6,8 +6,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-
-
 //controller
 const RoomController = require("./controllers/roomController");
 
@@ -24,15 +22,12 @@ io.on("connection", (socket) => {
   let categoryId;
   let date;
 
-	
-
   socket.on("join room", async (payload, done) => {
     roomId = payload.roomId;
     userId = payload.userId;
     categoryId = payload.categoryId;
     date = payload.date;
 
-	  
     if (!roomId) {
       socket.emit("no data");
     }
@@ -50,7 +45,6 @@ io.on("connection", (socket) => {
     }
    
     socket.join(roomId);
-    
 
     socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
     socketToNickname[socket.id] = payload.nickname;
@@ -99,9 +93,6 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (payload) => {
     socket.broadcast.to(payload.roomId).emit('receive_message', payload);
-
-	  console.log("send_message할 때 roomId", roomId)
-    console.log("send_message 할 때 그 유저와 속해있는 방", sids);
   });
   socket.on("send_emoji", (payload) => {
     socket.broadcast.to(payload.roomId).emit('receive_emoji', payload);
@@ -139,10 +130,6 @@ io.on("connection", (socket) => {
 
     await RoomController.delete.participant(data);
 
-	  console.log("quit room 다 하고나서 roomId", roomId)
-
-    
-
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
     };
@@ -153,10 +140,7 @@ io.on("connection", (socket) => {
       userInfo,
     });
 
-    
-    
     socket.leave(roomId)
-
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
