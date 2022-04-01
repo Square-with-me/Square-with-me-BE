@@ -47,6 +47,7 @@ io.on("connection", (socket) => {
       users[roomId] = [socket.id];
     }
 
+    console.log("users 정보, socket leave 하기 전", users)
     socket.join(roomId);
 
     socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
@@ -71,6 +72,8 @@ io.on("connection", (socket) => {
     const otherUsers = others.map((socketId) => {
       return socketToUser[socketId]
     });
+    console.log(otherUsers, "otherUsers");
+    console.log("socket leave 하기전, otherUsers 하고난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
 
     socket.emit("send users", { otherSockets, otherUsers });
   });
@@ -137,6 +140,8 @@ io.on("connection", (socket) => {
 
 	  console.log("quit room 다 하고나서 roomId", roomId)
 
+    
+
     if(users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
     };
@@ -147,10 +152,16 @@ io.on("connection", (socket) => {
       userInfo,
     });
 
+    
+    socket.leave(roomId)
+
+    console.log("socket leave 하고 난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
+    console.log("users 정보, socket leave 하고난 후", users)
+
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
   });
-
+ 
   socket.on("disconnecting", async () => {
     console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
   });
