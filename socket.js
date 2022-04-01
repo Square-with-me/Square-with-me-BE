@@ -13,6 +13,8 @@ const io = require("socket.io")(server, {
 //   },
 // } = wsServer;
 
+// sids는 key값에는 socket id가 적혀있고 value에는 그 socket id가 접속해 있는 방의 이름이 적혀있다.
+
 const {
   sockets: {
       adapter: { sids, rooms },
@@ -62,8 +64,10 @@ io.on("connection", (socket) => {
    console.log("그 유저의 socket.id", socket.id);
     console.log("rooms socket join 하기 전", rooms);
     console.log("users 정보, socket join 하기 전, socket leave 하기 전", users)
+    console.log("socket join 하기 전 sids, sids는 key값에는 socket id가 적혀있고 value에는 그 socket id가 접속해 있는 방의 이름이 적혀있다.",sids );
     socket.join(roomId);
     console.log("rooms socket join 하고난 후후", rooms);
+    console.log("socket join 하고난 후 하고난 후 하고난 후 하고난 후",sids );
 
     socketToRoom[socket.id] = roomId; // 각각의 소켓아이디가 어떤 룸에 들어가는지
     socketToNickname[socket.id] = payload.nickname;
@@ -168,6 +172,7 @@ io.on("connection", (socket) => {
     });
 
     
+    console.log("leave 하기 전",sids);
     socket.leave(roomId)
 
     console.log("socket leave 하고 난 후 socketToRoom socketToRoom socketToRoom",socketToRoom)
@@ -175,6 +180,8 @@ io.on("connection", (socket) => {
     console.log("rooms socket join 하고난 후 socket leave까지 하고난 후", rooms);
 
     console.log("io.sockets io.sockets io.sockets io.sockets io.sockets", io.sockets)
+
+    console.log("leave 하고나서 leave 하고나서 leave 하고나서",sids);
 
     delete socketToNickname[socket.id];
     delete socketToUser[socket.id];
