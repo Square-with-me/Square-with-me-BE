@@ -59,7 +59,7 @@ io.on("connection", (socket) => {
       // 첫 참가자
       users[roomId] = [socket.id];
     }
-
+   console.log("그 유저의 socket.id", socket.id);
     console.log("rooms socket join 하기 전", rooms);
     console.log("users 정보, socket join 하기 전, socket leave 하기 전", users)
     socket.join(roomId);
