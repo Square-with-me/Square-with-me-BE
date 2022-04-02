@@ -359,6 +359,7 @@ module.exports = {
               order: [["createdAt", "desc"]],
             });
 
+            console.log("rooms를 콘솔에 찍으면 이렇게 나온다.", rooms, "rooms를 콘솔에 찍으면 이렇게 나온다.")
 
 
         // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
