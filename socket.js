@@ -154,13 +154,6 @@ io.on("connection", (socket) => {
     
     // 방 정보 남아있으면은 방 나가기 처리하도록
 
-    console.log(users, "users[roomId]는 이렇게 생겼다") 
-    console.log(users[roomId], "users[roomId]는 이렇게 생겼다")  
-    console.log("if(users[roomId].includes(socket.id))이 트루인지 펄스인지 궁금하다 조건문 실행 before", users[roomId].includes(socket.id)? true: false)
-    console.log("disconnecting 할 때 조건문 before",sids );
-    // if(users[roomId].includes(socket.id)) {
-    
-
       const data = {
         roomId,
         userId,
@@ -187,11 +180,6 @@ io.on("connection", (socket) => {
       delete socketToUser[socket.id];
       delete socketToRoom[socket.id];
 
-
-      console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
-    // };
-    console.log("조건문 실행 after", users[roomId].includes(socket.id)? true: false)
-    console.log("disconnecting 할 때 조건문 after",sids );
   });
 });
 
