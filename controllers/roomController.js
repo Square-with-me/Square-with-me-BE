@@ -310,8 +310,8 @@ module.exports = {
             where: {
               [Op.or]: [
               {title: { [Op.like]: `%${query}%` }},
-              { "$Category.name$": {[Op.like]: `%${query}%`} },
-              { "$Tag.name$": {[Op.like]: `%${query}%`} },
+              // { "$Category.name$": {[Op.like]: `%${query}%`} },
+              // { "$Tag.name$": {[Op.like]: `%${query}%`} },
               ],
             },
             offset: offset,
