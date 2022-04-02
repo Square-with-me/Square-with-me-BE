@@ -108,7 +108,7 @@ module.exports = {
         entryTime,
         roomId,
         category,
-        roomTitle,
+        roomName: roomTitle,
       });
       await createLog.save();
 
@@ -176,7 +176,7 @@ module.exports = {
         entryTime,
         roomId,
         category,
-        roomTitle,
+        roomName: roomTitle,
       });
       await createLog.save();
 
