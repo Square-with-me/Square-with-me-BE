@@ -165,8 +165,7 @@ module.exports = {
       const category = roomInfo.category.id;
       const entryTime = dateUtil.koreanDate();
       const roomTitle = roomInfo.title;
-      console.log(roomInfo, "roomInfo는 이것이다!");
-      console.log(roomTitle, "roomTitle은 이것이다!")
+      
       const createLog = new Log({
         userId,
         entryTime,
@@ -176,12 +175,14 @@ module.exports = {
       });
       await createLog.save();
 
-    console.log(createLog, "createLog는 이것이다")
     
       res.status(201).json({
         isSuccess: true,
         data: roomInfo,
       });
+      console.log(roomInfo, "roomInfo는 이것이다!");
+      console.log(roomTitle, "roomTitle은 이것이다!")
+      console.log(createLog, "createLog는 이것이다")
     }),
 
     // like: asyncWrapper(async (req, res) => {
