@@ -308,7 +308,11 @@ module.exports = {
           // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
           rooms = await Room.findAll({
             where: {
-              title: { [Op.like]: `%${query}%` },
+              [Op.or]: [
+              {title: { [Op.like]: `%${query}%` }},
+              { "$Category.name$": {[Op.like]: `%${query}%`} },
+              { "$Tag.name$": {[Op.like]: `%${query}%`} },
+              ],
             },
             offset: offset,
             limit: roomSearchingLimit,
