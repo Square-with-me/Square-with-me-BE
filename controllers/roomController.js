@@ -177,6 +177,7 @@ module.exports = {
       await createLog.save();
 
     console.log(createLog, "createLog는 이것이다")
+    
       res.status(201).json({
         isSuccess: true,
         data: roomInfo,
