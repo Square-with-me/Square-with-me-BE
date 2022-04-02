@@ -154,6 +154,10 @@ io.on("connection", (socket) => {
     
     // 방 정보 남아있으면은 방 나가기 처리하도록
 
+    
+    if(users[roomId].includes(socket.id)) {
+    
+
       const data = {
         roomId,
         userId,
@@ -180,6 +184,8 @@ io.on("connection", (socket) => {
       delete socketToUser[socket.id];
       delete socketToRoom[socket.id];
 
+
+    };
   });
 });
 

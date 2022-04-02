@@ -315,51 +315,52 @@ module.exports = {
         default:
 
           
-          // 창훈 두 번째 시도
-          rooms = await Room.findAll({
-              where: {
-                [Op.or]: [
-                {title: { [Op.like]: `%${query}%` }},
-                // { "$Category.name$": {[Op.like]: `%${query}%`} },
-                // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-                ],
-              },
-              offset: offset,
-              limit: roomSearchingLimit,
-              attributes: [
-                "id",
-                "title",
-                "isSecret",
-                "createdAt",
-                "likeCnt",
-                "participantCnt",
-              ],
-              include: [
-                {
-                  model: Category,
-                  attributes: ["id", "name"],
-                  where: {
-                    [Op.or]: [ 
-                      {name: {[Op.like]: `%${query}%` }
-                    }
-                  ]}
-                },
-                {
-                  model: Tag,
-                  as: "Tags",
-                  attributes: ["id", "name"],
-                  through: { attributes: [] },
-                  where: {
-                    [Op.or]: [ 
-                      {name: {[Op.like]: `%${query}%` }
-                    }
-                  ]}
-                },
-              ],
-              order: [["createdAt", "desc"]],
-            });
+          //// 창훈 두 번째 시도
+          // rooms = await Room.findAll({
+          //     where: {
+          //       [Op.or]: [
+          //       {title: { [Op.like]: `%${query}%` }},
+          //       // { "$Category.name$": {[Op.like]: `%${query}%`} },
+          //       // { "$Tag.name$": {[Op.like]: `%${query}%`} },
+          //       ],
+          //     },
+          //     offset: offset,
+          //     limit: roomSearchingLimit,
+          //     attributes: [
+          //       "id",
+          //       "title",
+          //       "isSecret",
+          //       "createdAt",
+          //       "likeCnt",
+          //       "participantCnt",
+          //     ],
+          //     include: [
+          //       {
+          //         model: Category,
+          //         attributes: ["id", "name"],
+          //         where: {
+          //           [Op.or]: [ 
+          //             {name: {[Op.like]: `%${query}%` }
+          //           }
+          //         ]}
+          //       },
+          //       {
+          //         model: Tag,
+          //         as: "Tags",
+          //         attributes: ["id", "name"],
+          //         through: { attributes: [] },
+          //         where: {
+          //           [Op.or]: [ 
+          //             {name: {[Op.like]: `%${query}%` }
+          //           }
+          //         ]}
+          //       },
+          //     ],
+          //     order: [["createdAt", "desc"]],
+          //   });
 
-            console.log("rooms를 콘솔에 찍으면 이렇게 나온다.", rooms, "rooms를 콘솔에 찍으면 이렇게 나온다.")
+          //   console.log("rooms를 콘솔에 찍으면 이렇게 나온다.", rooms, "rooms를 콘솔에 찍으면 이렇게 나온다.")
+
 
 
         // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
@@ -434,38 +435,38 @@ module.exports = {
           //// 원래 코드
 
           // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-          // rooms = await Room.findAll({
-          //   where: {
-          //     [Op.or]: [
-          //     {title: { [Op.like]: `%${query}%` }},
-          //     // { "$Category.name$": {[Op.like]: `%${query}%`} },
-          //     // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-          //     ],
-          //   },
-          //   offset: offset,
-          //   limit: roomSearchingLimit,
-          //   attributes: [
-          //     "id",
-          //     "title",
-          //     "isSecret",
-          //     "createdAt",
-          //     "likeCnt",
-          //     "participantCnt",
-          //   ],
-          //   include: [
-          //     {
-          //       model: Category,
-          //       attributes: ["id", "name"],
-          //     },
-          //     {
-          //       model: Tag,
-          //       as: "Tags",
-          //       attributes: ["id", "name"],
-          //       through: { attributes: [] },
-          //     },
-          //   ],
-          //   order: [["createdAt", "desc"]],
-          // });
+          rooms = await Room.findAll({
+            where: {
+              [Op.or]: [
+              {title: { [Op.like]: `%${query}%` }},
+              // { "$Category.name$": {[Op.like]: `%${query}%`} },
+              // { "$Tag.name$": {[Op.like]: `%${query}%`} },
+              ],
+            },
+            offset: offset,
+            limit: roomSearchingLimit,
+            attributes: [
+              "id",
+              "title",
+              "isSecret",
+              "createdAt",
+              "likeCnt",
+              "participantCnt",
+            ],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "name"],
+              },
+              {
+                model: Tag,
+                as: "Tags",
+                attributes: ["id", "name"],
+                through: { attributes: [] },
+              },
+            ],
+            order: [["createdAt", "desc"]],
+          });
           break;
       };
 
