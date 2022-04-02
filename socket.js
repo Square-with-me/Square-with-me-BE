@@ -6,6 +6,12 @@ const io = require("socket.io")(server, {
   },
 });
 
+const {
+  sockets: {
+      adapter: { sids, rooms },
+  },
+} = io;
+
 //controller
 const RoomController = require("./controllers/roomController");
 
@@ -149,6 +155,7 @@ io.on("connection", (socket) => {
     // 방 정보 남아있으면은 방 나가기 처리하도록
 
     console.log("if(users[roomId].includes(socket.id))이 트루인지 펄스인지 궁금하다 조건문 실행 before", users[roomId].includes(socket.id)? true: false)
+    console.log("disconnecting 할 때 조건문 before",sids );
     if(users[roomId].includes(socket.id)) {
       
       const data = {
@@ -181,7 +188,7 @@ io.on("connection", (socket) => {
       console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
     };
     console.log("조건문 실행 after", users[roomId].includes(socket.id)? true: false)
-
+    console.log("disconnecting 할 때 조건문 after",sids );
   });
 });
 
