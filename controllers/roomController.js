@@ -314,42 +314,157 @@ module.exports = {
 
         default:
 
-          // category
-          //
+          
+          // 창훈 두 번째 시도
+          rooms = await Room.findAll({
+              where: {
+                [Op.or]: [
+                {title: { [Op.like]: `%${query}%` }},
+                // { "$Category.name$": {[Op.like]: `%${query}%`} },
+                // { "$Tag.name$": {[Op.like]: `%${query}%`} },
+                ],
+              },
+              offset: offset,
+              limit: roomSearchingLimit,
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+              ],
+              order: [["createdAt", "desc"]],
+            });
+
+
+
+        // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
+        // const searchingCategories = await Category.findAll({
+        //   where: {
+        //     name: { [Op.like]: `%${query}%` }},
+        // })
+
+        // // 예를 들어 '뷰티 운동' 이라고 입력하면 두 카테고리 모두 나와야 하는 것이 아닌지?
+
+        // const searchingTags = await Tag.findAll({
+        //   where: {
+        //     name: { [Op.like]: `%${query}%` }},
+        // },
+
+        // )
+        // // 관련된 모든 태그 모두 출동하려면?
+
+        // // 해당되는 모든 방제목 검색
+
+        // const searchingTitles = await Room.findAll({
+        //   where: {
+        //     title: { [Op.like]: `%${query}%` }},
+        // })
+        // // findAll 은 리스트형, 즉, 배열을 반환
+
+
+        //   let searchingTitle
+        //   let searchingTag
+        //   let searchingTitle
+          
+
+        //   let rooms = []
+
+        // // 제목이 들어맞는 방
+        //   searchingRoomTitle.map( v => 
+        //    searchingRoom = await Room.findOne({
+        //       where: {
+        //         title: `${v.title}`},
+        //       // offset: offset,
+        //       // limit: roomSearchingLimit,
+        //       attributes: [
+        //         "id",
+        //         "title",
+        //         "isSecret",
+        //         "createdAt",
+        //         "likeCnt",
+        //         "participantCnt",
+        //       ],
+        //       include: [
+        //         {
+        //           model: Category,
+        //           attributes: ["id", "name"],
+        //         },
+        //         {
+        //           model: Tag,
+        //           as: "Tags",
+        //           attributes: ["id", "name"],
+        //           through: { attributes: [] },
+        //         },
+        //       ],
+        //       // order: [["createdAt", "desc"]],
+        //     }),
+        //     rooms. push(searchingRoom) // 찾은 결괏 값을 하나씩 여기에 넣어준다.
+
+        //     )
+         
+
+
+
+
+          //// 원래 코드
 
           // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-          rooms = await Room.findAll({
-            where: {
-              [Op.or]: [
-              {title: { [Op.like]: `%${query}%` }},
-              // { "$Category.name$": {[Op.like]: `%${query}%`} },
-              // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-              ],
-            },
-            offset: offset,
-            limit: roomSearchingLimit,
-            attributes: [
-              "id",
-              "title",
-              "isSecret",
-              "createdAt",
-              "likeCnt",
-              "participantCnt",
-            ],
-            include: [
-              {
-                model: Category,
-                attributes: ["id", "name"],
-              },
-              {
-                model: Tag,
-                as: "Tags",
-                attributes: ["id", "name"],
-                through: { attributes: [] },
-              },
-            ],
-            order: [["createdAt", "desc"]],
-          });
+          // rooms = await Room.findAll({
+          //   where: {
+          //     [Op.or]: [
+          //     {title: { [Op.like]: `%${query}%` }},
+          //     // { "$Category.name$": {[Op.like]: `%${query}%`} },
+          //     // { "$Tag.name$": {[Op.like]: `%${query}%`} },
+          //     ],
+          //   },
+          //   offset: offset,
+          //   limit: roomSearchingLimit,
+          //   attributes: [
+          //     "id",
+          //     "title",
+          //     "isSecret",
+          //     "createdAt",
+          //     "likeCnt",
+          //     "participantCnt",
+          //   ],
+          //   include: [
+          //     {
+          //       model: Category,
+          //       attributes: ["id", "name"],
+          //     },
+          //     {
+          //       model: Tag,
+          //       as: "Tags",
+          //       attributes: ["id", "name"],
+          //       through: { attributes: [] },
+          //     },
+          //   ],
+          //   order: [["createdAt", "desc"]],
+          // });
           break;
       };
 
