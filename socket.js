@@ -6,6 +6,12 @@ const io = require("socket.io")(server, {
   },
 });
 
+const {
+  sockets: {
+      adapter: { sids, rooms },
+  },
+} = io;
+
 //controller
 const RoomController = require("./controllers/roomController");
 
@@ -145,11 +151,43 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnecting", async () => {
-    console.log(socket.id, socketToNickname[socket.id], "님의 연결이 끊겼어요.");
+    
     // 방 정보 남아있으면은 방 나가기 처리하도록
+
+    
+    if(users[roomId].includes(socket.id)) {
+    
+
+      const data = {
+        roomId,
+        userId,
+        time: time,
+        categoryId: categoryId,
+        date: date,
+      };
+  
+      await RoomController.delete.participant(data);
+  
+      if(users[roomId]) {
+        users[roomId] = users[roomId].filter((id) => id !== socket.id);
+      };
+      const userInfo = socketToUser[socket.id];
+  
+      socket.broadcast.to(roomId).emit("user left", {
+        socketId: socket.id,
+        userInfo,
+      });
+  
+      socket.leave(roomId);
+  
+      delete socketToNickname[socket.id];
+      delete socketToUser[socket.id];
+      delete socketToRoom[socket.id];
+
+
+    };
   });
 });
-
 
 
 module.exports = { server };
