@@ -6,12 +6,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-const {
-  sockets: {
-      adapter: { sids, rooms },
-  },
-} = io;
-
 //controller
 const RoomController = require("./controllers/roomController");
 
@@ -151,13 +145,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnecting", async () => {
-    
     // 방 정보 남아있으면은 방 나가기 처리하도록
-
-    
     if(users[roomId].includes(socket.id)) {
-    
-
       const data = {
         roomId,
         userId,
@@ -183,11 +172,8 @@ io.on("connection", (socket) => {
       delete socketToNickname[socket.id];
       delete socketToUser[socket.id];
       delete socketToRoom[socket.id];
-
-
     };
   });
 });
-
 
 module.exports = { server };

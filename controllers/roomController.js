@@ -99,9 +99,6 @@ module.exports = {
       const category = roomInfo.category.id;
       const entryTime = dateUtil.koreanDate();
       const roomTitle = roomInfo.title;
-
-      console.log(roomInfo, "roomInfo는 이것이다!");
-      console.log(roomTitle, "roomTitle은 이것이다!")
       
       const createLog = new Log({
         userId,
@@ -112,7 +109,6 @@ module.exports = {
       });
       await createLog.save();
 
-      console.log(createLog, "createLog는 이것이다")
       return res.status(201).json({
         isSuccess: true,
         data: roomInfo,
@@ -552,7 +548,6 @@ module.exports = {
 
   delete: {
     participant: async (data) => {
-      console.log("data", data);
       try {
         const { roomId, userId, time, categoryId, date } = data; // time: 분 단위, date: 방 입장 시점의 날짜
 
@@ -730,9 +725,7 @@ module.exports = {
                 category: "beauty",
               });
 
-              console.log("뷰티 시간 저장아 되어랏, 일요일");
               updateOption[day] = preRecord[day] + time;
-
               await preRecord.update(updateOption);
               break;
             case 2:
