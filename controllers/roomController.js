@@ -318,7 +318,7 @@ module.exports = {
 
           // 제목, 카테고리, 태그 순으로 조건에 부합하는 방 모두 가져오기
           // 겹치는 방이 없도록 배열 내 중복 제거
-          // 시간 순과 desc 순으로 정렬
+          // 시간 순과 내림차순으로 정렬
           // 이떄 offset과 roomSearchingLimit은 적용하지 않음, 태그로 찾은 방, 카테고리로 찾은 방, 제목으로 찾은 방 간에 시간차가 있기 떄문,
           // 예를 들어 각각 7개의 방을 찾았는데 시간 순으로 따졌을 때 태그 2, 카테고리 2개, 제목 3개 총 7개의 방이 노출됨,
           // 여기서 offset으로 각각의 Room.findAll 마다 방을 7개씩 건너가 버리면 중간에 생략되는 방들이 생김
@@ -417,222 +417,58 @@ module.exports = {
               order: [["createdAt", "desc"]],
             });
           
-          
-            // 중복 제거 및 ["createdAt", "desc"] 
-
-            // rooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
-            
-            // rooms = roomsByTitle[0].dataValues.createdAt // 이런 형태면 날짜 정보를 꺼내올 수 있다
-
-            // arr.sort((a, b) => b - a)  숫자 내림차순
 
             // 구한 배열 모두 합치기
             
-            let rooms2 = []
-            rooms2 = rooms2.concat(roomsByTitle, roomsByTag, roomsByCategory)
-
-            console.log('rooms2는 이것이다.ㅏㅏㅏ', rooms2)
-            console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
-
-
-            // 배열 값 위치 변환에 사용되는 변수
-            let a;
-            let b;
+            let searchRooms = []
+            searchRooms = searchRooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
           
-
-            console.log("rooms2의 인덱스 0000000000", rooms2[0], "rooms2의 인덱스 0000000000")
-            console.log("rooms2[0].dataValues", rooms2[0].dataValues, "rooms2[0].dataValues")
-            
-            console.log("rooms2.length", rooms2.length, "rooms2.length")
-            console.log("rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt", rooms2[0].dataValues.createdAt === rooms2[0].dataValues.createdAt, "rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt")
-            console.log("rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()", rooms2[0].dataValues.createdAt.getTime() === rooms2[0].dataValues.createdAt.getTime(), "rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()");
-            console.log("여기는 뭘까?", rooms2[0].dataValues.createdAt.getTime() === rooms2[1].dataValues.createdAt.getTime());
-            
             // 중복 데이터 제거
-            for (let i = 0 ; i < rooms2.length - 1 ; i++) {
+            
+            let uniqueRooms = []
+            let uniqueRoomsTitles = []
+
+                searchRooms.map((v) => {if (!uniqueRoomsTitles.includes(v.dataValues.title)) {
+                uniqueRooms.push(v)
+                uniqueRoomsTitles.push(v.dataValues.title)
+                }
+             }
+          )
+        
               // 시간끼리 이렇게 비교해도 가능
-            if(rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()) 
-            // if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) )
-            { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
+            // if(uniqueRooms[i].dataValues.createdAt.getTime() === uniqueRooms[i+1].dataValues.createdAt.getTime()) 
+            // if( JSON.stringify(uniqueRooms[i].dataValues) === JSON.stringify(uniqueRooms[i+1].dataValues) )
+            // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
 
-              // 방이 있을 때 까지만 실행   
-                b = rooms2[rooms2.length-1]
-                rooms2[rooms2.length-1] = rooms2[i] 
-                rooms2[i] = b
-                rooms2.pop()
-                i = -1
-              
-            }
-          }
-
-          
 
           // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
-            for (let i = 0 ; i < rooms2.length - 1 ; i++) {
-            if(rooms2[i].dataValues.createdAt < rooms2[i+1].dataValues.createdAt) {
-              a = rooms2[i]
-              rooms2[i] = rooms2[i+1]
-              rooms2[i+1] = a
+
+          // 배열 값 위치 변환에 사용되는 변수
+          
+          let tempSaved;
+
+            for (let i = 0 ; i < uniqueRooms.length - 1 ; i++) {
+            if(uniqueRooms[i].dataValues.createdAt < uniqueRooms[i+1].dataValues.createdAt) {
+              tempSaved = uniqueRooms[i]
+              uniqueRooms[i] = uniqueRooms[i+1]
+              uniqueRooms[i+1] = tempSaved
               i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
             }
             }
             
-            // 그중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
+
+            // 그 중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
 
             if (page === 1) {
-              if (rooms2.length < 7) { // 결과물이 7개 미만인 경우
-                rooms = rooms2.slice(0,rooms2.length)
+              if (uniqueRooms.length < 7) { // 결과물이 7개 미만인 경우
+                rooms = uniqueRooms.slice(0,uniqueRooms.length)
               } else {
-                rooms = rooms2.slice(0, 7)
+                rooms = uniqueRooms.slice(0, 7)
               }
             } else {
-              rooms  = rooms2.slice(7 + 8*(page-2), 7 + 8*(page-1))
+              rooms  = uniqueRooms.slice(7 + 8*(page-2), 7 + 8*(page-1))
             }
-            
           
-        /*
-        for (a ; a < slicedArray.length ; a++){
-
-  if (slicedArray[a] > slicedArray[a+1]) {
-  d = slicedArray[a]
-  slicedArray[a] = slicedArray[a+1]
-  slicedArray[a+1] = d
-  a = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
-    }
-
-}
-        */
-
-
-            // console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
-            // console.log(roomsByTitle.room, "roomsByTitle.room roomsByTitle.room");// undefined
-            // console.log(roomsByTitle.dataValues, "roomsByTitle.dataValues roomsByTitle.dataValues"); // undefined
-            // console.log(roomsByTitle.room.dataValues, "roomsByTitle.room.dataValues roomsByTitle.room.dataValues"); 이건 안됨
-            // console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
-            // console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
-            
-            
-            
-            // rooms = 
-            
-
-
-
-
-          //// 창훈 두 번째 시도
-          // rooms = await Room.findAll({
-          //     where: {
-          //       [Op.or]: [
-          //       {title: { [Op.like]: `%${query}%` }},
-          //       // { "$Category.name$": {[Op.like]: `%${query}%`} },
-          //       // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-          //       ],
-          //     },
-          //     offset: offset,
-          //     limit: roomSearchingLimit,
-          //     attributes: [
-          //       "id",
-          //       "title",
-          //       "isSecret",
-          //       "createdAt",
-          //       "likeCnt",
-          //       "participantCnt",
-          //     ],
-          //     include: [
-          //       {
-          //         model: Category,
-          //         attributes: ["id", "name"],
-          //         where: {
-          //           [Op.or]: [ 
-          //             {name: {[Op.like]: `%${query}%` }
-          //           }
-          //         ]}
-          //       },
-          //       {
-          //         model: Tag,
-          //         as: "Tags",
-          //         attributes: ["id", "name"],
-          //         through: { attributes: [] },
-          //         where: {
-          //           [Op.or]: [ 
-          //             {name: {[Op.like]: `%${query}%` }
-          //           }
-          //         ]}
-          //       },
-          //     ],
-          //     order: [["createdAt", "desc"]],
-          //   });
-
-          //   console.log("rooms를 콘솔에 찍으면 이렇게 나온다.", rooms, "rooms를 콘솔에 찍으면 이렇게 나온다.")
-
-
-
-        // // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
-        // const searchingCategories = await Category.findAll({
-        //   where: {
-        //     name: { [Op.like]: `%${query}%` }},
-        // })
-
-        // // 예를 들어 '뷰티 운동' 이라고 입력하면 두 카테고리 모두 나와야 하는 것이 아닌지?
-
-        // const searchingTags = await Tag.findAll({
-        //   where: {
-        //     name: { [Op.like]: `%${query}%` }},
-        // },
-
-        // )
-        // // 관련된 모든 태그 모두 출동하려면?
-
-        // // 해당되는 모든 방제목 검색
-
-        // const searchingTitles = await Room.findAll({
-        //   where: {
-        //     title: { [Op.like]: `%${query}%` }},
-        // })
-        // // findAll 은 리스트형, 즉, 배열을 반환
-
-
-        //   let searchingTitle
-        //   let searchingTag
-        //   let searchingTitle
-          
-
-        //   let rooms = []
-
-        // // 제목이 들어맞는 방
-        //   searchingRoomTitle.map( v => 
-        //    searchingRoom = await Room.findOne({
-        //       where: {
-        //         title: `${v.title}`},
-        //       // offset: offset,
-        //       // limit: roomSearchingLimit,
-        //       attributes: [
-        //         "id",
-        //         "title",
-        //         "isSecret",
-        //         "createdAt",
-        //         "likeCnt",
-        //         "participantCnt",
-        //       ],
-        //       include: [
-        //         {
-        //           model: Category,
-        //           attributes: ["id", "name"],
-        //         },
-        //         {
-        //           model: Tag,
-        //           as: "Tags",
-        //           attributes: ["id", "name"],
-        //           through: { attributes: [] },
-        //         },
-        //       ],
-        //       // order: [["createdAt", "desc"]],
-        //     }),
-        //     rooms. push(searchingRoom) // 찾은 결괏 값을 하나씩 여기에 넣어준다.
-
-        //     )
-         
-
 
           //// 원래 코드
 
