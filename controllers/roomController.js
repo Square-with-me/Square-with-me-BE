@@ -431,7 +431,7 @@ module.exports = {
             let rooms2 = []
             rooms2 = rooms2.concat(roomsByTitle, roomsByTag, roomsByCategory)
 
-            console.log(rooms2, 'rooms는 이것이다.ㅏㅏㅏ')
+            console.log('rooms2는 이것이다.ㅏㅏㅏ', rooms2)
             console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
 
 
@@ -439,12 +439,14 @@ module.exports = {
             let b;
           
 
-            // if(rooms[i].dataValues.createdAt.getTime() === rooms[i+1].dataValues.createdAt.getTime()) 시간끼리 이렇게 비교해도 가능
+            
 
             // 중복 데이터 제거
             for (let i = 0 ; i < rooms2.length ; i++) {
-            
-            if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) ) { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
+              // 시간끼리 이렇게 비교해도 가능
+            if(rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()) 
+            // if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) )
+            { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
               b = rooms2[rooms2.length-1]
               rooms2[room2.length-1] = rooms2[i] 
               rooms2[i] = b
