@@ -449,21 +449,26 @@ module.exports = {
             console.log("여기는 뭘까?", rooms2[0].dataValues.createdAt.getTime() === rooms2[1].dataValues.createdAt.getTime());
             
             // 중복 데이터 제거
-            for (let i = 0 ; i < rooms2.length ; i++) {
+            for (let i = 0 ; i < rooms2.length - 1 ; i++) {
               // 시간끼리 이렇게 비교해도 가능
             if(rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()) 
             // if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) )
             { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
-              b = rooms2[rooms2.length-1]
-              rooms2[rooms2.length-1] = rooms2[i] 
-              rooms2[i] = b
-              rooms2.pop()
-              i = -1
+
+              // 방이 있을 때 까지만 실행   
+                b = rooms2[rooms2.length-1]
+                rooms2[rooms2.length-1] = rooms2[i] 
+                rooms2[i] = b
+                rooms2.pop()
+                i = -1
+              
             }
           }
 
+          
+
           // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
-            for (let i = 0 ; i < rooms2.length ; i++) {
+            for (let i = 0 ; i < rooms2.length - 1 ; i++) {
             if(rooms2[i].dataValues.createdAt < rooms2[i+1].dataValues.createdAt) {
               a = rooms2[i]
               rooms2[i] = rooms2[i+1]
