@@ -416,16 +416,18 @@ module.exports = {
           
             // 중복 제거 및 ["createdAt", "desc"] 
 
-            rooms = [roomsByTitle, roomsByTag, roomsByCategory]
+            rooms = new Room(roomsByTitle.dataValues, roomsByTag.dataValues, roomsByCategory.dataValues).findAll({
+              order: [["createdAt", "desc"]],
+            })
 
-            console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
+            console.log(roomsByTitle.dataValues, "roomsByTitle roomsByTitle roomsByTitle");
             console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
             console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
               console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
-              console.log(rooms, '이 위를 봐야한다ㅏㅏㅏㅏ')
+              console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
             
-
+            // rooms = 
             
 
 
