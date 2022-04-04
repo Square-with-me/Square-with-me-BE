@@ -435,11 +435,14 @@ module.exports = {
             console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
 
 
+            // 배열 값 위치 변환에 사용되는 변수
             let a;
             let b;
           
 
             console.log("rooms2의 인덱스 0000000000", rooms2[0], "rooms2의 인덱스 0000000000")
+            console.log("rooms2[0].dataValues", rooms2[0].dataValues, "rooms2[0].dataValues")
+            console.log("rooms2[0].room.dataValues", rooms2[0].room.dataValues, "rooms2[0].room.dataValues")
 
             // 중복 데이터 제거
             for (let i = 0 ; i < rooms2.length ; i++) {
@@ -448,7 +451,7 @@ module.exports = {
             // if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) )
             { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
               b = rooms2[rooms2.length-1]
-              rooms2[room2.length-1] = rooms2[i] 
+              rooms2[rooms2.length-1] = rooms2[i] 
               rooms2[i] = b
               rooms2.pop()
               i = -1
