@@ -1,6 +1,7 @@
 {
   "files": [
     "./controllers/authController_notCookie.ts",
+    "./controllers/authController.ts",
     "./controllers/roomController.ts",
     "./controllers/userController.ts"
   ],
