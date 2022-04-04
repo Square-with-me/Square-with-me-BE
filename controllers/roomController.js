@@ -431,7 +431,10 @@ module.exports = {
             let rooms2 = []
             rooms2 = rooms2.concat(roomsByTitle, roomsByTag, roomsByCategory)
 
-            
+            console.log(rooms2, 'rooms는 이것이다.ㅏㅏㅏ')
+            console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
+
+
             let a;
             let b;
           
@@ -494,8 +497,7 @@ module.exports = {
             // console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
             // console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
-            console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
-            console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
+            
             
             // rooms = 
             
