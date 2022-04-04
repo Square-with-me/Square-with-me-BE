@@ -418,7 +418,7 @@ module.exports = {
 
             // rooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
             
-            rooms = roomsByTitle[0].room.dataValues
+            rooms = roomsByTitle[0].dataValues
 
 
             // console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
