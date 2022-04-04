@@ -416,13 +416,15 @@ module.exports = {
           
             // 중복 제거 및 ["createdAt", "desc"] 
 
-            rooms = roomsByTitle
+            // rooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
             
+            rooms = roomsByTitle[0].room.dataValues
 
-            console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
-            console.log(roomsByTitle.room, "roomsByTitle.room roomsByTitle.room");
-            console.log(roomsByTitle.dataValues, "roomsByTitle.dataValues roomsByTitle.dataValues");
-            console.log(roomsByTitle.room.dataValues, "roomsByTitle.room.dataValues roomsByTitle.room.dataValues");
+
+            // console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
+            // console.log(roomsByTitle.room, "roomsByTitle.room roomsByTitle.room");// undefined
+            // console.log(roomsByTitle.dataValues, "roomsByTitle.dataValues roomsByTitle.dataValues"); // undefined
+            // console.log(roomsByTitle.room.dataValues, "roomsByTitle.room.dataValues roomsByTitle.room.dataValues"); 이건 안됨
             // console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
             // console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
