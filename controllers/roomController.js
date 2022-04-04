@@ -314,7 +314,120 @@ module.exports = {
 
         default:
 
+          // 창훈 세번째 시도
+
+          // 제목, 카테고리, 태그 순으로 조건에 부합하는 방 모두 가져오기
+          // 겹치는 방이 없도록 배열 내 중복 제거
+          // 시간 순과 desc 순으로 정렬
+
+          const roomsByTitle = await Room.findAll({
+              where: {
+                [Op.or]: [
+                {title: { [Op.like]: `%${query}%` }},
+                ],
+              },
+              offset: offset,
+              limit: roomSearchingLimit,
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                },
+              ],
+              // order: [["createdAt", "desc"]],
+            });
+        
+            const roomsByTag = await Room.findAll({
+              offset: offset,
+              limit: roomSearchingLimit,
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+              ],
+              // order: [["createdAt", "desc"]],
+            });
+
+            const roomsByCategory = await Room.findAll({
+              offset: offset,
+              limit: roomSearchingLimit,
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                },
+              ],
+              // order: [["createdAt", "desc"]],
+            });
           
+          
+            // 중복 제거 및 ["createdAt", "desc"] 대로 정렬 필요
+
+            rooms = [roomsByTitle, roomsByTag, roomsByCategory]
+
+            
+              console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
+              console.log(rooms, '이 위를 봐야한다ㅏㅏㅏㅏ')
+            
+
+            
+
+
+
+
           //// 창훈 두 번째 시도
           // rooms = await Room.findAll({
           //     where: {
@@ -363,7 +476,7 @@ module.exports = {
 
 
 
-        // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
+        // // 창훈 첫번째 시도, 한 요소씩 찾아서 별도의 배열에 집어넣고 시간순으로 나열하여 반환하려했음, 시간 복잡도가 너무 클 것으로 예상 ex) 정렬을 위해 또다시 map, filter, includes같은 함수들을 써야할 것 같음
         // const searchingCategories = await Category.findAll({
         //   where: {
         //     name: { [Op.like]: `%${query}%` }},
@@ -430,43 +543,42 @@ module.exports = {
          
 
 
-
-
           //// 원래 코드
 
-          // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-          rooms = await Room.findAll({
-            where: {
-              [Op.or]: [
-              {title: { [Op.like]: `%${query}%` }},
-              // { "$Category.name$": {[Op.like]: `%${query}%`} },
-              // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-              ],
-            },
-            offset: offset,
-            limit: roomSearchingLimit,
-            attributes: [
-              "id",
-              "title",
-              "isSecret",
-              "createdAt",
-              "likeCnt",
-              "participantCnt",
-            ],
-            include: [
-              {
-                model: Category,
-                attributes: ["id", "name"],
-              },
-              {
-                model: Tag,
-                as: "Tags",
-                attributes: ["id", "name"],
-                through: { attributes: [] },
-              },
-            ],
-            order: [["createdAt", "desc"]],
-          });
+          // // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
+          // rooms = await Room.findAll({
+          //   where: {
+          //     [Op.or]: [
+          //     {title: { [Op.like]: `%${query}%` }},
+          //     // { "$Category.name$": {[Op.like]: `%${query}%`} },
+          //     // { "$Tag.name$": {[Op.like]: `%${query}%`} },
+          //     ],
+          //   },
+          //   offset: offset,
+          //   limit: roomSearchingLimit,
+          //   attributes: [
+          //     "id",
+          //     "title",
+          //     "isSecret",
+          //     "createdAt",
+          //     "likeCnt",
+          //     "participantCnt",
+          //   ],
+          //   include: [
+          //     {
+          //       model: Category,
+          //       attributes: ["id", "name"],
+          //     },
+          //     {
+          //       model: Tag,
+          //       as: "Tags",
+          //       attributes: ["id", "name"],
+          //       through: { attributes: [] },
+          //     },
+          //   ],
+          //   order: [["createdAt", "desc"]],
+          // });
+
           break;
       };
 
