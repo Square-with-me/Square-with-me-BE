@@ -1,0 +1,10 @@
+{
+  "files": ["./authController_notCookie.ts", "./userController.ts", "./roomController.ts"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "strictFunctionTypes": true
+  }
+}
