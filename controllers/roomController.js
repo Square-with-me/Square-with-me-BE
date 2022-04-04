@@ -416,10 +416,10 @@ module.exports = {
           
             // 중복 제거 및 ["createdAt", "desc"] 
 
-            rooms = [roomsByTitle.dataValues, roomsByTag.dataValues, roomsByCategory.dataValues]
+            rooms = [roomsByTitle.room.dataValues, roomsByTag.room.dataValues, roomsByCategory.room.dataValues]
             
 
-            console.log(roomsByTitle.dataValues, "roomsByTitle roomsByTitle roomsByTitle");
+            console.log(roomsByTitle.room.dataValues, "roomsByTitle roomsByTitle roomsByTitle");
             console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
             console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
