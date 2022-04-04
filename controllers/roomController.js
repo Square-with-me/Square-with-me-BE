@@ -439,7 +439,7 @@ module.exports = {
             let b;
           
 
-            
+            console.log("rooms2의 인덱스 0000000000", rooms2[0], "rooms2의 인덱스 0000000000")
 
             // 중복 데이터 제거
             for (let i = 0 ; i < rooms2.length ; i++) {
@@ -459,8 +459,8 @@ module.exports = {
             for (let i = 0 ; i < rooms2.length ; i++) {
             if(rooms2[i].dataValues.createdAt < rooms2[i+1].dataValues.createdAt) {
               a = rooms2[i]
-              rooms2[i] = rooms2 [i+1]
-              rooms2 [i+1] = a
+              rooms2[i] = rooms2[i+1]
+              rooms2[i+1] = a
               i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
             }
             }
@@ -468,7 +468,7 @@ module.exports = {
             // 그중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
 
             if (page === 1) {
-              if (rooms2.length < 7) {
+              if (rooms2.length < 7) { // 결과물이 7개 미만인 경우
                 rooms = rooms2.slice(0,rooms2.length)
               } else {
                 rooms = rooms2.slice(0, 7)
