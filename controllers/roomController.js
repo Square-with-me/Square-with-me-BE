@@ -348,7 +348,7 @@ module.exports = {
                   through: { attributes: [] },
                 },
               ],
-              // order: [["createdAt", "desc"]],
+              order: [["createdAt", "desc"]],
             });
         
             const roomsByTag = await Room.findAll({
@@ -379,7 +379,7 @@ module.exports = {
                   ]}
                 },
               ],
-              // order: [["createdAt", "desc"]],
+              order: [["createdAt", "desc"]],
             });
 
             const roomsByCategory = await Room.findAll({
@@ -410,14 +410,17 @@ module.exports = {
                   through: { attributes: [] },
                 },
               ],
-              // order: [["createdAt", "desc"]],
+              order: [["createdAt", "desc"]],
             });
           
           
-            // 중복 제거 및 ["createdAt", "desc"] 대로 정렬 필요
+            // 중복 제거 및 ["createdAt", "desc"] 
 
             rooms = [roomsByTitle, roomsByTag, roomsByCategory]
 
+            console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
+            console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
+            console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
               console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
               console.log(rooms, '이 위를 봐야한다ㅏㅏㅏㅏ')
