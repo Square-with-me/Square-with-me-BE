@@ -416,9 +416,8 @@ module.exports = {
           
             // 중복 제거 및 ["createdAt", "desc"] 
 
-            rooms = new Room(roomsByTitle.dataValues, roomsByTag.dataValues, roomsByCategory.dataValues).findAll({
-              order: [["createdAt", "desc"]],
-            })
+            rooms = [roomsByTitle.dataValues, roomsByTag.dataValues, roomsByCategory.dataValues]
+            
 
             console.log(roomsByTitle.dataValues, "roomsByTitle roomsByTitle roomsByTitle");
             console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
