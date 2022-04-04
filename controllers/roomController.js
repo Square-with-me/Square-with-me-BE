@@ -444,13 +444,14 @@ module.exports = {
             console.log("rooms2[0].dataValues", rooms2[0].dataValues, "rooms2[0].dataValues")
             
             console.log("rooms2.length", rooms2.length, "rooms2.length")
-            console.log("rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt", rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt, "rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt")
-            console.log("rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()", rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime(), "rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()");
-
+            console.log("rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt", rooms2[0].dataValues.createdAt === rooms2[0].dataValues.createdAt, "rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt")
+            console.log("rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()", rooms2[0].dataValues.createdAt.getTime() === rooms2[0].dataValues.createdAt.getTime(), "rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()");
+            console.log("여기는 뭘까?", rooms2[0].dataValues.createdAt.getTime() === rooms2[1].dataValues.createdAt.getTime());
+            
             // 중복 데이터 제거
             for (let i = 0 ; i < rooms2.length ; i++) {
               // 시간끼리 이렇게 비교해도 가능
-            if(rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()) 
+            if(rooms2[0].dataValues.createdAt.getTime() === rooms2[0].dataValues.createdAt.getTime()) 
             // if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) )
             { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
               b = rooms2[rooms2.length-1]
