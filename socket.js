@@ -146,7 +146,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnecting", async () => {
     // 방 정보 남아있으면은 방 나가기 처리하도록
-    if(users[roomId].includes(socket.id)) {
+    if(users[roomId] && users[roomId].includes(socket.id)) {
       const data = {
         roomId,
         userId,
