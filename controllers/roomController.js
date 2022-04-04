@@ -314,8 +314,6 @@ module.exports = {
 
         default:
 
-          // 창훈 세번째 시도
-
           // 제목, 카테고리, 태그 순으로 조건에 부합하는 방 모두 가져오기
           // 겹치는 방이 없도록 배열 내 중복 제거
           // 시간 순과 내림차순으로 정렬
@@ -330,8 +328,6 @@ module.exports = {
                 {title: { [Op.like]: `%${query}%` }},
                 ],
               },
-              // offset: offset,
-              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -356,8 +352,6 @@ module.exports = {
             });
         
             const roomsByTag = await Room.findAll({
-              // offset: offset,
-              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -387,8 +381,6 @@ module.exports = {
             });
 
             const roomsByCategory = await Room.findAll({
-              // offset: offset,
-              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -418,12 +410,12 @@ module.exports = {
             });
           
 
-            // 구한 배열 모두 합치기
+            // 구한 방 목록 배열 모두 합치기
             
             let searchRooms = []
             searchRooms = searchRooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
           
-            // 중복 데이터 제거
+            // 중복된 방 데이터 제거
             
             let uniqueRooms = []
             let uniqueRoomsTitles = []
@@ -434,29 +426,21 @@ module.exports = {
                 }
              }
           )
-        
-              // 시간끼리 이렇게 비교해도 가능
-            // if(uniqueRooms[i].dataValues.createdAt.getTime() === uniqueRooms[i+1].dataValues.createdAt.getTime()) 
-            // if( JSON.stringify(uniqueRooms[i].dataValues) === JSON.stringify(uniqueRooms[i+1].dataValues) )
-            // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
 
 
           // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
-
-          // 배열 값 위치 변환에 사용되는 변수
           
-          let tempSaved;
+          let tempSaved; // 배열 값 위치 변환에 사용되는 변수
 
             for (let i = 0 ; i < uniqueRooms.length - 1 ; i++) {
             if(uniqueRooms[i].dataValues.createdAt < uniqueRooms[i+1].dataValues.createdAt) {
               tempSaved = uniqueRooms[i]
               uniqueRooms[i] = uniqueRooms[i+1]
               uniqueRooms[i+1] = tempSaved
-              i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
+              i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교 후 인덱스를 -1로 지정해주어 다시 시작
             }
             }
             
-
             // 그 중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
 
             if (page === 1) {
@@ -468,43 +452,6 @@ module.exports = {
             } else {
               rooms  = uniqueRooms.slice(7 + 8*(page-2), 7 + 8*(page-1))
             }
-          
-
-          //// 원래 코드
-
-          // // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-          // rooms = await Room.findAll({
-          //   where: {
-          //     [Op.or]: [
-          //     {title: { [Op.like]: `%${query}%` }},
-          //     // { "$Category.name$": {[Op.like]: `%${query}%`} },
-          //     // { "$Tag.name$": {[Op.like]: `%${query}%`} },
-          //     ],
-          //   },
-          //   offset: offset,
-          //   limit: roomSearchingLimit,
-          //   attributes: [
-          //     "id",
-          //     "title",
-          //     "isSecret",
-          //     "createdAt",
-          //     "likeCnt",
-          //     "participantCnt",
-          //   ],
-          //   include: [
-          //     {
-          //       model: Category,
-          //       attributes: ["id", "name"],
-          //     },
-          //     {
-          //       model: Tag,
-          //       as: "Tags",
-          //       attributes: ["id", "name"],
-          //       through: { attributes: [] },
-          //     },
-          //   ],
-          //   order: [["createdAt", "desc"]],
-          // });
 
           break;
       };
