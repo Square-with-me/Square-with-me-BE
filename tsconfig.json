@@ -1,5 +1,9 @@
 {
-  "files": ["./authController_notCookie.ts", "./userController.ts", "./roomController.ts"],
+  "files": [
+    "./controllers/authController_notCookie.ts",
+    "./controllers/roomController.ts",
+    "./controllers/userController.ts"
+  ],
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
