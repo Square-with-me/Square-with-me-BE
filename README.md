@@ -17,6 +17,6 @@
 # contributors
 |name|position|github|
 |------|---|---|
-|장현광|BE / Node.js|https://github.com/Hyeon-Gwang|
-|장창훈|BE / Node.js|https://github.com/Hoon333|
-|황성원|BE / Node.js|https://github.com/Magiof|
+|장현광|Node.js|https://github.com/Hyeon-Gwang|
+|장창훈|Node.js|https://github.com/Hoon333|
+|황성원|Node.js|https://github.com/Magiof|
