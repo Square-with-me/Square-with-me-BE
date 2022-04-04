@@ -28,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(10),
         allowNull: false,
       },
-      lastUpdated: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
       newBadge: {
         type: DataTypes.INTEGER,
         allowNull: true,

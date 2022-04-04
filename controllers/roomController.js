@@ -319,6 +319,10 @@ module.exports = {
           // 제목, 카테고리, 태그 순으로 조건에 부합하는 방 모두 가져오기
           // 겹치는 방이 없도록 배열 내 중복 제거
           // 시간 순과 desc 순으로 정렬
+          // 이떄 offset과 roomSearchingLimit은 적용하지 않음, 태그로 찾은 방, 카테고리로 찾은 방, 제목으로 찾은 방 간에 시간차가 있기 떄문,
+          // 예를 들어 각각 7개의 방을 찾았는데 시간 순으로 따졌을 때 태그 2, 카테고리 2개, 제목 3개 총 7개의 방이 노출됨,
+          // 여기서 offset으로 각각의 Room.findAll 마다 방을 7개씩 건너가 버리면 중간에 생략되는 방들이 생김
+          // 그렇기에 조건에 부합하는 모든 방을 다 찾은 다음 7개, 8개, 8개... 이렇게 보여주는 게 맞음
 
           const roomsByTitle = await Room.findAll({
               where: {
@@ -326,8 +330,8 @@ module.exports = {
                 {title: { [Op.like]: `%${query}%` }},
                 ],
               },
-              offset: offset,
-              limit: roomSearchingLimit,
+              // offset: offset,
+              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -352,8 +356,8 @@ module.exports = {
             });
         
             const roomsByTag = await Room.findAll({
-              offset: offset,
-              limit: roomSearchingLimit,
+              // offset: offset,
+              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -383,8 +387,8 @@ module.exports = {
             });
 
             const roomsByCategory = await Room.findAll({
-              offset: offset,
-              limit: roomSearchingLimit,
+              // offset: offset,
+              // limit: roomSearchingLimit,
               attributes: [
                 "id",
                 "title",
@@ -418,7 +422,69 @@ module.exports = {
 
             // rooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
             
-            rooms = roomsByTitle[0].dataValues.createdAt
+            // rooms = roomsByTitle[0].dataValues.createdAt // 이런 형태면 날짜 정보를 꺼내올 수 있다
+
+            // arr.sort((a, b) => b - a)  숫자 내림차순
+
+            // 구한 배열 모두 합치기
+            
+            let rooms2 = []
+            rooms2 = rooms2.concat(roomsByTitle, roomsByTag, roomsByCategory)
+
+            
+            let a;
+            let b;
+          
+
+            // if(rooms[i].dataValues.createdAt.getTime() === rooms[i+1].dataValues.createdAt.getTime()) 시간끼리 이렇게 비교해도 가능
+
+            // 중복 데이터 제거
+            for (let i = 0 ; i < rooms2.length ; i++) {
+            
+            if( JSON.stringify(rooms2[i].dataValues) === JSON.stringify(rooms2[i+1].dataValues) ) { // 객체 간 직접적 비교는 안되기에 객체를 문자열로 바꿔줌
+              b = rooms2[rooms2.length-1]
+              rooms2[room2.length-1] = rooms2[i] 
+              rooms2[i] = b
+              rooms2.pop()
+              i = -1
+            }
+          }
+
+          // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
+            for (let i = 0 ; i < rooms2.length ; i++) {
+            if(rooms2[i].dataValues.createdAt < rooms2[i+1].dataValues.createdAt) {
+              a = rooms2[i]
+              rooms2[i] = rooms2 [i+1]
+              rooms2 [i+1] = a
+              i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
+            }
+            }
+            
+            // 그중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
+
+            if (page === 1) {
+              if (rooms2.length < 7) {
+                rooms = rooms2.slice(0,rooms2.length)
+              } else {
+                rooms = rooms2.slice(0, 7)
+              }
+            } else {
+              rooms  = rooms2.slice(7 + 8*(page-2), 7 + 8*(page-1))
+            }
+            
+          
+        /*
+        for (a ; a < slicedArray.length ; a++){
+
+  if (slicedArray[a] > slicedArray[a+1]) {
+  d = slicedArray[a]
+  slicedArray[a] = slicedArray[a+1]
+  slicedArray[a+1] = d
+  a = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교후 인덱스를 -1로 지정해주어 다시 시작
+    }
+
+}
+        */
 
 
             // console.log(roomsByTitle, "roomsByTitle roomsByTitle roomsByTitle");
@@ -428,8 +494,8 @@ module.exports = {
             // console.log(roomsByTag, 'roomsByTag roomsByTag roomsByTag');
             // console.log(roomsByCategory, 'roomsByCategory roomsByCategory roomsByCategory');
             
-              console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
-              console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
+            console.log(rooms, 'rooms는 이것이다.ㅏㅏㅏ')
+            console.log('이 위를 봐야한다ㅏㅏㅏㅏ')
             
             // rooms = 
             
