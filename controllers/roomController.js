@@ -442,7 +442,10 @@ module.exports = {
 
             console.log("rooms2의 인덱스 0000000000", rooms2[0], "rooms2의 인덱스 0000000000")
             console.log("rooms2[0].dataValues", rooms2[0].dataValues, "rooms2[0].dataValues")
-            console.log("rooms2[0].room.dataValues", rooms2[0].room.dataValues, "rooms2[0].room.dataValues")
+            
+            console.log("rooms2.length", rooms2.length, "rooms2.length")
+            console.log("rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt", rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt, "rooms2[i].dataValues.createdAt === rooms2[i+1].dataValues.createdAt")
+            console.log("rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()", rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime(), "rooms2[i].dataValues.createdAt.getTime() === rooms2[i+1].dataValues.createdAt.getTime()");
 
             // 중복 데이터 제거
             for (let i = 0 ; i < rooms2.length ; i++) {
