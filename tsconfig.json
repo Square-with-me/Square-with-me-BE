@@ -3,7 +3,11 @@
     "./controllers/authController_notCookie.ts",
     "./controllers/authController.ts",
     "./controllers/roomController.ts",
-    "./controllers/userController.ts"
+    "./controllers/userController.ts",
+    "./utils/date.ts",
+    "./utils/util.ts",
+    "./utils/middleware.ts",
+    "./utils/jwt.ts"
   ],
   "compilerOptions": {
     "allowJs": true,
