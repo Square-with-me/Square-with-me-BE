@@ -316,38 +316,137 @@ module.exports = {
 
         default:
           // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-          rooms = await Room.findAll({
-            where: {
-              [Op.or]: [
-              {title: { [Op.like]: `%${query}%` }},
-              { "$Category.name$": {[Op.like]: `%${query}%`} },
-              { "$Tag.name$": {[Op.like]: `%${query}%`} },
+          const roomsByTitle = await Room.findAll({
+              where: {
+                [Op.or]: [
+                {title: { [Op.like]: `%${query}%` }},
+                ],
+              },
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
               ],
-            },
-            offset: offset,
-            limit: roomSearchingLimit,
-            attributes: [
-              "id",
-              "title",
-              "isSecret",
-              "createdAt",
-              "likeCnt",
-              "participantCnt",
-            ],
-            include: [
-              {
-                model: Category,
-                attributes: ["id", "name"],
-              },
-              {
-                model: Tag,
-                as: "Tags",
-                attributes: ["id", "name"],
-                through: { attributes: [] },
-              },
-            ],
-            order: [["createdAt", "desc"]],
-          });
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                },
+              ],
+              order: [["createdAt", "desc"]],
+            });
+        
+            const roomsByTag = await Room.findAll({
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+              ],
+              order: [["createdAt", "desc"]],
+            });
+
+            const roomsByCategory = await Room.findAll({
+              attributes: [
+                "id",
+                "title",
+                "isSecret",
+                "createdAt",
+                "likeCnt",
+                "participantCnt",
+              ],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"],
+                  where: {
+                    [Op.or]: [ 
+                      {name: {[Op.like]: `%${query}%` }
+                    }
+                  ]}
+                },
+                {
+                  model: Tag,
+                  as: "Tags",
+                  attributes: ["id", "name"],
+                  through: { attributes: [] },
+                },
+              ],
+              order: [["createdAt", "desc"]],
+            });
+          
+
+            // 구한 방 목록 배열 모두 합치기
+            
+            let searchRooms: any[] = []
+            searchRooms = searchRooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
+          
+            // 중복된 방 데이터 제거
+            
+            let uniqueRooms: any[] = []
+            let uniqueRoomsTitles: any[] = []
+
+                searchRooms.map((v) => {if (!uniqueRoomsTitles.includes(v.dataValues.title)) {
+                uniqueRooms.push(v)
+                uniqueRoomsTitles.push(v.dataValues.title)
+                }
+             }
+          )
+
+
+          // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
+          
+          let tempSaved; // 배열 값 위치 변환에 사용되는 변수
+
+            for (let i = 0 ; i < uniqueRooms.length - 1 ; i++) {
+            if(uniqueRooms[i].dataValues.createdAt < uniqueRooms[i+1].dataValues.createdAt) {
+              tempSaved = uniqueRooms[i]
+              uniqueRooms[i] = uniqueRooms[i+1]
+              uniqueRooms[i+1] = tempSaved
+              i = -1 // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교 후 인덱스를 -1로 지정해주어 다시 시작
+            }
+            }
+            
+            // 그 중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
+
+            if (Page === 1) {
+              if (uniqueRooms.length < 7) { // 결과물이 7개 미만인 경우
+                rooms = uniqueRooms.slice(0,uniqueRooms.length)
+              } else {
+                rooms = uniqueRooms.slice(0, 7)
+              }
+            } else {
+              rooms  = uniqueRooms.slice(7 + 8*(Page-2), 7 + 8*(Page-1))
+            }
+
           break;
       };
 

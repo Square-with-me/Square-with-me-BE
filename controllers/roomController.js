@@ -237,10 +237,10 @@ module.exports = {
     update: {},
     get: {
         rooms: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-            var _a, query, page, offset, Page, roomSearchingLimit, rooms, _b;
-            var _c, _d, _e, _f, _g, _h;
-            return __generator(this, function (_j) {
-                switch (_j.label) {
+            var _a, query, page, offset, Page, roomSearchingLimit, rooms, _b, roomsByTitle, roomsByTag, roomsByCategory, searchRooms, uniqueRooms_1, uniqueRoomsTitles_1, tempSaved, i;
+            var _c, _d, _e, _f, _g, _h, _j, _k;
+            return __generator(this, function (_l) {
+                switch (_l.label) {
                     case 0:
                         _a = req.query, query = _a.q, page = _a.p;
                         offset = 0;
@@ -289,8 +289,8 @@ module.exports = {
                         })];
                     case 2:
                         // 전체 방 목록 가져오기
-                        rooms = _j.sent();
-                        return [3 /*break*/, 7];
+                        rooms = _l.sent();
+                        return [3 /*break*/, 9];
                     case 3: return [4 /*yield*/, Room.findAll({
                             where: (_c = {},
                                 _c[Op.and] = [
@@ -323,18 +323,14 @@ module.exports = {
                             order: [["createdAt", "desc"]]
                         })];
                     case 4:
-                        rooms = _j.sent();
-                        return [3 /*break*/, 7];
+                        rooms = _l.sent();
+                        return [3 /*break*/, 9];
                     case 5: return [4 /*yield*/, Room.findAll({
                             where: (_e = {},
                                 _e[Op.or] = [
                                     { title: (_f = {}, _f[Op.like] = "%".concat(query, "%"), _f) },
-                                    { "$Category.name$": (_g = {}, _g[Op.like] = "%".concat(query, "%"), _g) },
-                                    { "$Tag.name$": (_h = {}, _h[Op.like] = "%".concat(query, "%"), _h) },
                                 ],
                                 _e),
-                            offset: offset,
-                            limit: roomSearchingLimit,
                             attributes: [
                                 "id",
                                 "title",
@@ -358,10 +354,102 @@ module.exports = {
                             order: [["createdAt", "desc"]]
                         })];
                     case 6:
-                        // 검색어로 검색하는 경우 => 비슷한 방 제목 목록 가져오기
-                        rooms = _j.sent();
-                        return [3 /*break*/, 7];
+                        roomsByTitle = _l.sent();
+                        return [4 /*yield*/, Room.findAll({
+                                attributes: [
+                                    "id",
+                                    "title",
+                                    "isSecret",
+                                    "createdAt",
+                                    "likeCnt",
+                                    "participantCnt",
+                                ],
+                                include: [
+                                    {
+                                        model: Category,
+                                        attributes: ["id", "name"]
+                                    },
+                                    {
+                                        model: Tag,
+                                        as: "Tags",
+                                        attributes: ["id", "name"],
+                                        through: { attributes: [] },
+                                        where: (_g = {},
+                                            _g[Op.or] = [
+                                                { name: (_h = {}, _h[Op.like] = "%".concat(query, "%"), _h)
+                                                }
+                                            ],
+                                            _g)
+                                    },
+                                ],
+                                order: [["createdAt", "desc"]]
+                            })];
                     case 7:
+                        roomsByTag = _l.sent();
+                        return [4 /*yield*/, Room.findAll({
+                                attributes: [
+                                    "id",
+                                    "title",
+                                    "isSecret",
+                                    "createdAt",
+                                    "likeCnt",
+                                    "participantCnt",
+                                ],
+                                include: [
+                                    {
+                                        model: Category,
+                                        attributes: ["id", "name"],
+                                        where: (_j = {},
+                                            _j[Op.or] = [
+                                                { name: (_k = {}, _k[Op.like] = "%".concat(query, "%"), _k)
+                                                }
+                                            ],
+                                            _j)
+                                    },
+                                    {
+                                        model: Tag,
+                                        as: "Tags",
+                                        attributes: ["id", "name"],
+                                        through: { attributes: [] }
+                                    },
+                                ],
+                                order: [["createdAt", "desc"]]
+                            })];
+                    case 8:
+                        roomsByCategory = _l.sent();
+                        searchRooms = [];
+                        searchRooms = searchRooms.concat(roomsByTitle, roomsByTag, roomsByCategory);
+                        uniqueRooms_1 = [];
+                        uniqueRoomsTitles_1 = [];
+                        searchRooms.map(function (v) {
+                            if (!uniqueRoomsTitles_1.includes(v.dataValues.title)) {
+                                uniqueRooms_1.push(v);
+                                uniqueRoomsTitles_1.push(v.dataValues.title);
+                            }
+                        });
+                        tempSaved = void 0;
+                        for (i = 0; i < uniqueRooms_1.length - 1; i++) {
+                            if (uniqueRooms_1[i].dataValues.createdAt < uniqueRooms_1[i + 1].dataValues.createdAt) {
+                                tempSaved = uniqueRooms_1[i];
+                                uniqueRooms_1[i] = uniqueRooms_1[i + 1];
+                                uniqueRooms_1[i + 1] = tempSaved;
+                                i = -1; // 서로의 앞뒤만 고려하는 것이 아닌 전체 수 내에서의 대소를 비교하기 위해 앞뒤 비교 후 인덱스를 -1로 지정해주어 다시 시작
+                            }
+                        }
+                        // 그 중 처음엔 7개, 그 다음엔 8개씩 보여주도록 하기
+                        if (Page === 1) {
+                            if (uniqueRooms_1.length < 7) { // 결과물이 7개 미만인 경우
+                                rooms = uniqueRooms_1.slice(0, uniqueRooms_1.length);
+                            }
+                            else {
+                                rooms = uniqueRooms_1.slice(0, 7);
+                            }
+                        }
+                        else {
+                            rooms = uniqueRooms_1.slice(7 + 8 * (Page - 2), 7 + 8 * (Page - 1));
+                        }
+                        return [3 /*break*/, 9];
+                    case 9:
                         ;
                         return [2 /*return*/, res.status(200).json({
                                 isSuccess: true,
