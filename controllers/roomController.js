@@ -410,11 +410,14 @@ module.exports = {
             });
           
 
+            
             // 구한 방 목록 배열 모두 합치기
+            
             
             let searchRooms = []
             searchRooms = searchRooms.concat(roomsByTitle, roomsByTag, roomsByCategory)
           
+            console.log("searchRooms", searchRooms, "searchRooms")
             // 중복된 방 데이터 제거
             
             let uniqueRooms = []
@@ -426,6 +429,8 @@ module.exports = {
                 }
              }
           )
+
+          console.log("uniqueRooms", uniqueRooms, "uniqueRooms");
 
 
           // 날짜 순으로 내림차순 (최신 글이 위에 배치되도록 함)
@@ -453,6 +458,7 @@ module.exports = {
               rooms  = uniqueRooms.slice(7 + 8*(page-2), 7 + 8*(page-1))
             }
 
+            console.log("rooms", rooms, "rooms")
           break;
       };
 
