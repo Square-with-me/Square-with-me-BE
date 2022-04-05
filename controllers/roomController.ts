@@ -793,7 +793,7 @@ module.exports = {
             await user.update({ newBadge: categoryBadge.id });
           }
         } else {
-          // 월 ~ 토 인 경우, '퇴장 시간 저장 - 뱃지 지급 여부 판단'
+          // 월 ~ 토 인 경우, "퇴장 시간 저장 - 뱃지 지급 여부 판단"
           // 주간 기록 저장
           const updateOption: objType = {};
           switch (categoryId) {
