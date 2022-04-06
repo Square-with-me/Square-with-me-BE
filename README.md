@@ -27,7 +27,9 @@
 2. clone
 3. npm install
 4. create .env
-5. npm run dev
+5. create MySQL DB: npx sequelize db:create
+6. npm run dev
+7. create seeds: npx sequelize db:seed:all
 ```
 
 ## Architecture
