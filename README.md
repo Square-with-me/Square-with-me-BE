@@ -10,81 +10,50 @@
 
 <h3 align='center'> 🙆 무엇이든 함께 할 수 있는 실시간 화상 채팅 🙆‍♂️ </h3>
   
-</br></br></br>
-
-## 📌 바로가기
-- <a href="https://nemowithme.com"> 🟪 with me 바로가기 </a></br>
-- <a href="https://github.com/Square-with-me/Square-with-me-BE"> 📁 백엔드 GitHub Repository </a></br>
-- <a href="https://www.youtube.com/watch?v=FtRGOCRLCSY&feature=youtu.be"> 🎥 프로젝트 발표 영상 보러가기 </a>
-- <a href="https://smart-surprise-3fe.notion.site/with-me-6638767634654e5490df2991947906f6"> 🟪 with me 팀노션 (Brochure) </a></br>
-- <a href="https://www.instagram.com/nemo_with_me/"> 🟪 with me 인스타그램 </a></br>
-
-</br></br></br>
-
-## ⏰ 프로젝트 기간
-
 </br>
 
-||기간 (2022)|
-|:------:|---|
-|총 기간| 2월 25일 ~ 4월 8일 (6주)|
-|배포일| 4월 1일|
-|사용자 설문조사| 4월 1일 ~ 4월 7일|
-|서비스 개선| 4월 1일 ~ 4월 8일|
+## 📌 바로가기
 
-</br></br></br>
+- <a href="https://nemowithme.com"> 🟪 with me </a></br>
+- <a href="https://github.com/Square-with-me"> 🟪 Team Repo </a></br>
 
+</br>
 
 ## 🔎 주요 기능
 
 <details>
-<summary>⏱ 공용 타이머</summary> </br>
+  <summary>⏱ 공용 타이머</summary> </br>
   
-- 시간 제한을 필요로 하는 작업을 할 때 사용자들이 함께 정한 시간 동안 집중할 수 있도록 공용 타이머 기능을 구현했습니다. 
-- 시간 제한을 필요로 하는 작업의 예: 스터디, 운동, 스케치, 마피아 게임 등 </br>
-  
-</br>
+  - 시간 제한을 필요로 하는 작업을 할 때 사용자들이 함께 정한 시간 동안 집중할 수 있도록 공용 타이머 기능을 구현했습니다. 
+  - 시간 제한을 필요로 하는 작업의 예: 스터디, 운동, 스케치, 마피아 게임 등 </br>
+  </br>
 
-![타이머](https://user-images.githubusercontent.com/77830226/161819311-b0cc09c7-7dcb-44ed-9f91-32509c4af994.gif)  
-  
+  ![타이머](https://user-images.githubusercontent.com/77830226/161819311-b0cc09c7-7dcb-44ed-9f91-32509c4af994.gif)  
 </details>
 
 <details>
-<summary>👥 실시간 화상 채팅</summary> </br>
+  <summary>👥 실시간 화상 채팅</summary> </br>
   
-- 마이크 on/off , 카메라 on/off 기능을 통해 화상채팅 사용자들이 자율적으로 선택해 사용할 수 있으며,
-</br>이모티콘을 눌러 간단한 감정 표현도 주고받을 수 있습니다. 
-    
-</br>
+  - 마이크 on/off , 카메라 on/off 기능을 통해 화상채팅 사용자들이 자율적으로 선택해 사용할 수 있으며, 이모티콘을 눌러 간단한 감정 표현도 주고받을 수 있습니다. 
+  </br>
 
-![채팅 이모티콘](https://user-images.githubusercontent.com/77830226/161819289-32fbe0fc-566d-4983-a0e0-feaa78456a01.gif) 
-    
+  ![채팅 이모티콘](https://user-images.githubusercontent.com/77830226/161819289-32fbe0fc-566d-4983-a0e0-feaa78456a01.gif) 
 </details>
 
 <details>
-<summary>📊 기록 그래프</summary> </br>
-
-- 사용자가 🟪 with me 에서 얼마만큼 활동했는지 시각적으로 볼 수 있도록 마이페이지를 그래프 형태로 표현했습니다.
-- 오늘과 이번 주 참여 기록에서는 카테고리별 참여 기록을, 이번 달 참여 기록에서는 하루 총 참여 시간을 확인할 수 있습니다.
-- 뱃지를 함께 볼 수 있도록 구성해 사용자가 서비스를 이용하며 성취감을 느낄 수 있도록 하고
-</br> 원하는 대표 뱃지를 설정해 다른 참여자에게 보여줄 수 있도록 구현했습니다.
-    
-</br>
+  <summary>📊 기록 그래프</summary> </br>
   
-![마이페이지 기록](https://user-images.githubusercontent.com/77830226/161819359-b1ba80bc-4765-4c58-ae5b-61408d768299.gif)
-    
+  - 사용자가 🟪 with me 에서 얼마만큼 활동했는지 시각적으로 볼 수 있도록 마이페이지를 그래프 형태로 표현했습니다.
+  - 오늘과 이번 주 참여 기록에서는 카테고리별 참여 기록을, 이번 달 참여 기록에서는 하루 총 참여 시간을 확인할 수 있습니다.
+  - 뱃지를 함께 볼 수 있도록 구성해 사용자가 서비스를 이용하며 성취감을 느낄 수 있도록 하고 원하는 대표 뱃지를 설정해 다른 참여자에게 보여줄 수 있도록 구현했습니다.
+  </br>
+  
+  ![마이페이지 기록](https://user-images.githubusercontent.com/77830226/161819359-b1ba80bc-4765-4c58-ae5b-61408d768299.gif)
 </details>
 
-</br></br>
-
-
+</br>
 
 ## 🛠 기술스택
-
-</br>
-
->### 🧑‍💻 백엔드
-</br>
 <p align='center'>
   <img src='https://img.shields.io/badge/Node-v16.13.1-339933?logo=Node.js'/>
   <img src='https://img.shields.io/badge/NPM-CB3837?logo=npm'/>
@@ -105,9 +74,7 @@
   <img src="https://img.shields.io/badge/Amazon Certificate Manager-232F3E?logo=Amazon AWS&logoColor=white" />
 </p>
 
-</br></br>
-
-
+</br>
 
 ## How to use
 ```
@@ -123,6 +90,13 @@
 ## Architecture
 ![architecture-BE](https://user-images.githubusercontent.com/48178101/161919048-e18c46fc-fb15-4362-b747-eca052ebaa2c.png)
 
+</br>
+
+## ERD
+![ERD](https://user-images.githubusercontent.com/48178101/162151638-892fe55b-e63e-4b87-be4d-370ace7dc677.png)
+
+</br>
+
 ## Contributors
 |name|position|github|
 |------|---|---|
@@ -130,5 +104,32 @@
 |장창훈|Node.js|https://github.com/Hoon333|
 |황성원|Node.js|https://github.com/Magiof|
 
+## Feature
+1. `Node.js & Express`를 이용한 웹 애플리케이션 서버
+2. 유저, 방 정보, 뱃지, 카테고리 등 테이블간의 관계를 기반으로 `MySQL` 선택, `Sequelize ORM` 사용
+3. 유저 참여 기록과 이용 로그를 `MongoDB`로 분리, `mongoose ODM` 사용
+4. `JWT`를 이용한 로그인 인증
+5. 클라리언트와 webRTC stream, 메시지, 타이머 정보 교환 등을 위해 `socket` 이용
+6. 최근 일주일, 한달간 유저의 총 참여 시간을 분 단위로 기록
+7. Travis CI - Docker - AWS Elastic Beanstalk으로 이어지는 `CI/CD 파이프라인`
+8. `AWS RDS와 Atlas`를 이용하여 데이터베이스 분리
+9. 비즈니스 로직을 Controller로 분리 & Controller에 한해 `Typescript` 적용
 
-![최종단체사진](https://user-images.githubusercontent.com/77830226/161935598-84bde947-0ebe-42e2-b262-c7db4a1a5deb.jpg)
+</br>
+
+## Trouble shooting
+#### - MySQL과 MongoDB 분리
+
+#### - Travis CI와 Docker 도입
+
+#### - 유저 로그 기록
+
+</br>
+
+## ⏰ 프로젝트 기간
+
+|||
+|:------:|---|
+|총 기간| 2월 25일 ~ 4월 8일 (6주)|
+|배포일| 4월 1일|
+|서비스 개선| 4월 1일 ~ 4월 8일|
