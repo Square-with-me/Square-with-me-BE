@@ -104,6 +104,8 @@
 |장창훈|Node.js|https://github.com/Hoon333|
 |황성원|Node.js|https://github.com/Magiof|
 
+</br>
+
 ## Feature
 1. `Node.js & Express`를 이용한 웹 애플리케이션 서버
 2. 유저, 방 정보, 뱃지, 카테고리 등 테이블간의 관계를 기반으로 `MySQL` 선택, `Sequelize ORM` 사용
