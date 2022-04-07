@@ -23,6 +23,7 @@
   </br></br>
   Deploy
   </br></br>
+  <img src="https://img.shields.io/badge/Git hub-000000?logo=Github&logoColor=white" />
   <img src="https://img.shields.io/badge/Travis CI-3EAAAF?logo=Travis CI&logoColor=white" />
   <img src="https://img.shields.io/badge/Docker-2496ED?logo=Docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Amazon Elastic Beanstalk-232F3E?logo=Amazon AWS&logoColor=white" />
