@@ -8,6 +8,29 @@
   
 </br>
 
+## 🛠 기술스택
+<p align='center'>
+  <img src='https://img.shields.io/badge/Node-v16.13.1-339933?logo=Node.js'/>
+  <img src='https://img.shields.io/badge/NPM-CB3837?logo=npm'/>
+  <img src='https://img.shields.io/badge/socket.io-v4.4.1-white?logo=Socket.io'/>
+  <img src="https://img.shields.io/badge/Express-v4.17.3-009688?logo=Express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MySQL-v8.0.23-4479a1?logo=MySQL&logoColor=white" />
+  <img src="https://img.shields.io/badge/Sequelize-v6.17.0-52b0e7?logo=Sequelize&logoColor=white" />
+  </br>
+  <img src="https://img.shields.io/badge/MongoDB-v5.0.6-47A248?logo=MongoDB&logoColor=white" />
+  <img src="https://img.shields.io/badge/Passport-v0.5.2-34E27A?logo=Passport&logoColor=white" />
+  <img src="https://img.shields.io/badge/Json Web Token-v8.5.1-8a8a8a?logo=JSON Web Tokens&logoColor=white" />
+  </br></br>
+  Deploy
+  </br></br>
+  <img src="https://img.shields.io/badge/Travis CI-3EAAAF?logo=Travis CI&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?logo=Docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Amazon Elastic Beanstalk-232F3E?logo=Amazon AWS&logoColor=white" />
+  <img src="https://img.shields.io/badge/Amazon Certificate Manager-232F3E?logo=Amazon AWS&logoColor=white" />
+</p>
+
+</br>
+
 ## 📌 바로가기
 
 - <a href="https://nemowithme.com"> 🟪 with me </a></br>
@@ -46,29 +69,6 @@
   
   ![마이페이지 기록](https://user-images.githubusercontent.com/77830226/161819359-b1ba80bc-4765-4c58-ae5b-61408d768299.gif)
 </details>
-
-</br>
-
-## 🛠 기술스택
-<p align='center'>
-  <img src='https://img.shields.io/badge/Node-v16.13.1-339933?logo=Node.js'/>
-  <img src='https://img.shields.io/badge/NPM-CB3837?logo=npm'/>
-  <img src='https://img.shields.io/badge/socket.io-v4.4.1-white?logo=Socket.io'/>
-  <img src="https://img.shields.io/badge/Express-v4.17.3-009688?logo=Express&logoColor=white" />
-  <img src="https://img.shields.io/badge/MySQL-v8.0.23-4479a1?logo=MySQL&logoColor=white" />
-  <img src="https://img.shields.io/badge/Sequelize-v6.17.0-52b0e7?logo=Sequelize&logoColor=white" />
-  </br>
-  <img src="https://img.shields.io/badge/MongoDB-v5.0.6-47A248?logo=MongoDB&logoColor=white" />
-  <img src="https://img.shields.io/badge/Passport-v0.5.2-34E27A?logo=Passport&logoColor=white" />
-  <img src="https://img.shields.io/badge/Json Web Token-v8.5.1-8a8a8a?logo=JSON Web Tokens&logoColor=white" />
-  </br></br>
-  Deploy
-  </br></br>
-  <img src="https://img.shields.io/badge/Travis CI-3EAAAF?logo=Travis CI&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?logo=Docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Amazon Elastic Beanstalk-232F3E?logo=Amazon AWS&logoColor=white" />
-  <img src="https://img.shields.io/badge/Amazon Certificate Manager-232F3E?logo=Amazon AWS&logoColor=white" />
-</p>
 
 </br>
 
@@ -133,7 +133,8 @@
 2. 한계: 기존 자바스크립트만을 사용하는 프로젝트 환경에서 타입스크립트로의 전환이 한번에 이루어지기 힘들었습니다. sequelize 공식문서에도 나와있듯(https://sequelize.org/docs/v6/other-topics/typescript/) 둘을 동시에 연계해서 사용하는 방식은 지양해야 합니다. 저희는 sequelize에서 typeORM으로, 궁극적으로 모든 파일을 자바스크립트에서 타입스크립트로 전환하는 것을 목표로 점진적으로 업데이트하고 있습니다.
 
 #### - 주간, 월간 기록 초기화
-
+1. 문제 상황: 이번 주 혹은 이번 달 참여 시간을 보여주어야 하는데 주 혹은 월이 바뀌면 기록이 초기화 되어야 한다.
+2. 
 
 </br>
 
