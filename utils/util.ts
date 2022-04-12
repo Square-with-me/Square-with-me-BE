@@ -1,4 +1,4 @@
-const { v4 } = require("uuid");
+const { sequelize } = require("../models")
 const multer = require("multer");
 const path = require("path");
 
@@ -28,7 +28,7 @@ type objType = {
 
 module.exports = {
   regex: {
-    checkEmail: (email:string) => {
+    checkEmail: (email: string) => {
       const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
       const isValid = regex.test(email);
@@ -36,7 +36,7 @@ module.exports = {
       return isValid;
     },
 
-    checkNickname: (nickname:string) => {
+    checkNickname: (nickname: string) => {
       const regex = /[!@#$%^&*()_\-+=~`{}\[\]\\|"':;<>,.\/?]/g;
 
       const isValid = !nickname.match(regex);
@@ -45,12 +45,30 @@ module.exports = {
     }
   },
 
-  asyncWrapper: (asyncFn: (arg0: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, arg1: Response<any, Record<string, any>>, arg2: NextFunction) => any) => {
+  // asyncWrapper: (asyncFn: (arg0: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, arg1: Response<any, Record<string, any>>, arg2: NextFunction) => any) => {
+  asyncWrapper: (asyncFn: (arg0: Request, arg1: Response, arg2: NextFunction) => any) => {
     return (async (req: Request, res: Response, next: NextFunction) => {
       try {
         return await asyncFn(req, res, next);
       } catch(error) {
         console.error(error);
+        return res.status(500).json({
+          isSuccess: false,
+          msg: "Internal Server Error",
+        });
+      };
+    });
+  },
+
+  asyncWrapperWithTransaction: (asyncFn: (arg_0: Request, arg_1: Response, arg_2: NextFunction, arg_3: any) => any) => {
+    return (async (req: Request, res: Response, next: NextFunction) => {
+      const t = await sequelize.transaction();
+
+      try {
+        return await asyncFn(req, res, next, t);
+      } catch(error) {
+        console.error(error);
+        await t.rollback();
         return res.status(500).json({
           isSuccess: false,
           msg: "Internal Server Error",

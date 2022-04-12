@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.methodForTs = void 0;
-var v4 = require("uuid").v4;
+var sequelize = require("../models").sequelize;
 var multer = require("multer");
 var path = require("path");
 var multerS3 = require("multer-s3");
@@ -63,6 +63,7 @@ module.exports = {
             return isValid ? true : false;
         }
     },
+    // asyncWrapper: (asyncFn: (arg0: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, arg1: Response<any, Record<string, any>>, arg2: NextFunction) => any) => {
     asyncWrapper: function (asyncFn) {
         return (function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
             var error_1;
@@ -80,6 +81,36 @@ module.exports = {
                                 msg: "Internal Server Error"
                             })];
                     case 3:
+                        ;
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    },
+    asyncWrapperWithTransaction: function (asyncFn) {
+        return (function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+            var t, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, sequelize.transaction()];
+                    case 1:
+                        t = _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 4, , 6]);
+                        return [4 /*yield*/, asyncFn(req, res, next, t)];
+                    case 3: return [2 /*return*/, _a.sent()];
+                    case 4:
+                        error_2 = _a.sent();
+                        console.error(error_2);
+                        return [4 /*yield*/, t.rollback()];
+                    case 5:
+                        _a.sent();
+                        return [2 /*return*/, res.status(500).json({
+                                isSuccess: false,
+                                msg: "Internal Server Error"
+                            })];
+                    case 6:
                         ;
                         return [2 /*return*/];
                 }
