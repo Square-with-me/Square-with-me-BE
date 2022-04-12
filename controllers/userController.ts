@@ -1,5 +1,5 @@
 // utils
-const { asyncWrapper, regex } = require("../utils/util");
+const { asyncWrapper, asyncWrapperWithTransaction, regex } = require("../utils/util");
 
 // models
 const { User, Badge } = require("../models");
@@ -14,7 +14,6 @@ export const methodForTs = (
   res: Response,
   next: NextFunction
 ) => {};
-
 
 module.exports = {
   create: {},
@@ -44,18 +43,19 @@ module.exports = {
   },
 
   update: {
-    profileImg: asyncWrapper(async (req: Request, res: Response) => {
+    profileImg: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { userId } = req.params;
       const { profileImg } = req.body;
 
       const user = await User.findOne({
         where: { id: userId },
-      });
+      }, { transaction: t });
 
       await user.update({
         profileImg,
-      });
+      }, { transaction: t });
 
+      await t.commit();
       return res.status(200).json({
         isSuccess: true,
         data: {
@@ -64,7 +64,7 @@ module.exports = {
       });
     }),
 
-    nickname: asyncWrapper(async (req: Request, res: Response) => {
+    nickname: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { userId } = req.params;
       const { nickname } = req.body;
 
@@ -84,12 +84,13 @@ module.exports = {
 
       const user = await User.findOne({
         where: { id: userId },
-      });
+      }, { transaction: t });
 
       await user.update({
         nickname,
-      });
+      }, { transaction: t });
 
+      await t.commit();
       return res.status(200).json({
         isSuccess: true,
         data: {
@@ -98,7 +99,7 @@ module.exports = {
       });
     }),
 
-    statusMsg: asyncWrapper(async (req: Request, res: Response) => {
+    statusMsg: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { userId } = req.params;
       const { statusMsg } = req.body;
 
@@ -111,12 +112,13 @@ module.exports = {
 
       const user = await User.findOne({
         where: { id: userId },
-      });
+      }, { transaction: t });
 
       await user.update({
         statusMsg,
-      });
+      }, { transaction: t });
 
+      await t.commit();
       return res.status(200).json({
         isSuccess: true,
         data: {
@@ -125,21 +127,22 @@ module.exports = {
       });
     }),
 
-    masterBadge: asyncWrapper(async (req: Request, res: Response) => {
+    masterBadge: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { id: userId } = res.locals.user;
       const { badgeId } = req.body;
 
       const user = await User.findOne({
         where: { id: userId },
-      });
+      }, { transaction: t });
 
       await user.update({
         masterBadgeId: badgeId,
-      });
+      }, { transaction: t });
+
       const badge = await Badge.findOne({
         where: { id: badgeId },
         attributes: ["id", "name", "imageUrl"]
-      });
+      }, { transaction: t });
 
       return res.status(200).json({
         isSuccess: true,

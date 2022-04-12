@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.methodForTs = void 0;
 // utils
-var _a = require("../utils/util"), asyncWrapper = _a.asyncWrapper, regex = _a.regex;
+var _a = require("../utils/util"), asyncWrapper = _a.asyncWrapper, asyncWrapperWithTransaction = _a.asyncWrapperWithTransaction, regex = _a.regex;
 // models
 var _b = require("../models"), User = _b.User, Badge = _b.Badge;
 // korean local time
@@ -82,7 +82,7 @@ module.exports = {
         }); })
     },
     update: {
-        profileImg: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        profileImg: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var userId, profileImg, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -91,13 +91,16 @@ module.exports = {
                         profileImg = req.body.profileImg;
                         return [4 /*yield*/, User.findOne({
                                 where: { id: userId }
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         user = _a.sent();
                         return [4 /*yield*/, user.update({
                                 profileImg: profileImg
-                            })];
+                            }, { transaction: t })];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, t.commit()];
+                    case 3:
                         _a.sent();
                         return [2 /*return*/, res.status(200).json({
                                 isSuccess: true,
@@ -108,7 +111,7 @@ module.exports = {
                 }
             });
         }); }),
-        nickname: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        nickname: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var userId, nickname, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -131,13 +134,16 @@ module.exports = {
                         ;
                         return [4 /*yield*/, User.findOne({
                                 where: { id: userId }
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         user = _a.sent();
                         return [4 /*yield*/, user.update({
                                 nickname: nickname
-                            })];
+                            }, { transaction: t })];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, t.commit()];
+                    case 3:
                         _a.sent();
                         return [2 /*return*/, res.status(200).json({
                                 isSuccess: true,
@@ -148,7 +154,7 @@ module.exports = {
                 }
             });
         }); }),
-        statusMsg: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        statusMsg: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var userId, statusMsg, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -164,13 +170,16 @@ module.exports = {
                         ;
                         return [4 /*yield*/, User.findOne({
                                 where: { id: userId }
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         user = _a.sent();
                         return [4 /*yield*/, user.update({
                                 statusMsg: statusMsg
-                            })];
+                            }, { transaction: t })];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, t.commit()];
+                    case 3:
                         _a.sent();
                         return [2 /*return*/, res.status(200).json({
                                 isSuccess: true,
@@ -181,7 +190,7 @@ module.exports = {
                 }
             });
         }); }),
-        masterBadge: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        masterBadge: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var userId, badgeId, user, badge;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -190,18 +199,18 @@ module.exports = {
                         badgeId = req.body.badgeId;
                         return [4 /*yield*/, User.findOne({
                                 where: { id: userId }
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         user = _a.sent();
                         return [4 /*yield*/, user.update({
                                 masterBadgeId: badgeId
-                            })];
+                            }, { transaction: t })];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, Badge.findOne({
                                 where: { id: badgeId },
                                 attributes: ["id", "name", "imageUrl"]
-                            })];
+                            }, { transaction: t })];
                     case 3:
                         badge = _a.sent();
                         return [2 /*return*/, res.status(200).json({
