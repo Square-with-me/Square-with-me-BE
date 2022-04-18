@@ -18,13 +18,13 @@ export const methodForTs = (
 module.exports = {
   create: {},
   giveBadge: {
-    bug: asyncWrapper(async (req: Request, res: Response) => {
+    bug: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { userId } = req.params;
       const bugBadgeId = 8;  // 버그 뱃지 = 8
 
       const user = await User.findOne({
         where: { id: userId },
-      });
+      }, { transaction: t });
       if(!user) {
         return res.status(400).json({
           isSuccess: false,
@@ -32,9 +32,10 @@ module.exports = {
         });
       };
 
-      await user.addMyBadges(bugBadgeId);
-      await user.update({ newBadge: bugBadgeId }); // 버그뱃지도 지급 시 뉴 뱃지로 추가
+      await user.addMyBadges(bugBadgeId, { transaction: t });
+      await user.update({ newBadge: bugBadgeId }, { transaction: t }); // 버그뱃지도 지급 시 뉴 뱃지로 추가
 
+      await t.commit();
       return res.status(201).json({
         isSuccess: true,
         msg: "버그/리뷰 뱃지 지급 성공"
@@ -177,12 +178,12 @@ module.exports = {
     }),
 
     // 보유한 뱃지 정보 가져오기
-    badges: asyncWrapper(async (req: Request, res: Response) => {
+    badges: asyncWrapperWithTransaction(async (req: Request, res: Response, next: NextFunction, t: any) => {
       const { user } = res.locals;
 
       const badges = await user.getMyBadges({
         attributes: ["id", "name", "imageUrl"],
-      });
+      }, { transaction: t });
       
       // newBadge가 있으면 숫자, 없으면 null 값임
       const newBadge =  await User.findOne({
@@ -190,7 +191,7 @@ module.exports = {
           id: user.id
         },
         attributes: ["newBadge"]
-      })
+      }, { transaction: t });
       
       // newBadge 가 있는 경우
       if (newBadge.dataValues.newBadge !== null ) {
@@ -204,13 +205,14 @@ module.exports = {
         // 값 넘겨주고 나서 해당 유저의 newBadge 칼럼 초기화
         await User.update({
           newBadge: null
-        }, 
-        {
+        }, {
           where: {
             id: user.id
-        }})
-        
+          }
+        }, { transaction: t });
+        t.commit();
       } else { // newBadge로 넘어온 것이 없는 경우
+        t.commit();
         res.status(200).json({
           isSuccess: true,
           data: badges,
@@ -220,10 +222,7 @@ module.exports = {
 
     records: asyncWrapper(async (req: Request, res: Response) => {
       const { id } = res.locals.user;
-
       // 네모와 함께한 시간 주간, 월간 기록 가져오기
-
-      // <주간 기록>
       const weekdaysRecord = await dateUtil.weekRecordInitChecking(id, dateUtil.koreanDate)
       
       if (weekdaysRecord.msg) {
@@ -233,7 +232,6 @@ module.exports = {
         });
       }
 
-      // <월간 기록>
       const monthRecord = await dateUtil.monthRecordInitChecking(id, dateUtil.koreanDate)
 
       if (monthRecord.msg) {

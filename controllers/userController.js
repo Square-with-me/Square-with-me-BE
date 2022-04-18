@@ -48,7 +48,7 @@ exports.methodForTs = methodForTs;
 module.exports = {
     create: {},
     giveBadge: {
-        bug: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        bug: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var userId, bugBadgeId, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -57,7 +57,7 @@ module.exports = {
                         bugBadgeId = 8;
                         return [4 /*yield*/, User.findOne({
                                 where: { id: userId }
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         user = _a.sent();
                         if (!user) {
@@ -67,12 +67,15 @@ module.exports = {
                                 })];
                         }
                         ;
-                        return [4 /*yield*/, user.addMyBadges(bugBadgeId)];
+                        return [4 /*yield*/, user.addMyBadges(bugBadgeId, { transaction: t })];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, user.update({ newBadge: bugBadgeId })];
+                        return [4 /*yield*/, user.update({ newBadge: bugBadgeId }, { transaction: t })];
                     case 3:
                         _a.sent(); // 버그뱃지도 지급 시 뉴 뱃지로 추가
+                        return [4 /*yield*/, t.commit()];
+                    case 4:
+                        _a.sent();
                         return [2 /*return*/, res.status(201).json({
                                 isSuccess: true,
                                 msg: "버그/리뷰 뱃지 지급 성공"
@@ -253,7 +256,7 @@ module.exports = {
             });
         }); }),
         // 보유한 뱃지 정보 가져오기
-        badges: asyncWrapper(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        badges: asyncWrapperWithTransaction(function (req, res, next, t) { return __awaiter(void 0, void 0, void 0, function () {
             var user, badges, newBadge;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -261,7 +264,7 @@ module.exports = {
                         user = res.locals.user;
                         return [4 /*yield*/, user.getMyBadges({
                                 attributes: ["id", "name", "imageUrl"]
-                            })];
+                            }, { transaction: t })];
                     case 1:
                         badges = _a.sent();
                         return [4 /*yield*/, User.findOne({
@@ -269,9 +272,7 @@ module.exports = {
                                     id: user.id
                                 },
                                 attributes: ["newBadge"]
-                            })
-                            // newBadge 가 있는 경우
-                        ];
+                            }, { transaction: t })];
                     case 2:
                         newBadge = _a.sent();
                         if (!(newBadge.dataValues.newBadge !== null)) return [3 /*break*/, 4];
@@ -287,12 +288,14 @@ module.exports = {
                                 where: {
                                     id: user.id
                                 }
-                            })];
+                            }, { transaction: t })];
                     case 3:
                         // 값 넘겨주고 나서 해당 유저의 newBadge 칼럼 초기화
                         _a.sent();
+                        t.commit();
                         return [3 /*break*/, 5];
                     case 4:
+                        t.commit();
                         res.status(200).json({
                             isSuccess: true,
                             data: badges
