@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
 
   Room.associate = (db) => {
     db.Room.belongsToMany(db.User, { through: "Participant", as: "Participants", onDelete: "CASCADE" });
-    // db.Room.hasOne(db.Viewer, { onDelete: "CASCADE" });  // ch: hasMany가 맞지 않는지? 한 방에 관전자는 여럿일 수 있음
     db.Room.belongsTo(db.Category);
     db.Room.belongsToMany(db.Tag, { through: "RoomTag", as: "Tags" });
     db.Room.hasMany(db.Like, { onDelete: "CASCADE" });
